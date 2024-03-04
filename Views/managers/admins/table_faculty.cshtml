@@ -1,0 +1,176 @@
+﻿
+
+@{
+    Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
+}
+
+<!--start content-->
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <div class="breadcrumb-title pe-3">Tables</div>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Managers" asp-action="Index"><i class="bx bx-home-alt"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">List submission</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col d-flex justify-content-end">
+            <a asp-action="FormCreateFaculty" asp-controller="Managers" type="button" class="btn btn-info px-5"><i class="bi bi-plus"></i> Create new</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="example2" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Faculty Name</th>
+                            <th>Dean Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Tiger Nixon</td>
+                            <td>System Architect</td>
+                            <td>Edinburgh</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Garrett Winters</td>
+                            <td>Accountant</td>
+                            <td>Tokyo</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ashton Cox</td>
+                            <td>Junior Technical Author</td>
+                            <td>San Francisco</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cedric Kelly</td>
+                            <td>Senior Javascript Developer</td>
+                            <td>Edinburgh</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Airi Satou</td>
+                            <td>Designer</td>
+                            <td>Tokyo</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Brielle Williamson</td>
+                            <td>Integration Specialist</td>
+                            <td>New York</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Herrod Chandler</td>
+                            <td>Sales Assistant</td>
+                            <td>San Francisco</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Rhona Davidson</td>
+                            <td>Integration Specialist</td>
+                            <td>Tokyo</td>
+                            <td>
+                                <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                    <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Views"><i class="bi bi-eye-fill"></i></a>
+                                    <a href="create-comment.html" class="text-warning" data-bs-toggle="tooltip"
+                                       data-bs-placement="bottom" title="Comment"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                       title="Delete"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Faculty Name</th>
+                            <th>Dean Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<!--end page main-->

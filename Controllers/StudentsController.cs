@@ -1,0 +1,124 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace COMP1640.Controllers
+{
+    public class StudentsController : Controller
+    {
+
+        // GET: StudentsController
+        public ActionResult Index()
+        {
+            ViewData["Title"] = "Home Page";
+            return View();
+        }
+        public IActionResult SubmissionList()
+        {
+            ViewData["Title"] = "Submission List";
+            return View();
+        }
+
+        // Action for the About Us page
+        public IActionResult AboutUs()
+        {
+            ViewData["Title"] = "About Us";
+            return View();
+        }
+
+        // Action for the Contact Us page
+        public IActionResult ContactUs()
+        {
+            ViewData["Title"] = "Contact Us";
+            return View();
+        }
+
+        // Action for the My Account page
+        public IActionResult MyAccount()
+        {
+            ViewData["Title"] = "My Account";
+            return View();
+        }
+
+        // Action for the Login/Register page
+        public IActionResult LoginRegister()
+        {
+            ViewData["Title"] = "Login Or Register";
+            return View();
+        }
+
+        public IActionResult FromCreateSubmission()
+        {
+            ViewData["Title"] = "From Submission";
+            return View("~/Views/managers/student/student_submission.cshtml");
+        }
+
+        //// GET: StudentsController/Details/5
+        //public ActionResult Details(int id)
+        //{
+        //    return View();
+        //}
+
+        //// GET: StudentsController/Create
+        //public ActionResult Create()
+        //{
+        //    return View();
+        //}
+
+        // POST: StudentsController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(IFormCollection collection)
+        {
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: StudentsController/Edit/5
+        public ActionResult Edit(int id)
+        {
+            return View();
+        }
+
+        // POST: StudentsController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, IFormCollection collection)
+        {
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: StudentsController/Delete/5
+        public ActionResult Delete(int id)
+        {
+            return View();
+        }
+
+        // POST: StudentsController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, IFormCollection collection)
+        {
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+    }
+}
