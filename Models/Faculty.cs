@@ -23,4 +23,7 @@ public partial class Faculty
     [Column("deanName")]
     [StringLength(255)]
     public string? DeanName { get; set; }
+
+    [InverseProperty("Faculty")]
+    public virtual ICollection<AspNetUser> AspNetUsers { get; set; } = new List<AspNetUser>();
 }

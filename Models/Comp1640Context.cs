@@ -40,9 +40,11 @@ public partial class Comp1640Context : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
         modelBuilder.Entity<AnnualMagazine>(entity =>
         {
-            entity.HasKey(e => e.AnnualMagazineId).HasName("PK__AnnualMa__B59FC27F3FBADA5A");
+            entity.HasKey(e => e.AnnualMagazineId).HasName("PK__AnnualMa__B59FC27FDFEF28B8");
 
             entity.Property(e => e.AnnualMagazineId).ValueGeneratedNever();
         });
@@ -60,6 +62,8 @@ public partial class Comp1640Context : DbContext
                 .IsUnique()
                 .HasFilter("([NormalizedUserName] IS NOT NULL)");
 
+            entity.HasOne(d => d.Faculty).WithMany(p => p.AspNetUsers).HasConstraintName("FK_AspNetUsers_Faculties");
+
             entity.HasMany(d => d.Roles).WithMany(p => p.Users)
                 .UsingEntity<Dictionary<string, object>>(
                     "AspNetUserRole",
@@ -75,31 +79,31 @@ public partial class Comp1640Context : DbContext
 
         modelBuilder.Entity<Contribution>(entity =>
         {
-            entity.HasKey(e => e.ContributionId).HasName("PK__Contribu__52B05C813DC3ECD4");
+            entity.HasKey(e => e.ContributionId).HasName("PK__Contribu__52B05C81F4193E07");
 
             entity.Property(e => e.ContributionId).ValueGeneratedNever();
 
             entity.HasOne(d => d.AnnualMagazine).WithMany(p => p.Contributions)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Contribut__annua__4F7CD00D");
+                .HasConstraintName("FK__Contribut__annua__6477ECF3");
         });
 
         modelBuilder.Entity<Faculty>(entity =>
         {
-            entity.HasKey(e => e.FacultyId).HasName("PK__Facultie__DBBF6FD164BB68D2");
+            entity.HasKey(e => e.FacultyId).HasName("PK__Facultie__DBBF6FD1EBCB2501");
 
             entity.Property(e => e.FacultyId).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<FileDetail>(entity =>
         {
-            entity.HasKey(e => e.FileId).HasName("PK__FileDeta__C2C6FFDC917CB1B3");
+            entity.HasKey(e => e.FileId).HasName("PK__FileDeta__C2C6FFDCEA78D4DE");
 
             entity.Property(e => e.FileId).ValueGeneratedNever();
 
             entity.HasOne(d => d.Contribution).WithMany(p => p.FileDetails)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__FileDetai__contr__5070F446");
+                .HasConstraintName("FK__FileDetai__contr__656C112C");
         });
 
         OnModelCreatingPartial(modelBuilder);

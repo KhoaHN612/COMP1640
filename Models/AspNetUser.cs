@@ -44,6 +44,16 @@ public partial class AspNetUser
 
     public int AccessFailedCount { get; set; }
 
+    public DateOnly DayOfBirth { get; set; }
+
+    [StringLength(200)]
+    public string Address { get; set; } = null!;
+
+    [StringLength(100)]
+    public string ProfileImagePath { get; set; } = null!;
+
+    public int? FacultyId { get; set; }
+
     [InverseProperty("User")]
     public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; } = new List<AspNetUserClaim>();
 
@@ -52,6 +62,10 @@ public partial class AspNetUser
 
     [InverseProperty("User")]
     public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; set; } = new List<AspNetUserToken>();
+
+    [ForeignKey("FacultyId")]
+    [InverseProperty("AspNetUsers")]
+    public virtual Faculty? Faculty { get; set; }
 
     [ForeignKey("UserId")]
     [InverseProperty("Users")]
