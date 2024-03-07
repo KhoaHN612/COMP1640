@@ -10,32 +10,39 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using COMP1640.Areas.Identity.Data;
+using COMP1640.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace COMP1640.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<COMP1640User> _signInManager;
+        private readonly UserManager<COMP1640User> _userManager;
+        private readonly IUserStore<COMP1640User> _userStore;
+        private readonly IUserEmailStore<COMP1640User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
+        private readonly Comp1640Context _context;
+
         public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<COMP1640User> userManager,
+            IUserStore<COMP1640User> userStore,
+            SignInManager<COMP1640User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            Comp1640Context context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +50,7 @@ namespace COMP1640.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -79,6 +87,25 @@ namespace COMP1640.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
+
+            //Custom user data HERE
+            [Required]
+            [Display(Name = "Day of birth")]
+            public DateOnly DayOfBirth { get; set; }
+
+            [StringLength(200)]
+            [Display(Name = "Address")]
+            public string Address { get; set; } = null!;
+
+            [StringLength(100)]
+            [Display(Name = "Image")]
+            public string ProfileImagePath { get; set; } = null!;
+
+            [Display(Name = "Faculty")]
+            public int? FacultyId { get; set; }
+
+            //End custom
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -102,6 +129,15 @@ namespace COMP1640.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            var faculties = await _context.Faculties.ToListAsync();
+            if (faculties != null && faculties.Any())
+            {
+                ViewData["FacultyId"] = new SelectList(faculties, "FacultyId", "Name");
+            }
+            else
+            {
+                ViewData["FacultyId"] = new SelectList(new List<Faculty>(), "FacultyId", "Name");
+            }
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -114,13 +150,18 @@ namespace COMP1640.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+                user.DayOfBirth = Input.DayOfBirth;
+                user.Address = Input.Address;
+                user.ProfileImagePath = "";
+                user.FacultyId = Input.FacultyId;
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("User created a new account with password." + Input.Password);
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -154,27 +195,27 @@ namespace COMP1640.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private COMP1640User CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<COMP1640User>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(COMP1640User)}'. " +
+                    $"Ensure that '{nameof(COMP1640User)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<COMP1640User> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<COMP1640User>)_userStore;
         }
     }
 }

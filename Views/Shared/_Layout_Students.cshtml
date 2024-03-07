@@ -57,7 +57,8 @@
                                     <a asp-controller="Students" asp-action="MyAccount">My Account</a>
                                 </li>
                                 <li>
-                                    <a asp-controller="Students" asp-action="LoginRegister" class="login">Login</a>
+                                    @* <a asp-controller="Students" asp-action="LoginRegister" class="login">Login</a> *@
+                                    <a asp-area="Identity" asp-page="/Account/Login" class="login">Login</a>
                                 </li>
                                 <li>
                                     <a asp-controller="Managers" asp-action="Index">Admin</a>
