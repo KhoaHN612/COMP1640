@@ -1,11 +1,18 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using COMP1640.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace COMP1640.Controllers
 {
     public class ManagersController : Controller
     {
+        private readonly Comp1640Context _context;
+
+        public ManagersController(Comp1640Context context)
+        {
+            _context = context;
+        }
         //================================ ADMIN ================================//
         public IActionResult Index()
         {
@@ -50,8 +57,9 @@ namespace COMP1640.Controllers
         }
         public IActionResult StudentSubmissionCoordinators()
         {
+            List<Contribution> contributions = _context.Contributions.Include(c => c.AnnualMagazine).ToList();
             ViewData["Title"] = "List Student Submission";
-            return View("coordinators/student_submission");
+            return View("coordinators/student_submission", contributions);
         }
         public IActionResult CoordinatorComment()
         {
@@ -66,9 +74,18 @@ namespace COMP1640.Controllers
         }
         public IActionResult StudentSubmissionManagers()
         {
+                List<Contribution> contributions = _context.Contributions
+                                                .Include(c => c.AnnualMagazine)
+                                                .Where(c => c.Status == "Approved")
+                                                .ToList();
             ViewData["Title"] = "List Student Submission";
-            return View("head_managers/student_submission");
+            return View("head_managers/student_submission", contributions);
         }
-
+        //================================ PROFILES ================================//
+        public IActionResult ShowProfile()
+        {
+            ViewData["Title"] = "Profiles";
+            return View("profile_managers");
+        }
     }
 }

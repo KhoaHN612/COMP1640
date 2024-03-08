@@ -53,13 +53,13 @@
                             @* UploadFile *@
                             <div class="col-md-6">
                                 <label class="form-label" for="inputGroupFile01">Upload</label>
-                                <input type="file" name='ContributionFile' class="form-control-file"
+                                <input type="file" name='ContributionFile' class="form-control"
                                     id="inputGroupFile01">
                             </div>
                             @* SubmissionDate *@
                             <div class="col-md-6">
                                 <label class="form-label">Submission Date:</label>
-                                <input asp-fo r="SubmissionDate" type="date" class="form-control" id="submissionDate">
+                                <input asp-for="SubmissionDate" type="date" class="form-control" id="submissionDate">
                             </div>
                             <script>
                                 var currentDate = new Date().toISOString().slice(0, 10);
