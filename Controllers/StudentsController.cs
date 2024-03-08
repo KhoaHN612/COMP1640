@@ -86,19 +86,41 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
+
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
+            if (fileExtension == ".docx")
             {
-                await fileDetail.ContributionFile.CopyToAsync(fileStream);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
+                }
+                fileDetail.FilePath = uniqueFileName;
+                fileDetail.Type = "Document";
             }
-            fileDetail.FilePath = uniqueFileName;
-            int maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
+            else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".webp")
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
+                }
+                fileDetail.FilePath = uniqueFileName;
+                fileDetail.Type = "Image";
+            }else{
+                return View("Error");
+            }
+            int maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
+            fileDetail.FileId = maxId + 1;
+
+            maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.ContributionId = maxId + 1;
             contribution.AnnualMagazineId = 1;
             contribution.Comment = null;
             contribution.Status = "Pending";
+            fileDetail.ContributionId = contribution.ContributionId;
             _context.Add(contribution);
+            _context.Add(fileDetail);
             var result = await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
