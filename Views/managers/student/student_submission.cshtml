@@ -1,4 +1,4 @@
-﻿@model COMP1640.Models.Contribution
+﻿@model COMP1640.Models.Contribution;
 @{
     Layout = "~/Views/Shared/_Layout_Students_Submission.cshtml";
 }
@@ -26,42 +26,81 @@
             <div class="card">
                 <div class="card-body">
                     <div class="p-4 border rounded">
-                        <form asp-action='Create' enctype='multipart/form-data'class="row g-3">
+                        <form asp-action='Create' enctype='multipart/form-data' class="row g-3">
                             @* StudentId *@
                             <div class="col-md-4">
                                 <label for="validationDefault01" class="form-label">Student ID</label>
-                                <input asp-for="UserId" type="text" class="form-control" id="validationDefault01" value="">
+                                <input asp-for="UserId" type="text" class="form-control" id="validationDefault01"
+                                    value="">
                             </div>
-                            
+                            @* Title choosing here *@
                             <div class="col-md-4">
-                                <label for="validationDefault02" class="form-label">Student name</label>
-                                <input type="text" class="form-control" id="validationDefault02" value="">
+                                <label asp-for='Title' for="annualMagazineId" class="form-label">Title</label>
+                                <input asp-for='Title' type="text" class="form-control" id="validationDefault02"
+                                    value="">
                             </div>
-                            @* ContributionTitle *@
+                            @* Academic Year here *@
                             <div class="col-md-4">
-                                <label asp-for='Title' class="form-label">Title</label>
-                                <input asp-for='Title' type="text" class="form-control" id="validationDefaultUsername" aria-describedby="inputGroupPrepend2">
+                                <label asp-for='AnnualMagazineId' class="form-label">Title</label>
+                                <select asp-for="AnnualMagazineId" class="form-control" id="annualMagazineId">
+                                    <option value="">-- Select Annual Magazine Year --</option>
+                                    @foreach (var item in ViewBag.annualMagazines)
+                                    {
+                                        <option value="@item.AnnualMagazineId">@item.AcademicYear</option>
+                                    }
+                                </select>
                             </div>
                             @* UploadFile *@
                             <div class="col-md-6">
                                 <label class="form-label" for="inputGroupFile01">Upload</label>
-                                <input type="file" name='ContributionFile'class="form-control-file" id="inputGroupFile01">
+                                <input type="file" name='ContributionFile' class="form-control-file"
+                                    id="inputGroupFile01">
                             </div>
                             @* SubmissionDate *@
                             <div class="col-md-6">
                                 <label class="form-label">Submission Date:</label>
-                                <input asp-for="SubmissionDate" type="date" class="form-control">
+                                <input asp-fo r="SubmissionDate" type="date" class="form-control" id="submissionDate">
                             </div>
+                            <script>
+                                var currentDate = new Date().toISOString().slice(0, 10);
+                                document.getElementById('submissionDate').value = currentDate;
+                            </script>
                             @* AgreeToTermsAndConditions *@
+                            @* <div class="col-12">
+                            <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
+                            required>
+                            <label class="form-check-label" for="invalidCheck2">Agree to terms and
+                            conditions</label>
+                            </div>
+                            </div>
+                            <div class="col-12">
+                            <button class="btn btn-primary" type="submit">Submit form</button>
+                            </div> *@
                             <div class="col-12">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck2" required>
-                                    <label class="form-check-label" for="invalidCheck2">Agree to terms and conditions</label>
+                                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
+                                        onchange="validateCheckbox()" required>
+                                    <label class="form-check-label" for="invalidCheck2">Agree to terms and
+                                        conditions</label>
                                 </div>
                             </div>
                             <div class="col-12">
-                                <button class="btn btn-primary" type="submit">Submit form</button>
+                                <button id="submitBtn" class="btn btn-primary" type="submit" disabled>Submit
+                                    form</button>
                             </div>
+                            <script>
+                                function validateCheckbox() {
+                                    var checkbox = document.getElementById('invalidCheck2');
+                                    var submitBtn = document.getElementById('submitBtn');
+
+                                    if (checkbox.checked) {
+                                        submitBtn.disabled = false;
+                                    } else {
+                                        submitBtn.disabled = true;
+                                    }
+                                }
+                            </script>
                         </form>
                     </div>
                 </div>
@@ -70,4 +109,3 @@
     </div>
     <!--end row-->
 </main>
-

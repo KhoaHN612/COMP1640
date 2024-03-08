@@ -1,4 +1,5 @@
-﻿using COMP1640.Models;
+﻿using System.Security.Claims;
+using COMP1640.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace COMP1640.Controllers
         private readonly Comp1640Context _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<StudentsController> _logger;
-        public StudentsController(Comp1640Context context, 
+        public StudentsController(Comp1640Context context,
             IWebHostEnvironment webHostEnvironment,
             ILogger<StudentsController> logger)
         {
@@ -63,6 +64,8 @@ namespace COMP1640.Controllers
         public IActionResult FromCreateSubmission()
         {
             ViewData["Title"] = "From Submission";
+            var annualMagazines = _context.AnnualMagazines.ToList();
+            ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
@@ -83,7 +86,8 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution)
         {
-            contribution.ContributionId = 1;
+            int maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
+            contribution.ContributionId = maxId + 1;
             contribution.AnnualMagazineId = 1;
             contribution.Comment = null;
             contribution.Status = "Pending";
