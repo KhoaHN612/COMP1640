@@ -90,6 +90,9 @@ namespace COMP1640.Areas.Identity.Pages.Account
 
             //Custom user data HERE
             [Required]
+            public string FullName { get; set; } = null!;
+
+            [Required]
             [Display(Name = "Day of birth")]
             public DateOnly DayOfBirth { get; set; }
 
@@ -150,6 +153,7 @@ namespace COMP1640.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+                user.FullName = Input.FullName;
                 user.DayOfBirth = Input.DayOfBirth;
                 user.Address = Input.Address;
                 user.ProfileImagePath = "";
