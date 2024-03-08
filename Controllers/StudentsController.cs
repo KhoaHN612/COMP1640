@@ -1,10 +1,20 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using COMP1640.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace COMP1640.Controllers
 {
     public class StudentsController : Controller
     {
+        private int contributionId;
+        private readonly Comp1640Context _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public StudentsController(Comp1640Context context, IWebHostEnvironment webHostEnvironment)
+        {
+            _context = context;
+            _webHostEnvironment = webHostEnvironment;
+        }
 
         // GET: StudentsController
         public ActionResult Index()
@@ -67,16 +77,15 @@ namespace COMP1640.Controllers
         // POST: StudentsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            contribution.ContributionId = 1;
+            contribution.AnnualMagazineId = 1;
+            contribution.Comment = null;
+            contribution.Status = "Pending";
+            _context.Add(contribution);
+            _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: StudentsController/Edit/5
@@ -119,6 +128,15 @@ namespace COMP1640.Controllers
             {
                 return View();
             }
+        }
+
+        private string GetUniqueFileName(string fileName)
+        {
+            fileName = Path.GetFileName(fileName);
+            return Path.GetFileNameWithoutExtension(fileName)
+                   + "_"
+                   + Guid.NewGuid().ToString().Substring(0, 4)
+                   + Path.GetExtension(fileName);
         }
     }
 }
