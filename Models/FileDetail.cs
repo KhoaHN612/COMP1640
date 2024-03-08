@@ -26,4 +26,7 @@ public partial class FileDetail
     [ForeignKey("ContributionId")]
     [InverseProperty("FileDetails")]
     public virtual Contribution Contribution { get; set; } = null!;
+
+    [NotMapped]
+    public IFormFile ContributionFile { get; set; }
 }

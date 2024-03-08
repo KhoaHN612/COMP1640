@@ -84,8 +84,15 @@ namespace COMP1640.Controllers
         // POST: StudentsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution)
+        public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
+            string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
+            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await fileDetail.ContributionFile.CopyToAsync(fileStream);
+            }
+            fileDetail.FilePath = uniqueFileName;
             int maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.ContributionId = maxId + 1;
             contribution.AnnualMagazineId = 1;
