@@ -86,44 +86,69 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
+            // Kiểm tra xác thực
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            // Kiểm tra file không hợp lệ
+            string fileExtension = Path.GetExtension(fileDetail.ContributionFile.FileName).ToLowerInvariant();
+            if (fileExtension != ".docx" &&
+                fileExtension != ".jpg" &&
+                fileExtension != ".jpeg" &&
+                fileExtension != ".png" &&
+                fileExtension != ".webp")
+            {
+                return BadRequest("Invalid file format");
+            }
+
+            // Tạo đường dẫn và ghi file
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
-            string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await fileDetail.ContributionFile.CopyToAsync(fileStream);
+            }
+
+            // Gán thông tin file và loại file
+            fileDetail.FilePath = uniqueFileName;
             if (fileExtension == ".docx")
             {
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
-                }
-                fileDetail.FilePath = uniqueFileName;
                 fileDetail.Type = "Document";
             }
-            else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".webp")
+            else
             {
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
-                }
-                fileDetail.FilePath = uniqueFileName;
                 fileDetail.Type = "Image";
-            }else{
-                return View("Error");
             }
-            int maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
-            fileDetail.FileId = maxId + 1;
 
-            maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-            contribution.ContributionId = maxId + 1;
-            contribution.AnnualMagazineId = 1;
-            contribution.Comment = null;
-            contribution.Status = "Pending";
+            // Tạo ID mới cho contribution và fileDetail
+            int maxContributionId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
+            contribution.ContributionId = maxContributionId + 1;
             fileDetail.ContributionId = contribution.ContributionId;
-            _context.Add(contribution);
-            _context.Add(fileDetail);
-            var result = await _context.SaveChangesAsync();
+            int maxFileId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
+            fileDetail.FileId = maxFileId + 1;
+
+            // Thêm contribution và fileDetail vào cơ sở dữ liệu trong một giao dịch
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.Add(contribution);
+                    _context.Add(fileDetail);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         // GET: StudentsController/Edit/5
         public ActionResult Edit(int id)
