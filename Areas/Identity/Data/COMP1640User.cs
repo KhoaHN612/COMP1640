@@ -7,6 +7,7 @@ namespace COMP1640.Areas.Identity.Data;
 
 public class COMP1640User : IdentityUser
 {
+    public string FullName { get; set; } = null!;
     public DateOnly DayOfBirth { get; set; }
 
     [StringLength(200)]
