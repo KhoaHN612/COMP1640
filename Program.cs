@@ -6,13 +6,14 @@ using COMP1640.Areas.Identity.Data;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MyConnect");
 
-builder.Services.AddDbContext<Comp1640Context>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnect") 
-    ?? throw new InvalidOperationException("Connection string 'comp1640context' not found.") ));
+builder.Services.AddDbContext<Comp1640Context>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnect")
+    ?? throw new InvalidOperationException("Connection string 'comp1640context' not found.")));
 
-builder.Services.AddDefaultIdentity<COMP1640User>(options => 
+builder.Services.AddDefaultIdentity<COMP1640User>(options =>
     options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<Comp1640Context>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

@@ -8,7 +8,6 @@ namespace COMP1640.Controllers
 {
     public class StudentsController : Controller
     {
-        private int contributionId;
         private readonly Comp1640Context _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<StudentsController> _logger;
@@ -51,6 +50,8 @@ namespace COMP1640.Controllers
         public IActionResult MyAccount()
         {
             ViewData["Title"] = "My Account";
+            var contributions = _context.Contributions.ToList();
+            ViewBag.contributions = contributions;
             return View();
         }
 
@@ -86,13 +87,13 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
-            // Kiểm tra xác thực
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // Kiểm tra file không hợp lệ
+
             string fileExtension = Path.GetExtension(fileDetail.ContributionFile.FileName).ToLowerInvariant();
             if (fileExtension != ".docx" &&
                 fileExtension != ".jpg" &&
@@ -103,7 +104,7 @@ namespace COMP1640.Controllers
                 return BadRequest("Invalid file format");
             }
 
-            // Tạo đường dẫn và ghi file
+
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -111,7 +112,7 @@ namespace COMP1640.Controllers
                 await fileDetail.ContributionFile.CopyToAsync(fileStream);
             }
 
-            // Gán thông tin file và loại file
+
             fileDetail.FilePath = uniqueFileName;
             if (fileExtension == ".docx")
             {
@@ -122,14 +123,14 @@ namespace COMP1640.Controllers
                 fileDetail.Type = "Image";
             }
 
-            // Tạo ID mới cho contribution và fileDetail
+
             int maxContributionId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.ContributionId = maxContributionId + 1;
             fileDetail.ContributionId = contribution.ContributionId;
             int maxFileId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
             fileDetail.FileId = maxFileId + 1;
 
-            // Thêm contribution và fileDetail vào cơ sở dữ liệu trong một giao dịch
+
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try

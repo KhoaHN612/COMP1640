@@ -27,22 +27,19 @@
                 <div class="card-body">
                     <div class="p-4 border rounded">
                         <form asp-action='Create' enctype='multipart/form-data' class="row g-3">
-                            @* StudentId *@
                             <div class="col-md-4">
                                 <label for="validationDefault01" class="form-label">Student ID</label>
                                 <input asp-for="UserId" type="text" class="form-control" id="validationDefault01"
-                                    value="">
+                                    value="" required>
                             </div>
-                            @* Title choosing here *@
                             <div class="col-md-4">
                                 <label asp-for='Title' for="annualMagazineId" class="form-label">Title</label>
                                 <input asp-for='Title' type="text" class="form-control" id="validationDefault02"
-                                    value="">
+                                    value="" required>
                             </div>
-                            @* Academic Year here *@
                             <div class="col-md-4">
                                 <label asp-for='AnnualMagazineId' class="form-label">Title</label>
-                                <select asp-for="AnnualMagazineId" class="form-control" id="annualMagazineId">
+                                <select asp-for="AnnualMagazineId" class="form-control" id="annualMagazineId" required>
                                     <option value="">-- Select Annual Magazine Year --</option>
                                     @foreach (var item in ViewBag.annualMagazines)
                                     {
@@ -50,22 +47,16 @@
                                     }
                                 </select>
                             </div>
-                            @* UploadFile *@
                             <div class="col-md-6">
                                 <label class="form-label" for="inputGroupFile01">Upload</label>
-                                <input type="file" name='ContributionFile' class="form-control"
-                                    id="inputGroupFile01">
+                                <input type="file" name='ContributionFile' class="form-control" id="inputGroupFile01"
+                                    required>
                             </div>
-                            @* SubmissionDate *@
                             <div class="col-md-6">
                                 <label class="form-label">Submission Date:</label>
-                                <input asp-for="SubmissionDate" type="date" class="form-control" id="submissionDate">
+                                <input asp-for="SubmissionDate" type="date" class="form-control" id="submissionDate"
+                                    required>
                             </div>
-                            <script>
-                                var currentDate = new Date().toISOString().slice(0, 10);
-                                document.getElementById('submissionDate').value = currentDate;
-                            </script>
-                            @* AgreeToTermsAndConditions *@
                             <div class="col-12">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
@@ -78,19 +69,8 @@
                                 <button id="submitBtn" class="btn btn-primary" type="submit" disabled>Submit
                                     form</button>
                             </div>
-                            <script>
-                                function validateCheckbox() {
-                                    var checkbox = document.getElementById('invalidCheck2');
-                                    var submitBtn = document.getElementById('submitBtn');
-
-                                    if (checkbox.checked) {
-                                        submitBtn.disabled = false;
-                                    } else {
-                                        submitBtn.disabled = true;
-                                    }
-                                }
-                            </script>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -98,3 +78,17 @@
     </div>
     <!--end row-->
 </main>
+<script>
+    function validateCheckbox() {
+        var checkbox = document.getElementById('invalidCheck2');
+        var submitBtn = document.getElementById('submitBtn');
+
+        if (checkbox.checked) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+    var currentDate = new Date().toISOString().slice(0, 10);
+    document.getElementById('submissionDate').value = currentDate;
+</script>
