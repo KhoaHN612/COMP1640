@@ -10,8 +10,12 @@ namespace COMP1640.Controllers
         private int contributionId;
         private readonly Comp1640Context _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public StudentsController(Comp1640Context context, IWebHostEnvironment webHostEnvironment)
+        private readonly ILogger<StudentsController> _logger;
+        public StudentsController(Comp1640Context context, 
+            IWebHostEnvironment webHostEnvironment,
+            ILogger<StudentsController> logger)
         {
+            _logger = logger;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
@@ -77,14 +81,14 @@ namespace COMP1640.Controllers
         // POST: StudentsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution)
+        public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution)
         {
             contribution.ContributionId = 1;
             contribution.AnnualMagazineId = 1;
             contribution.Comment = null;
             contribution.Status = "Pending";
             _context.Add(contribution);
-            _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
