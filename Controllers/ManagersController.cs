@@ -85,6 +85,7 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "List Student Submission";
             return View("head_managers/student_submission", contributions);
         }
+        // DOWNLOAD EACH FILES
         [HttpGet]
         public async Task<IActionResult> DownloadContributionFiles(int id)
         {
@@ -121,7 +122,49 @@ namespace COMP1640.Controllers
             var zipFileName = $"ContributionFiles_{id}.zip";
             return File(memoryStream.ToArray(), "application/zip", zipFileName);
         }
+        //DOWNLOAD ALL FILES
 
+        [HttpGet]
+        public async Task<IActionResult> DownloadAllApproved()
+        {
+            var contributions = await _context.Contributions
+                .Where(c => c.Status == "Approved")
+                .Include(c => c.FileDetails)
+                .ToListAsync();
+
+            var memoryStream = new MemoryStream();
+            try
+            {
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, leaveOpen: true))
+                {
+                    foreach (var contribution in contributions)
+                    {
+                        foreach (var fileDetail in contribution.FileDetails)
+                        {
+                            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", fileDetail.FilePath);
+
+                            if (System.IO.File.Exists(filePath))
+                            {
+                                var entry = archive.CreateEntry(Path.GetFileName(filePath));
+
+                                using (var entryStream = entry.Open())
+                                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                                {
+                                    await fileStream.CopyToAsync(entryStream);
+                                }
+                            }
+                        }
+                    }
+                }
+                memoryStream.Position = 0;
+                return File(memoryStream, "application/zip", "ApprovedFiles.zip");
+            }
+            catch
+            {
+                memoryStream.Close();
+                throw;
+            }
+        }
         //================================ PROFILES ================================//
         public IActionResult ShowProfile()
         {

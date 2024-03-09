@@ -21,9 +21,8 @@
     <hr />
     <div class="row">
         <div class="col d-flex justify-content-end">
-            <button type="button" class="btn btn-info px-5">
-                <i class="bi bi-cloud-arrow-down-fill"></i> Downloads
-                All
+            <button type="button" class="btn btn-info px-5" onclick="location.href='@Url.Action("DownloadAllApproved", "Managers")'">
+                <i class="bi bi-cloud-arrow-down-fill"></i> Download All
             </button>
         </div>
     </div>
@@ -52,8 +51,8 @@
                                 <td>@contribution.SubmissionDate.ToString("dd/MM/yyyy")</td>
                                 <td>
                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                            title="Views"><i class="bi bi-eye-fill"></i></a>
+                                        @* <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                            title="Views"><i class="bi bi-eye-fill"></i></a> *@
                                         <a href="@Url.Action("DownloadContributionFiles", "Managers", new { id = contribution.ContributionId })" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download">
                                             <i class="lni lni-download"></i>
                                         </a>
