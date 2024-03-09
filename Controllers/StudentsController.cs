@@ -70,86 +70,50 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
-        //// GET: StudentsController/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return View();
-        //}
-
-        //// GET: StudentsController/Create
-        //public ActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        // POST: StudentsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-
-            string fileExtension = Path.GetExtension(fileDetail.ContributionFile.FileName).ToLowerInvariant();
-            if (fileExtension != ".docx" &&
-                fileExtension != ".jpg" &&
-                fileExtension != ".jpeg" &&
-                fileExtension != ".png" &&
-                fileExtension != ".webp")
-            {
-                return BadRequest("Invalid file format");
-            }
-
-
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await fileDetail.ContributionFile.CopyToAsync(fileStream);
-            }
-
-
-            fileDetail.FilePath = uniqueFileName;
+            string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
             if (fileExtension == ".docx")
             {
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
+                }
+                fileDetail.FilePath = uniqueFileName;
                 fileDetail.Type = "Document";
+            }
+            else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".webp")
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
+                }
+                fileDetail.FilePath = uniqueFileName;
+                fileDetail.Type = "Image";
             }
             else
             {
-                fileDetail.Type = "Image";
+                return View("Error");
             }
+            int maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
+            fileDetail.FileId = maxId + 1;
 
-
-            int maxContributionId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-            contribution.ContributionId = maxContributionId + 1;
+            maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
+            contribution.ContributionId = maxId + 1;
+            contribution.AnnualMagazineId = 1;
+            contribution.Comment = null;
+            contribution.Status = "Pending";
             fileDetail.ContributionId = contribution.ContributionId;
-            int maxFileId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
-            fileDetail.FileId = maxFileId + 1;
-
-
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    _context.Add(contribution);
-                    _context.Add(fileDetail);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
-
+            _context.Add(contribution);
+            _context.Add(fileDetail);
+            var result = await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
 
         // GET: StudentsController/Edit/5
         public ActionResult Edit(int id)
