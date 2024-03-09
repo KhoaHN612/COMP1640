@@ -1,17 +1,21 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using COMP1640.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading.Tasks;
+using COMP1640.Models;
 
 namespace COMP1640.Controllers
 {
     public class ManagersController : Controller
     {
         private readonly Comp1640Context _context;
-
-        public ManagersController(Comp1640Context context)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ManagersController(Comp1640Context context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
         //================================ ADMIN ================================//
         public IActionResult Index()
@@ -81,6 +85,43 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "List Student Submission";
             return View("head_managers/student_submission", contributions);
         }
+        [HttpGet]
+        public async Task<IActionResult> DownloadContributionFiles(int id)
+        {
+            var fileDetails = await _context.FileDetails
+                .Where(fd => fd.ContributionId == id)
+                .ToListAsync();
+
+            if (!fileDetails.Any())
+            {
+                return NotFound("No files found for this contribution.");
+            }
+
+            using var memoryStream = new MemoryStream();
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var fileDetail in fileDetails)
+                {
+                    var completeFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", fileDetail.FilePath);
+                    if (!System.IO.File.Exists(completeFilePath))
+                    {
+                        continue; // Ideally, add some error logging here
+                    }
+
+                    var entry = archive.CreateEntry(Path.GetFileName(completeFilePath));
+                    using var entryStream = entry.Open();
+                    using var fileStream = System.IO.File.OpenRead(completeFilePath);
+                    await fileStream.CopyToAsync(entryStream);
+                    entryStream.Flush(); // Make sure to flush the stream
+                }
+            }
+
+            memoryStream.Position = 0; // Reset the memory stream position
+
+            var zipFileName = $"ContributionFiles_{id}.zip";
+            return File(memoryStream.ToArray(), "application/zip", zipFileName);
+        }
+
         //================================ PROFILES ================================//
         public IActionResult ShowProfile()
         {

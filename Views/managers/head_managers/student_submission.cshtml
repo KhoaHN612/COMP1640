@@ -54,8 +54,9 @@
                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
                                         <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
                                             title="Views"><i class="bi bi-eye-fill"></i></a>
-                                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                            title="Download"><i class="lni lni-download"></i></a>
+                                        <a href="@Url.Action("DownloadContributionFiles", "Managers", new { id = contribution.ContributionId })" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download">
+                                            <i class="lni lni-download"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
