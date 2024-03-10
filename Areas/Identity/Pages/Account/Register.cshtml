@@ -12,7 +12,7 @@
     }
 </style>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-10">
         @* <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
         <h2>Create a new account.</h2>
         <hr />
@@ -96,10 +96,10 @@
                                     <input type="text" class="form-control" asp-for="Input.Address"
                                         placeholder="Enter address">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group input-group">
                                     <label asp-for="Input.FacultyId" class="control-label"></label>
-                                    <select asp-for="Input.FacultyId" class="form-control"
-                                        asp-items="@ViewData["FacultyId"] as SelectList">
+                                    <select asp-for="Input.FacultyId" 
+                                        asp-items="@ViewData["FacultyId"] as SelectList" name="study-level">
                                         <option disabled selected> -- Select a faculty -- </option>
                                     </select>
                                 </div>
