@@ -108,12 +108,16 @@
                                     <tbody>
                                         @foreach (var item in ViewBag.contributions)
                                         {
-                                            <tr class="status-not-started">
-                                                <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
-                                                </th>
-                                                <th>@item.SubmissionDate</th>
-                                                <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
-                                            </tr>
+                                            if (item.UserId == ViewBag.users)
+                                            {
+                                                <tr class="status-not-started">
+                                                    <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
+                                                    </th>
+                                                    <th>@item.SubmissionDate</th>
+                                                    <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
+                                                </tr>
+                                            }
+
                                         }
                                     </tbody>
                                 </table>

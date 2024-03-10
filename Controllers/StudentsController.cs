@@ -11,13 +11,17 @@ namespace COMP1640.Controllers
         private readonly Comp1640Context _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<StudentsController> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public StudentsController(Comp1640Context context,
             IWebHostEnvironment webHostEnvironment,
-            ILogger<StudentsController> logger)
+            ILogger<StudentsController> logger,
+            IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: StudentsController
@@ -52,6 +56,8 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "My Account";
             var contributions = _context.Contributions.ToList();
             ViewBag.contributions = contributions;
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            ViewBag.users = userId;
             return View();
         }
 
@@ -72,7 +78,7 @@ namespace COMP1640.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("UserId, Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
+        public async Task<ActionResult> Create([Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
 
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
@@ -106,8 +112,11 @@ namespace COMP1640.Controllers
             maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.ContributionId = maxId + 1;
             contribution.AnnualMagazineId = 1;
+
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             contribution.Comment = null;
             contribution.Status = "Pending";
+            contribution.UserId = userId;
             fileDetail.ContributionId = contribution.ContributionId;
             _context.Add(contribution);
             _context.Add(fileDetail);
