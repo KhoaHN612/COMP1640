@@ -57,7 +57,8 @@ namespace COMP1640.Controllers
             var contributions = _context.Contributions.ToList();
             ViewBag.contributions = contributions;
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return View(userId);
+            ViewBag.users = userId;
+            return View();
         }
 
         // Action for the Login/Register page
