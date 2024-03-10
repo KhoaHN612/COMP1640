@@ -93,6 +93,10 @@ namespace COMP1640.Areas.Identity.Pages.Account
             public string FullName { get; set; } = null!;
 
             [Required]
+            [Display(Name = "Phone Number")]
+            public string PhoneNumber { get; set; }
+
+            [Required]
             [Display(Name = "Day of birth")]
             public DateOnly DayOfBirth { get; set; }
 
@@ -154,6 +158,7 @@ namespace COMP1640.Areas.Identity.Pages.Account
                 var user = CreateUser();
 
                 user.FullName = Input.FullName;
+                user.PhoneNumber = Input.PhoneNumber;
                 user.DayOfBirth = Input.DayOfBirth;
                 user.Address = Input.Address;
                 user.ProfileImagePath = "";
