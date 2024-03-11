@@ -171,5 +171,36 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "Profiles";
             return View("profile_managers");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus(int id, string status)
+        {
+            var contribution = await _context.Contributions.FindAsync(id);
+            if (contribution == null)
+            {
+                return NotFound();
+            }
+
+            if (contribution.Status == null)
+            {
+                contribution.Status = "Pending";
+            }
+            else
+            {
+                if (status == "Rejected" && contribution.Status != "Rejected")
+                {
+                    contribution.Status = status;
+                }
+                if (status == "Approved" && contribution.Status != "Approved")
+                {
+                    contribution.Status = status;
+                }
+            }
+            _context.Update(contribution);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("StudentSubmissionCoordinators", "Managers");
+        }
     }
 }

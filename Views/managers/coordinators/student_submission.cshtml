@@ -11,7 +11,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
                     <li class="breadcrumb-item">
-                        <a asp-controller="Managers" asp-action="IndexCooridinators"><i class="bx bx-home-alt"></i></a>
+                        <a asp-controller="Managers" asp-action="IndexCoordinators"><i class="bx bx-home-alt"></i></a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">List submission</li>
                 </ol>
@@ -54,20 +54,36 @@
                                     }
                                     else if (contribution.Status == "Approved")
                                     {
-                                        <span class="badge bg-light-success text-success w-100">Approvel</span>
+                                        <span class="badge bg-light-success text-success w-100">Approved</span>
                                     }
                                 </td>
                                 <td>
                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip"
+<a href="javascript:;" class="text-primary" data-bs-toggle="tooltip"
                                             data-bs-placement="bottom" title="Views"><i class="bi bi-eye-fill"></i></a>
+
                                         <a asp-controller="Managers" asp-action="CoordinatorComment" class="text-warning"
                                             data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment"><i
                                                 class="bi bi-pencil-fill"></i></a>
-                                        <a href="javascript:;" class="text-success" data-bs-toggle="tooltip"
-                                            data-bs-placement="bottom" title="Approve"><i class="bi bi-file-plus-fill"></i></a>
+
+                                        @* <a href="javascript:;" class="text-success" data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom" title="Approve"><i
+                                                class="bi bi-file-plus-fill"></i></a>
                                         <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip"
-                                            data-bs-placement="bottom" title="Reject"><i class="bi bi-file-minus-fill"></i></a>
+                                            data-bs-placement="bottom" title="Reject"><i
+                                                class="bi bi-file-minus-fill"></i></a> *@
+
+                                        <form asp-controller="Managers" asp-action="updatestatus" method="post">
+                                            <input type="hidden" name="id" value="@contribution.ContributionId" />
+                                            <input type="hidden" name="status" value="Rejected" />
+                                            <button type="submit" class="btn btn-danger">Reject</button>
+                                        </form>
+
+                                        <form asp-controller="Managers" asp-action="updatestatus" method="post">
+                                            <input type="hidden" name="id" value="@contribution.ContributionId" />
+                                            <input type="hidden" name="status" value="Approved" />
+                                            <button type="submit" class="btn btn-success">Approved</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
