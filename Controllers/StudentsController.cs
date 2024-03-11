@@ -68,6 +68,7 @@ namespace COMP1640.Controllers
             var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == user.FacultyId);
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
+            var userProfileImagePath = user.ProfileImagePath;
 
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
@@ -75,6 +76,7 @@ namespace COMP1640.Controllers
             ViewBag.userId = userId;
             ViewBag.userFullName = userFullName;
             ViewBag.userAddress = userAddress;
+            ViewBag.userProfileImagePath = userProfileImagePath;
             return View();
         }
 
@@ -185,17 +187,23 @@ namespace COMP1640.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> UploadProfileImage(int id, COMP1640User user)
+        public async Task<ActionResult> UpdateProfile(string id, [Bind("UserName, Address, Email")] COMP1640User user)
         {
-            string uniqueFileName = GetUniqueFileName(user.ProfileImage.FileName);
-            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            Console.WriteLine(id);
+            if (user != null)
             {
-                await user.ProfileImage.CopyToAsync(fileStream);
+                string uniqueFileName = GetUniqueFileName(user.ProfileImage.FileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await user.ProfileImage.CopyToAsync(fileStream);
+                }
+                user.ProfileImagePath = uniqueFileName;
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+            }else{
+                return NotFound();
             }
-            user.ProfileImagePath = uniqueFileName;
-            _context.Update(user);
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
