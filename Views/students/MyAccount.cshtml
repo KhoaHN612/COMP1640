@@ -1,4 +1,5 @@
-﻿@model IEnumerable<COMP1640.Models.Contribution>;
+﻿@* @model IEnumerable<COMP1640.Models.Contribution>; *@
+@model IEnumerable<COMP1640.Models.ContributionUsersModel>;
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 8px !important;
@@ -21,6 +22,7 @@
                     <div class="tab-content my-account-tab-content">
                         <div class="tab-pane active" id="tab-profile">
                             <form id="profile-form" method="post" enctype="multipart/form-data">
+                                <input type="hidden" asp-for="Id" />
                                 <!-- Thêm form tag với method POST và enctype cho file upload -->
                                 <section id="my-profile">
                                     <header>
@@ -41,35 +43,35 @@
                                                             <td>
                                                                 <div class="input-group">
                                                                     <input type="text" class="form-control" id="name"
-                                                                        name="name" value="John Doe">
+                                                                        name="name" value="@ViewBag.userFullName">
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="title">Location</td>
+                                                            <td class="title">Address</td>
                                                             <td>
                                                                 <div class="input-group">
                                                                     <input type="text" class="form-control"
-                                                                        id="location" name="location" value="London UK">
+                                                                        id="location" name="location"
+                                                                        value="@ViewBag.userAddress">
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="title bio">Bio</td>
+                                                            <td class="title">Faculty</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <textarea id="bio"
-                                                                        name="bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit.In sollicitudin mi id urna pulvinar, in ornare dui scelerisque. Nunc nec odio eros. Integer placerat tempor nunc eget semper. Nulla vitae dictum est, et convallis mauris. Integer</textarea>
+                                                                    <input type="text" class="form-control" id="faculty"
+                                                                        name="faculty" value="@ViewBag.userFaculty">
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="title">Website</td>
+                                                            <td class="title">Email</td>
                                                             <td>
                                                                 <div class="input-group">
                                                                     <input type="text" class="form-control" id="website"
-                                                                        name="website"
-                                                                        value="http://www.theme-starz.com">
+                                                                        name="website" value="@ViewBag.userEmail">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -108,7 +110,7 @@
                                     <tbody>
                                         @foreach (var item in ViewBag.contributions)
                                         {
-                                            if (item.UserId == ViewBag.users)
+                                            if (item.UserId == ViewBag.userId)
                                             {
                                                 <tr class="status-not-started">
                                                     <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
