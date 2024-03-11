@@ -404,7 +404,7 @@ var options = {
     },
     colors: ["#e72e7a"],
     xaxis: {
-        categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        categories: ["Airi Satou", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     },
     fill: {
         opacity: 1

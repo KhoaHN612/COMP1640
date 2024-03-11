@@ -420,7 +420,7 @@ var options = {
 	},
 	colors: ["#3461ff"],
     xaxis: {
-        categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        categories: ["Airi Satou", "Ashton Cox", "Brielle Williamson", "Cedric Kelly", "Garrett Winters", "Herrod Chandler", "Rhona Davidson", "Tiger Nixon", "Sep", "Oct", "Nov", "Dec"]
     },
 	responsive: [
 		{
@@ -452,11 +452,12 @@ var options = {
   var chart = new Chart(document.getElementById('chart6'), {
 	type: 'doughnut',
 	data: {
-		labels: ["Mobile", "Desktop", "Tablet"],
+		labels: ["Airi Satou", "Ashton Cox", "Brielle Williamson", "Cedric Kelly", "Garrett Winters", "Herrod Chandler", "Rhona Davidson", "Tiger Nixon"],
 		datasets: [{
 			label: "Device Users",
-			backgroundColor: ["#8ea8fd", "#3461ff", "#c1cfff"],
-			data: [2478, 5267, 1834]
+			//Set background color using randomColors function
+			backgroundColor: [randomColor(), randomColor(), randomColor(), randomColor(), randomColor(), randomColor(), randomColor(), randomColor()],			
+			data: [20, 20, 20, 20, 20, 20, 20, 20]
 		}]
 	  },
 	options: {
@@ -998,10 +999,32 @@ jQuery('#geographic-map').vectorMap(
 		selectedRegions: [],
 		showTooltip: true,
 	});
-
-
-
-
-
-    
 });
+
+
+
+//Random Colors without duplicates
+function randomColors() {
+	var letters = '0123456789ABCDEF'.split('');
+	var color = '#';
+	for (var i = 0; i < 6; i++ ) {
+		color += letters[Math.floor(Math.random() * 16)];
+	}
+	return color;
+}
+var usedColors = [];
+function randomColor() {
+	var color = randomColors();
+	if (usedColors.indexOf(color) > -1) {
+		return randomColor();
+	}
+	usedColors.push(color);
+	return color;
+}
+//End Random Colors without duplicates
+
+// Set color for bi bi-square-fill by backgroundColor in chart6
+var icons = document.querySelectorAll('.bi-square-fill');
+for (var i = 0; i < icons.length; i++) {
+	icons[i].style.backgroundColor = randomColor();
+}

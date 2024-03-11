@@ -7,7 +7,7 @@ namespace COMP1640.Controllers
     public class ManagersController : Controller
     {
         //================================ ADMIN ================================//
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Dashboard";
             return View("admins/index");

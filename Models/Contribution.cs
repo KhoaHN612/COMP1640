@@ -14,7 +14,7 @@ public partial class Contribution
     public int ContributionId { get; set; }
 
     [Column("userId")]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     [Column("annualMagazineId")]
     public int AnnualMagazineId { get; set; }

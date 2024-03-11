@@ -176,7 +176,7 @@ $(function () {
 				backgroundColor: ["#0d6efd", "#212529", "#17a00e", "#f41127", "#ffc107"],
 				data: [2478, 5267, 734, 784, 433]
 			}]
-		},
+		},	
 		options: {
 			maintainAspectRatio: false,
 			title: {
