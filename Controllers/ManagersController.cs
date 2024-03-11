@@ -43,7 +43,7 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "Create Submission Date page";
             return View("admins/form_create_submission_date");
         }
-        public IActionResult TableUser ()
+        public IActionResult TableUser()
         {
             ViewData["Title"] = "User Table page";
             return View("admins/table_user");
@@ -62,13 +62,16 @@ namespace COMP1640.Controllers
         public IActionResult StudentSubmissionCoordinators()
         {
             List<Contribution> contributions = _context.Contributions.Include(c => c.AnnualMagazine).ToList();
+
+
             ViewData["Title"] = "List Student Submission";
             return View("coordinators/student_submission", contributions);
         }
-        public IActionResult CoordinatorComment()
+        public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
-            return View("coordinators/create_comment");
+            var contribution = await _context.Contributions.FindAsync(id);
+            return View("coordinators/create_comment", contribution);
         }
         //================================ MANAGERS ================================//
         public IActionResult IndexManagers()
@@ -78,10 +81,10 @@ namespace COMP1640.Controllers
         }
         public IActionResult StudentSubmissionManagers()
         {
-                List<Contribution> contributions = _context.Contributions
-                                                .Include(c => c.AnnualMagazine)
-                                                .Where(c => c.Status == "Approved")
-                                                .ToList();
+            List<Contribution> contributions = _context.Contributions
+                                            .Include(c => c.AnnualMagazine)
+                                            .Where(c => c.Status == "Approved")
+                                            .ToList();
             ViewData["Title"] = "List Student Submission";
             return View("head_managers/student_submission", contributions);
         }
@@ -171,5 +174,59 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "Profiles";
             return View("profile_managers");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus(int id, string status)
+        {
+            var contribution = await _context.Contributions.FindAsync(id);
+            if (contribution == null)
+            {
+                return NotFound();
+            }
+
+            if (contribution.Status == null)
+            {
+                contribution.Status = "Pending";
+            }
+            else
+            {
+                if (status == "Rejected" && contribution.Status != "Rejected")
+                {
+                    contribution.Status = status;
+                }
+                if (status == "Approved" && contribution.Status != "Approved")
+                {
+                    contribution.Status = status;
+                }
+            }
+            _context.Update(contribution);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("StudentSubmissionCoordinators", "Managers");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateComment(Contribution contribution)
+        {
+            
+                var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+                if (existingContribution != null)
+                {
+                    
+                    existingContribution.Comment = contribution.Comment;
+                    
+                    _context.Update(existingContribution);
+                    await _context.SaveChangesAsync();
+                return RedirectToAction("StudentSubmissionCoordinators");
+            }
+          
+            return RedirectToAction("StudentSubmissionCoordinators", "Managers");
+        }
+
+
+
+
     }
 }
