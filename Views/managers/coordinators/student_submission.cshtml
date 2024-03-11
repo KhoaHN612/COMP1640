@@ -1,4 +1,5 @@
 ﻿@model List<COMP1640.Models.Contribution>
+
 @{
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
 }
@@ -59,19 +60,22 @@
                                 </td>
                                 <td>
                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
-<a href="javascript:;" class="text-primary" data-bs-toggle="tooltip"
+                                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip"
                                             data-bs-placement="bottom" title="Views"><i class="bi bi-eye-fill"></i></a>
 
                                         <a asp-controller="Managers" asp-action="CoordinatorComment" class="text-warning"
-                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment"><i
-                                                class="bi bi-pencil-fill"></i></a>
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment"
+                                            asp-route-id="@contribution.ContributionId">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+
 
                                         @* <a href="javascript:;" class="text-success" data-bs-toggle="tooltip"
-                                            data-bs-placement="bottom" title="Approve"><i
-                                                class="bi bi-file-plus-fill"></i></a>
-                                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip"
-                                            data-bs-placement="bottom" title="Reject"><i
-                                                class="bi bi-file-minus-fill"></i></a> *@
+                                    data-bs-placement="bottom" title="Approve"><i
+                                    class="bi bi-file-plus-fill"></i></a>
+                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom" title="Reject"><i
+                                    class="bi bi-file-minus-fill"></i></a> *@
 
                                         <form asp-controller="Managers" asp-action="updatestatus" method="post">
                                             <input type="hidden" name="id" value="@contribution.ContributionId" />
