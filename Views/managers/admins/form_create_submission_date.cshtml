@@ -17,7 +17,7 @@
                             List Submission Date
                         </a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Create Submission Date</li>
+                    <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"] Date</li>
                 </ol>
             </nav>
         </div>
@@ -31,11 +31,12 @@
                 <div class="card-body">
                     <div class="border p-4 rounded">
                         <!-- Start of form -->
-                        <form action="your-server-endpoint" method="post">
+                        <form action = "@Url.Action(Model.AnnualMagazineId == 0 ? "CreateAnnualMagazine" : "UpdateAnnualMagazine", "Managers")" method="post">
                             <div class="card-title d-flex align-items-center">
-                                <h5 class="mb-0">Create Submission Date</h5>
+                                <h5 class="mb-0">@ViewData["Title"] Date</h5>
                             </div>
                             <hr />
+                            <input type="hidden" id="annualMagazine" name="annualMagazineId" value="@Model.AnnualMagazineId"> 
                             <!-- Name Input -->
                             <div class="row mb-3">
                                 <label for="inputEnterArticleName" class="col-sm-3 col-form-label">
@@ -44,20 +45,7 @@
                                 </label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputEnterArticleName"
-                                           name="article_name" placeholder="Enter Article name">
-                                </div>
-                            </div>
-                            <!-- Phone Number Input -->
-                            <div class="row mb-3">
-                                <label for="inputFacultyNo2" class="col-sm-3 col-form-label">Faculty</label>
-                                <div class="col-sm-9">
-                                    <select class="form-select" name="faculty"
-                                            aria-label="Default select example">
-                                        <option selected disabled>Choose Faculty</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </select>
+                                            name="title" placeholder="Enter Article name" value="@Model.Title">
                                 </div>
                             </div>
                             <!-- Email Address Input -->
@@ -67,43 +55,34 @@
                                     Address
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="email" class="form-control" id="inputEmailAddress2"
-                                           name="email" placeholder="Email Address">
+                                    <input type="text" class="form-control" id="inputEnterArticleName"
+                                            name="academicYear" placeholder="Academic Year Ex. 2023-2024" value="@Model.AcademicYear">
                                 </div>
                             </div>
                             <!-- Choose Password Input -->
                             <div class="row mb-3">
                                 <label for="inputChooseDate2" class="col-sm-3 col-form-label">
-                                    Start Date
+                                    Submission Closure Date
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="datetime-local" class="form-control" id="inputChooseDate2"
-                                           name="start_datetime" placeholder="Choose Date Time">
+                                    <input type="date" class="form-control" id="inputChooseDate2"
+                                            name="submissionClosureDate" placeholder="Choose Date Time" value="@Model.SubmissionClosureDate?.ToString("yyyy-MM-dd")">
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <label for="inputChooseDate2" class="col-sm-3 col-form-label">
-                                    End Date
+                                    Final Closure Date
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="datetime-local" class="form-control" id="inputChooseDate2"
-                                           name="end_datetime" placeholder="Choose Date Time">
-                                </div>
-                            </div>
-                            <!-- Address Input -->
-                            <div class="row mb-3">
-                                <label for="inputDescription4"
-                                       class="col-sm-3 col-form-label">Description</label>
-                                <div class="col-sm-9">
-                                    <textarea class="form-control" id="inputDescription4" name="description"
-                                              rows="3" placeholder="Description"></textarea>
+                                    <input type="date" class="form-control" id="inputChooseDate2"
+                                            name="finalClosureDate" placeholder="Choose Date Time" value="@Model.FinalClosureDate?.ToString("yyyy-MM-dd")">
                                 </div>
                             </div>
                             <!-- Submit Button -->
                             <div class="row">
                                 <label class="col-sm-3 col-form-label"></label>
                                 <div class="col-sm-9">
-                                    <button type="submit" class="btn btn-primary px-5">Submit</button>
+                                    <button type="submit" class="btn btn-primary px-5">@ViewData["ButtonLabel"]</button>
                                 </div>
                             </div>
                         </form>

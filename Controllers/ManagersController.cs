@@ -5,6 +5,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using COMP1640.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Diagnostics;
 
 namespace COMP1640.Controllers
 {
@@ -25,24 +27,136 @@ namespace COMP1640.Controllers
         }
         public IActionResult TableFaculty()
         {
+            List<Faculty> faculty = _context.Faculties.OrderBy(f => f.FacultyId).ToList();
             ViewData["Title"] = "Faculty Table page";
-            return View("admins/table_faculty");
+            return View("admins/table_faculty", faculty);
         }
-        public IActionResult FormCreateFaculty()
+        public IActionResult FormCreateFaculty(int? id)
         {
-            ViewData["Title"] = "Create Faculty Table page";
-            return View("admins/form_create_faculty");
+            if (id != null)
+            {
+                ViewData["Title"] = "Edit Faculty";
+                ViewData["ButtonLabel"] = "Update";
+            }
+            else
+            {
+                ViewData["Title"] = "Create Faculty";
+                ViewData["ButtonLabel"] = "Submit";
+            }
+            Faculty faculty = id != null ? _context.Faculties.Find(id) : new Faculty();
+            return View("admins/form_create_faculty", faculty);
         }
+
+        [HttpPost]
+        public IActionResult CreateFaculty(Faculty faculty)
+        {
+            if (ModelState.IsValid)
+            {
+                int? maxFacultyId = _context.Faculties.Max(f => (int?)f.FacultyId);
+                int newFacultyId = (maxFacultyId ?? 0) + 1;
+                faculty.FacultyId = newFacultyId;
+                _context.Faculties.Add(faculty);
+                _context.SaveChanges();
+                return RedirectToAction("TableFaculty"); // Chuyển hướng sau khi tạo thành công
+            }
+            return View("admins/form_create_faculty", faculty); // Hiển thị lại form nếu dữ liệu không hợp lệ
+        }
+        [HttpPost]
+        public IActionResult UpdateFaculty(Faculty faculty)
+        {
+            var existingFaculty = _context.Faculties.Find(faculty.FacultyId);
+            if (existingFaculty == null)
+            {
+                return RedirectToAction("TableFaculty");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Entry(existingFaculty).CurrentValues.SetValues(faculty);
+                _context.SaveChanges();
+                return RedirectToAction("TableFaculty");
+            }
+            return View("admins/form_create_faculty", faculty);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteFaculty(int id)
+        {
+            var facultyToDelete = _context.Faculties.Find(id);
+            if (facultyToDelete != null)
+            {
+                _context.Faculties.Remove(facultyToDelete);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("TableFaculty"); // Chuyển hướng sau khi xóa
+        }
+
         public IActionResult TableSubmissionDate()
         {
+            List<AnnualMagazine> annualMagazine = _context.AnnualMagazines.OrderBy(f => f.AnnualMagazineId).ToList();
             ViewData["Title"] = "Submission Date Table page";
-            return View("admins/table_submission_date");
+            return View("admins/table_submission_date", annualMagazine);
         }
-        public IActionResult FormCreateSubmissionDate()
+        public IActionResult FormCreateSubmissionDate(int? id)
         {
-            ViewData["Title"] = "Create Submission Date page";
-            return View("admins/form_create_submission_date");
+            if (id != null)
+            {
+                ViewData["Title"] = "Edit Annual Magazine";
+                ViewData["ButtonLabel"] = "Update";
+            }
+            else
+            {
+                ViewData["Title"] = "Create Annual Magazine";
+                ViewData["ButtonLabel"] = "Submit";
+            }
+            AnnualMagazine annualMagazine = id != null ? _context.AnnualMagazines.Find(id) : new AnnualMagazine();
+            return View("admins/form_create_submission_date", annualMagazine);
         }
+                [HttpPost]
+        public IActionResult CreateAnnualMagazine(AnnualMagazine annualMagazine)
+        {
+            if (ModelState.IsValid)
+            {
+                int? maxAnnualMagazineId = _context.AnnualMagazines.Max(f => (int?)f.AnnualMagazineId);
+                int newFacultyId = (maxAnnualMagazineId ?? 0) + 1;
+                annualMagazine.AnnualMagazineId = newFacultyId;
+                _context.AnnualMagazines.Add(annualMagazine);
+                _context.SaveChanges();
+                return RedirectToAction("TableSubmissionDate"); // Chuyển hướng sau khi tạo thành công
+            }
+            return View("admins/form_create_submission_date", annualMagazine); // Hiển thị lại form nếu dữ liệu không hợp lệ
+        }
+
+        [HttpPost]
+        public IActionResult UpdateAnnualMagazine(AnnualMagazine annualMagazine) 
+        {
+                var existingAnnualMagazine = _context.AnnualMagazines.Find(annualMagazine.AnnualMagazineId);
+                if (existingAnnualMagazine == null)
+                {
+                    return RedirectToAction("TableSubmissionDate");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    _context.Entry(existingAnnualMagazine).CurrentValues.SetValues(annualMagazine);
+                    _context.SaveChanges();
+                    return RedirectToAction("TableSubmissionDate");
+                }
+                return View("admins/form_create_submission_date", annualMagazine);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteAnnualMagazine(int id)
+        {
+            var annualManazineToDelete = _context.AnnualMagazines.Find(id);
+            if (annualManazineToDelete != null)
+            {
+                _context.AnnualMagazines.Remove(annualManazineToDelete);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("TableSubmissionDate"); // Chuyển hướng sau khi xóa
+        }
+
         public IActionResult TableUser()
         {
             ViewData["Title"] = "User Table page";
@@ -62,8 +176,6 @@ namespace COMP1640.Controllers
         public IActionResult StudentSubmissionCoordinators()
         {
             List<Contribution> contributions = _context.Contributions.Include(c => c.AnnualMagazine).ToList();
-
-
             ViewData["Title"] = "List Student Submission";
             return View("coordinators/student_submission", contributions);
         }
@@ -221,7 +333,6 @@ namespace COMP1640.Controllers
                     await _context.SaveChangesAsync();
                 return RedirectToAction("StudentSubmissionCoordinators");
             }
-          
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
 
