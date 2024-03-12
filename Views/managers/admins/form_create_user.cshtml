@@ -1,4 +1,5 @@
-﻿@{
+﻿@model COMP1640.Areas.Identity.Data.COMP1640User
+@{
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
 }
 
@@ -26,68 +27,78 @@
                 <div class="card-body">
                     <div class="border p-4 rounded">
                         <!-- Start of form -->
-                        <form action="your-server-endpoint" method="post" enctype="multipart/form-data">
+                        <form asp-action="FormCreateUser" method="post" enctype="multipart/form-data">
                             <div class="card-title d-flex align-items-center">
                                 <h5 class="mb-0">User Registration</h5>
                             </div>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <hr />
                             <!-- Name Input -->
                             <div class="row mb-3">
-                                <label for="inputEnterArticleName" class="col-sm-3 col-form-label">
+                                <label asp-for="FullName" class="col-sm-3 col-form-label">
                                     Full Name
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="inputEnterArticleName"
-                                           name="faculty_name" placeholder="Enter Full Name">
+                                    <input type="text" class="form-control" asp-for="FullName"
+                                           placeholder="Enter Full Name">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="inputEmailAddress2" class="col-sm-3 col-form-label">
+                                <label asp-for="Email" class="col-sm-3 col-form-label">
                                     Email
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="email" class="form-control" id="inputEmailAddress2"
-                                           name="email" placeholder="Enter you email">
+                                    <input type="email" class="form-control" asp-for="Email"
+                                           placeholder="Enter you email">
                                 </div>
                             </div>
                             <!-- Email Address Input -->
                             <div class="row mb-3">
-                                <label for="inputAddress2" class="col-sm-3 col-form-label">
+                                <label asp-for="Address" class="col-sm-3 col-form-label">
                                     Address
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="inputAddress2"
-                                           name="text" placeholder="Enter Address here">
+                                    <input type="text" class="form-control" asp-for="Address"
+                                           placeholder="Enter Address here" value="Unknown">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="inputDate2" class="col-sm-3 col-form-label">
+                                <label asp-for="DayOfBirth" class="col-sm-3 col-form-label">
                                     Date of Birth
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="date" class="form-control" id="inputDate2"
-                                           name="date" placeholder="">
+                                    <input type="date" class="form-control" asp-for="DayOfBirth"
+                                           placeholder="">
                                 </div>
+                                <script>
+                                    document.getElementById('DayOfBirth').valueAsDate = new Date();
+                                </script>
                             </div>
                             <div class="row mb-3">
-                                <label for="inputPhone2" class="col-sm-3 col-form-label">
+                                <label asp-for="FacultyId" class="control-label col-sm-3 col-form-label">Faculty</label>
+                                <select asp-for="FacultyId" asp-items="@ViewBag.FacultyId" class="col-sm-9 form-control">
+                                    <option disabled selected> -- Select a faculty -- </option>
+                                </select>
+                            </div>
+                            <input type="hidden" asp-for="ProfileImagePath" value="Waiting">
+                            <div class="row mb-3">
+                                <label asp-for="PhoneNumber" class="col-sm-3 col-form-label">
                                     Phone Number
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="number" class="form-control" id="inputPhone2"
-                                           name="number" placeholder="Enter your phone number">
+                                    <input type="number" class="form-control" asp-for="PhoneNumber" placeholder="Enter your phone number">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="inputPassword2" class="col-sm-3 col-form-label">
+                                <label for="inputPassword" class="col-sm-3 col-form-label">
                                     Password
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="password" class="form-control" id="inputPassword2"
-                                           name="password" placeholder="Enter your password ">
+                                    <input type="password" class="form-control" id="inputPassword"
+                                           name="Password" placeholder="Enter your password ">
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            @* <div class="row mb-3">
                                 <label for="inputPhone2" class="col-sm-3 col-form-label">
                                     Image
                                 </label>
@@ -95,20 +106,19 @@
                                     <input type="file" class="form-control" id="inputPhone2"
                                            name="file" placeholder="Choose your Image">
                                 </div>
-                            </div>
+                            </div> *@
                             <div class="row mb-3">
                                 <label for="inputRole2" class="col-sm-3 col-form-label">
                                     Role
                                 </label>
                                 <div class="col-sm-9">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="">
-                                        <label class="form-check-label" for="flexRadioDefault1"> Default radio 2</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="" >
-                                        <label class="form-check-label" for="flexRadioDefault2"> Default radio 2</label>
-                                    </div>
+                                    @foreach (var role in ViewBag.Roles)
+                                    {
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="Role" id="@role.Name" value="@role.Id">
+                                            <label class="form-check-label" for="@role.Name"> @role.Name </label>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                             <!-- Submit Button -->
