@@ -5,8 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using COMP1640.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Diagnostics;
+
 
 namespace COMP1640.Controllers
 {
@@ -57,9 +56,9 @@ namespace COMP1640.Controllers
                 faculty.FacultyId = newFacultyId;
                 _context.Faculties.Add(faculty);
                 _context.SaveChanges();
-                return RedirectToAction("TableFaculty"); // Chuyển hướng sau khi tạo thành công
+                return RedirectToAction("TableFaculty");
             }
-            return View("admins/form_create_faculty", faculty); // Hiển thị lại form nếu dữ liệu không hợp lệ
+            return View("admins/form_create_faculty", faculty);
         }
         [HttpPost]
         public IActionResult UpdateFaculty(Faculty faculty)
@@ -88,7 +87,7 @@ namespace COMP1640.Controllers
                 _context.Faculties.Remove(facultyToDelete);
                 _context.SaveChanges();
             }
-            return RedirectToAction("TableFaculty"); // Chuyển hướng sau khi xóa
+            return RedirectToAction("TableFaculty");
         }
 
         public IActionResult TableSubmissionDate()
@@ -112,7 +111,8 @@ namespace COMP1640.Controllers
             AnnualMagazine annualMagazine = id != null ? _context.AnnualMagazines.Find(id) : new AnnualMagazine();
             return View("admins/form_create_submission_date", annualMagazine);
         }
-                [HttpPost]
+
+        [HttpPost]
         public IActionResult CreateAnnualMagazine(AnnualMagazine annualMagazine)
         {
             if (ModelState.IsValid)
@@ -122,9 +122,9 @@ namespace COMP1640.Controllers
                 annualMagazine.AnnualMagazineId = newFacultyId;
                 _context.AnnualMagazines.Add(annualMagazine);
                 _context.SaveChanges();
-                return RedirectToAction("TableSubmissionDate"); // Chuyển hướng sau khi tạo thành công
+                return RedirectToAction("TableSubmissionDate"); 
             }
-            return View("admins/form_create_submission_date", annualMagazine); // Hiển thị lại form nếu dữ liệu không hợp lệ
+            return View("admins/form_create_submission_date", annualMagazine);
         }
 
         [HttpPost]
@@ -335,9 +335,5 @@ namespace COMP1640.Controllers
             }
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
-
-
-
-
     }
 }
