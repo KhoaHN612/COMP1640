@@ -11,7 +11,7 @@
                 <ol class="breadcrumb mb-0 p-0">
                     <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="Index"><i class="bx bx-home-alt"></i></a></li>
                     <li class="breadcrumb-item active"><a asp-controller="Managers" asp-action="TableFaculty">List Faculty</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Create Faculty </li>
+                    <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"] Faculty </li>
                 </ol>
             </nav>
         </div>
@@ -19,19 +19,19 @@
     <!--end breadcrumb-->
     <div class="row">
         <div class="col-xl-9 mx-auto">
-            <h6 class="mb-0 text-uppercase">Create Faculty Form</h6>
+            <h6 class="mb-0 text-uppercase">@ViewData["Title"] Form</h6>
             <hr />
             <div class="card">
                 <div class="card-body">
                     <div class="border p-4 rounded">
                         <!-- Start of form -->
-                        <form action="your-server-endpoint" method="post">
+                        <form action="@Url.Action(Model.FacultyId == 0 ? "CreateFaculty" : "UpdateFaculty", "Managers")" method="post">
                             <div class="card-title d-flex align-items-center">
                                 <h5 class="mb-0">Faculty Registration</h5>
                             </div>
                             <hr />
                             <!-- Name Input -->
-                            <input type="hidden" id="facultyID" name="faculty_id" value="ID_ở_đây"> 
+                            <input type="hidden" id="facultyId" name="facultyId" value="@Model.FacultyId"> 
                             <div class="row mb-3">
                                 <label for="inputEnterArticleName" class="col-sm-3 col-form-label">
                                     Faculty
@@ -39,7 +39,7 @@
                                 </label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputEnterArticleName"
-                                           name="faculty_name" placeholder="Enter Faculty Name">
+                                            name="name" placeholder="Enter Faculty Name" value="@Model.Name">
                                 </div>
                             </div>
                             <!-- Email Address Input -->
@@ -48,24 +48,24 @@
                                     Dean Name
                                 </label>
                                 <div class="col-sm-9">
-                                    <input type="email" class="form-control" id="inputEmailAddress2"
-                                           name="email" placeholder="Dean name">
+                                    <input type="text" class="form-control" id="inputEmailAddress2"
+                                            name="deanName" placeholder="Dean name" value="@Model.DeanName">
                                 </div>
                             </div>
                             <!-- Address Input -->
                             <div class="row mb-3">
                                 <label for="inputDescription4"
-                                       class="col-sm-3 col-form-label">Description</label>
+                                        class="col-sm-3 col-form-label">Description</label>
                                 <div class="col-sm-9">
                                     <textarea class="form-control" id="inputDescription4" name="description"
-                                              rows="3" placeholder="Description"></textarea>
+                                            rows="3" placeholder="Description">@Model.Description</textarea>
                                 </div>
                             </div>
                             <!-- Submit Button -->
                             <div class="row">
                                 <label class="col-sm-3 col-form-label"></label>
                                 <div class="col-sm-9">
-                                    <button type="submit" class="btn btn-primary px-5">Submit</button>
+                                    <button type="submit" class="btn btn-primary px-5">@ViewData["ButtonLabel"]</button>
                                 </div>
                             </div>
                         </form>

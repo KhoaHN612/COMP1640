@@ -14,11 +14,13 @@ public class COMP1640User : IdentityUser
     public string Address { get; set; } = null!;
 
     [StringLength(100)]
-    public string ProfileImagePath { get; set; } = null!;
+    public string? ProfileImagePath { get; set; }
 
     public int? FacultyId { get; set; }
 
     [ForeignKey("FacultyId")]
     [InverseProperty("COMP1640User")]
     public virtual Faculty? Faculty { get; set; }
+    [NotMapped]
+    public IFormFile? ProfileImage { get; set; }
 }

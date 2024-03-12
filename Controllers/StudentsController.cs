@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
+using COMP1640.Areas.Identity.Data;
 using COMP1640.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,15 +14,20 @@ namespace COMP1640.Controllers
         private readonly ILogger<StudentsController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        private readonly UserManager<COMP1640User> _userManager;
+
         public StudentsController(Comp1640Context context,
             IWebHostEnvironment webHostEnvironment,
             ILogger<StudentsController> logger,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            UserManager<COMP1640User> userManager
+           )
         {
             _logger = logger;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
         // GET: StudentsController
@@ -51,13 +57,26 @@ namespace COMP1640.Controllers
         }
 
         // Action for the My Account page
-        public IActionResult MyAccount()
+        public async Task<IActionResult> MyAccount()
         {
             ViewData["Title"] = "My Account";
             var contributions = _context.Contributions.ToList();
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            var userFullName = user.FullName;
+            var userAddress = user.Address;
+            var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == user.FacultyId);
+            var userFaculty = facultyName != null ? facultyName.Name : null;
+            var userEmail = user.Email;
+            var userProfileImagePath = user.ProfileImagePath;
+
+            ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            ViewBag.users = userId;
+            ViewBag.userFaculty = userFaculty;
+            ViewBag.userId = userId;
+            ViewBag.userFullName = userFullName;
+            ViewBag.userAddress = userAddress;
+            ViewBag.userProfileImagePath = userProfileImagePath;
             return View();
         }
 
@@ -166,6 +185,29 @@ namespace COMP1640.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdateProfile(string id, [Bind("UserName, Address, Email")] COMP1640User user)
+        {
+            Console.WriteLine(id);
+            if (user != null)
+            {
+                string uniqueFileName = GetUniqueFileName(user.ProfileImage.FileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await user.ProfileImage.CopyToAsync(fileStream);
+                }
+                user.ProfileImagePath = uniqueFileName;
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+            }else{
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+
         private string GetUniqueFileName(string fileName)
         {
             fileName = Path.GetFileName(fileName);
@@ -173,6 +215,20 @@ namespace COMP1640.Controllers
                    + "_"
                    + Guid.NewGuid().ToString().Substring(0, 4)
                    + Path.GetExtension(fileName);
+        }
+
+        private COMP1640User CreateUser()
+        {
+            try
+            {
+                return Activator.CreateInstance<COMP1640User>();
+            }
+            catch
+            {
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(COMP1640User)}'. " +
+                    $"Ensure that '{nameof(COMP1640User)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+            }
         }
     }
 }
