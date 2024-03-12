@@ -1,4 +1,4 @@
-﻿@model COMP1640.Models.AspNetUser;
+﻿@model COMP1640.Areas.Identity.Data.COMP1640User
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 8px !important;
@@ -20,8 +20,7 @@
                     </ul><!-- /#my-profile-tabs -->
                     <div class="tab-content my-account-tab-content">
                         <div class="tab-pane active" id="tab-profile">
-                            <form id="profile-form" method="post" enctype="multipart/form-data"
-                                asp-action="UpdateProfile">
+                            <form asp-action="UpdateProfile" id="profile-form" enctype="multipart/form-data">
                                 <input type="hidden" id="userId" name="id" value="@ViewBag.userId">
                                 <!-- Thêm form tag với method POST và enctype cho file upload -->
                                 <section id="my-profile">
@@ -42,18 +41,20 @@
                                                             <td class="title">Full Name</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="name"
-                                                                        name="name" value="@ViewBag.userFullName">
+                                                                    <input asp-for="FullName" type="text"
+                                                                        class="form-control" id="name" name="Fullname"
+                                                                        value="@ViewBag.userFullName">
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="title">Address</td>
+                                                            <td class=" title">Address
+                                                            </td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control"
-                                                                        id="location" name="location"
-                                                                        value="@ViewBag.userAddress">
+                                                                    <input asp-for="Address" type="text"
+                                                                        class="form-control" id="location"
+                                                                        name="Address" value="@ViewBag.userAddress">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -61,8 +62,9 @@
                                                             <td class="title">Faculty</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="faculty"
-                                                                        name="faculty" value="@ViewBag.userFaculty">
+                                                                    <input readonly asp-for="Faculty" type="text"
+                                                                        class="form-control" id="faculty" name="FacultyId"
+                                                                        value="@ViewBag.userFaculty">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -70,8 +72,9 @@
                                                             <td class="title">Email</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="website"
-                                                                        name="website" value="@ViewBag.userEmail">
+                                                                    <input asp-for="Email" type="text"
+                                                                        class="form-control" id="website" name="Email"
+                                                                        value="@ViewBag.userEmail">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -79,7 +82,9 @@
                                                             <td class="title">Change Photo</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="file" id="change-photo" name="photo">
+                                                                    <input asp-for="ProfileImageFile" type="file"
+                                                                        id="change-photo" name="ProfileImageFile"
+                                                                        class="form-control">
                                                                 </div>
                                                             </td>
                                                         </tr>

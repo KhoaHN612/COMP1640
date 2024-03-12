@@ -1,5 +1,7 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
+using COMP1640.Migrations;
 using COMP1640.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +64,7 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "My Account";
             var contributions = _context.Contributions.ToList();
             var userId = _userManager.GetUserId(User);
+            var anotherUserId = userId;
             var user = await _userManager.FindByIdAsync(userId);
             var userFullName = user.FullName;
             var userAddress = user.Address;
@@ -73,7 +76,7 @@ namespace COMP1640.Controllers
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
-            ViewBag.userId = userId;
+            ViewBag.userId = anotherUserId;
             ViewBag.userFullName = userFullName;
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
@@ -101,6 +104,7 @@ namespace COMP1640.Controllers
         {
 
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
+            // Console.WriteLine(fileDetail.ContributionFile.FileName);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
             string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
             if (fileExtension == ".docx")
@@ -187,26 +191,35 @@ namespace COMP1640.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> UpdateProfile(string id, [Bind("UserName, Address, Email")] COMP1640User user)
+        public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
         {
-            Console.WriteLine(id);
-            if (user != null)
+            var userToUpdate = await _context.FindAsync<COMP1640User>(user.Id);
+            var profileImageFile = ProfileImageFile;
+            if (user.ProfileImageFile == null)
             {
-                string uniqueFileName = GetUniqueFileName(user.ProfileImage.FileName);
+                ModelState.Remove("ProfileImageFile");
+            }
+            else
+            {
+                string uniqueFileName = GetUniqueFileName(user.ProfileImageFile.FileName);
                 string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    await user.ProfileImage.CopyToAsync(fileStream);
+                    await user.ProfileImageFile.CopyToAsync(fileStream);
                 }
                 user.ProfileImagePath = uniqueFileName;
-                _context.Update(user);
-                await _context.SaveChangesAsync();
-            }else{
-                return NotFound();
+                userToUpdate.ProfileImagePath = user.ProfileImagePath;
             }
+
+            userToUpdate.FullName = user.FullName;
+            userToUpdate.Address = user.Address;
+            userToUpdate.Email = user.Email;
+
+
+            _context.Update(userToUpdate);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
 
         private string GetUniqueFileName(string fileName)
         {
@@ -215,20 +228,6 @@ namespace COMP1640.Controllers
                    + "_"
                    + Guid.NewGuid().ToString().Substring(0, 4)
                    + Path.GetExtension(fileName);
-        }
-
-        private COMP1640User CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<COMP1640User>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(COMP1640User)}'. " +
-                    $"Ensure that '{nameof(COMP1640User)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-            }
         }
     }
 }
