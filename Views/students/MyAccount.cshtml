@@ -63,8 +63,8 @@
                                                             <td>
                                                                 <div class="input-group">
                                                                     <input readonly asp-for="Faculty" type="text"
-                                                                        class="form-control" id="faculty" name="FacultyId"
-                                                                        value="@ViewBag.userFaculty">
+                                                                        class="form-control" id="faculty"
+                                                                        name="FacultyId" value="@ViewBag.userFaculty">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -108,6 +108,7 @@
                                     <thead>
                                         <tr>
                                             <th>Title</th>
+                                            <th class="status">Type</th>
                                             <th class="starts">Date Submitted</th>
                                             <th class="status">Status</th>
                                         </tr>
@@ -120,11 +121,11 @@
                                                 <tr class="status-not-started">
                                                     <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
                                                     </th>
+                                                    <th class="course-title">@ViewBag.fileType</th>
                                                     <th>@item.SubmissionDate</th>
                                                     <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
                                                 </tr>
                                             }
-
                                         }
                                     </tbody>
                                 </table>

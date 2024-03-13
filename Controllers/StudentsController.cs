@@ -73,6 +73,11 @@ namespace COMP1640.Controllers
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
 
+
+
+
+
+
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
@@ -214,11 +219,9 @@ namespace COMP1640.Controllers
             userToUpdate.FullName = user.FullName;
             userToUpdate.Address = user.Address;
             userToUpdate.Email = user.Email;
-
-
             _context.Update(userToUpdate);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MyAccount));
         }
 
         private string GetUniqueFileName(string fileName)
