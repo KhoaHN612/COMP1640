@@ -73,11 +73,21 @@ namespace COMP1640.Controllers
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
 
-
-
-
-
-
+            var fileTypes = new Dictionary<int, string>();
+            foreach (var contribution in contributions)
+            {
+                var fileDetail = _context.FileDetails.FirstOrDefault(fd => fd.ContributionId == contribution.ContributionId);
+                if (fileDetail != null)
+                {
+                    fileTypes[contribution.ContributionId] = fileDetail.Type;
+                }
+                else
+                {
+                    // Nếu không có fileDetail, gán giá trị mặc định cho loại file
+                    fileTypes[contribution.ContributionId] = "Unknown";
+                }
+            }
+            ViewBag.FileTypes = fileTypes;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
