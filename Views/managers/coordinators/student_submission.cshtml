@@ -70,15 +70,8 @@
                                         </a>
 
 
-                                        @* <a href="javascript:;" class="text-success" data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom" title="Approve"><i
-                                    class="bi bi-file-plus-fill"></i></a>
-                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom" title="Reject"><i
-                                    class="bi bi-file-minus-fill"></i></a> *@
-
                                         <form asp-controller="Managers" asp-action="updatestatus" method="post">
-                                            <input type="hidden" name="id" value="@contribution.ContributionId" />
+                                            <input type="hidden" name="id" value="@contribution.ContributionId" />                                          
                                             <input type="hidden" name="status" value="Rejected" />
                                             <button type="submit" class="btn btn-danger">Reject</button>
                                         </form>
