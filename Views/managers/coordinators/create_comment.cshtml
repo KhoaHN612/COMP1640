@@ -25,17 +25,18 @@
                         <hr />
                         <form class="row g-3" method="post">
                             <div class="col-6">
-                                <label class="form-label"> Student Name</label>
-                                <input type="text" class="form-control" readonly value="Đặng Minh Đạt">
+                                <label class="form-label"> Student ID</label>
+                                <input type="text" class="form-control" readonly value="@ViewBag.contributionUserId">
                             </div>
                             <div class="col-6">
-                                <label class="form-label">Student Email</label>
-                                <input type="email" class="form-control" readonly value="datdmgcc210147@fpt.edu.vn">
+                                <label class="form-label"> Title</label>
+                                <input type="text" class="form-control" readonly value="@ViewBag.contributionsTile">
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
+
             <div class="card">
                 <div class="card-body">
                     <div class="border p-3 rounded">
@@ -58,6 +59,16 @@
                     <div class="border p-3 rounded">
                         <h6 class="mb-0 text-uppercase">Comment Form</h6>
                         <hr />
+                         <form class="row g-3" method="post">
+                            <div class="col-6">
+                                <label class="form-label"> COORDINATORS NAME</label>
+                                <input type="text" class="form-control" readonly value="@ViewBag.userFullName">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">COORDINATORS EMAIL</label>
+                                <input type="email" class="form-control" readonly value="@ViewBag.userEmail">
+                            </div>
+                        </form>
                         <form class="row g-3" asp-action="UpdateComment" method="post">
                             <input type="hidden" asp-for="ContributionId" />
                             <div class="col-12">

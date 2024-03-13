@@ -277,6 +277,28 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "Create Comment";
             var contribution = await _context.Contributions.FindAsync(id);
+         
+            var contributions = _context.Contributions.ToList();
+            var userId = _userManager.GetUserId(User);
+            var anotherUserId = userId;
+            var user = await _userManager.FindByIdAsync(userId);
+            var userFullName = user.FullName;
+            var userAddress = user.Address;
+            var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == user.FacultyId);
+            var userFaculty = facultyName != null ? facultyName.Name : null;
+            var userEmail = user.Email;
+            var userProfileImagePath = user.ProfileImagePath;
+
+            ViewBag.userEmail = userEmail;
+            ViewBag.contributions = contributions;
+            ViewBag.userFaculty = userFaculty;
+            ViewBag.userId = anotherUserId;
+            ViewBag.contributionUserId = contribution.UserId;
+            ViewBag.contributionsTile = contribution.Title;
+            ViewBag.userFullName = userFullName;
+            ViewBag.userAddress = userAddress;
+            ViewBag.userProfileImagePath = userProfileImagePath;
+          
             return View("coordinators/create_comment", contribution);
         }
         //================================ MANAGERS ================================//
