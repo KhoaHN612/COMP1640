@@ -26,6 +26,7 @@
                 <table id="example2" class="table table-striped table-bordered">
                     <thead>
                         <tr>
+                            <th>No</th>
                             <th>Contribution ID</th>
                             <th>User ID</th>
                             <th>Title</th>
@@ -35,9 +36,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @{
+                            int index = 1;
+                        }
                         @foreach (var contributions in Model)
                         {
                             <tr>
+                                <td>@index</td>
                                 <td>@contributions.ContributionId</td>
                                 <td>@contributions.UserId</td>
                                 <td>@contributions.Title</td>
@@ -82,10 +87,12 @@
                                     </div>
                                 </td>
                             </tr>
+                            index++;
                         }
                     </tbody>
                     <tfoot>
                         <tr>
+                            <th>No</th>
                             <th>Contribution ID</th>
                             <th>User ID</th>
                             <th>Title</th>
