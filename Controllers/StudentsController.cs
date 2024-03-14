@@ -83,7 +83,6 @@ namespace COMP1640.Controllers
                 }
                 else
                 {
-                    // Nếu không có fileDetail, gán giá trị mặc định cho loại file
                     fileTypes[contribution.ContributionId] = "Unknown";
                 }
             }
@@ -231,6 +230,26 @@ namespace COMP1640.Controllers
             userToUpdate.Email = user.Email;
             _context.Update(userToUpdate);
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(MyAccount));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdatePassword(string id, string inputOldPassword, string newPassword)
+        {
+            Console.WriteLine(inputOldPassword);
+            Console.WriteLine(newPassword);
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                var status = await _userManager.ChangePasswordAsync(user, inputOldPassword, newPassword);
+            }
+
             return RedirectToAction(nameof(MyAccount));
         }
 

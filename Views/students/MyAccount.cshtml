@@ -146,18 +146,16 @@
                                 <div class="row">
                                     <div class="col-md-5 col-md-offset-4">
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                            In sollicitudin mi id urna pulvinar, in ornare dui scelerisque.
-                                            Nunc nec odio eros
+                                            Enter your old password
                                         </p>
-                                        <form role="form" class="clearfix" action="course-joined.html">
+                                        <form role="form" class="clearfix" asp-action="UpdatePassword">
                                             <div class="form-group">
                                                 <label for="current-password">Current Password</label>
-                                                <input type="password" class="form-control" id="current-password">
+                                                <input name="inputOldPassword"type="password" class="form-control" id="current-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="new-password">New Password</label>
-                                                <input type="password" class="form-control" id="new-password">
+                                                <input name="newPassword" type="password" class="form-control" id="new-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="repeat-new-password">Repeat New Password</label>
