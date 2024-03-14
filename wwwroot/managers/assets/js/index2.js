@@ -176,7 +176,7 @@ var options = {
 var options = {
 	series: [{
 		name: "Revenue",
-		data: [240, 160, 555, 257, 671, 414]
+		data: [240, 360, 555, 257, 671, 414]
 	}],
 	chart: {
 		type: "line",
