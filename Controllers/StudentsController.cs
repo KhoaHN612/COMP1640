@@ -237,8 +237,6 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdatePassword(string id, string inputOldPassword, string newPassword)
         {
-            Console.WriteLine(inputOldPassword);
-            Console.WriteLine(newPassword);
             var userId = _userManager.GetUserId(User);
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
