@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace COMP1640.Models;
 
 [Index("NormalizedEmail", Name = "EmailIndex")]

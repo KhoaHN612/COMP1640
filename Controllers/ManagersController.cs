@@ -27,7 +27,8 @@ namespace COMP1640.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
         //================================ ADMIN ================================//
-        public async Task<IActionResult> CreateRole(){
+        public async Task<IActionResult> CreateRole()
+        {
             string[] roleNames = { "Guest", "Manager", "Coordinator", "Student", "Admin" };
             IdentityResult roleResult;
             foreach (var roleName in roleNames)
@@ -144,27 +145,27 @@ namespace COMP1640.Controllers
                 annualMagazine.AnnualMagazineId = newFacultyId;
                 _context.AnnualMagazines.Add(annualMagazine);
                 _context.SaveChanges();
-                return RedirectToAction("TableSubmissionDate"); 
+                return RedirectToAction("TableSubmissionDate");
             }
             return View("admins/form_create_submission_date", annualMagazine);
         }
 
         [HttpPost]
-        public IActionResult UpdateAnnualMagazine(AnnualMagazine annualMagazine) 
+        public IActionResult UpdateAnnualMagazine(AnnualMagazine annualMagazine)
         {
-                var existingAnnualMagazine = _context.AnnualMagazines.Find(annualMagazine.AnnualMagazineId);
-                if (existingAnnualMagazine == null)
-                {
-                    return RedirectToAction("TableSubmissionDate");
-                }
+            var existingAnnualMagazine = _context.AnnualMagazines.Find(annualMagazine.AnnualMagazineId);
+            if (existingAnnualMagazine == null)
+            {
+                return RedirectToAction("TableSubmissionDate");
+            }
 
-                if (ModelState.IsValid)
-                {
-                    _context.Entry(existingAnnualMagazine).CurrentValues.SetValues(annualMagazine);
-                    _context.SaveChanges();
-                    return RedirectToAction("TableSubmissionDate");
-                }
-                return View("admins/form_create_submission_date", annualMagazine);
+            if (ModelState.IsValid)
+            {
+                _context.Entry(existingAnnualMagazine).CurrentValues.SetValues(annualMagazine);
+                _context.SaveChanges();
+                return RedirectToAction("TableSubmissionDate");
+            }
+            return View("admins/form_create_submission_date", annualMagazine);
         }
 
         [HttpDelete]
@@ -207,12 +208,12 @@ namespace COMP1640.Controllers
             if (ModelState.IsValid)
             {
                 // Create a new IdentityUser instance
-                var user = new COMP1640User 
-                { 
-                    UserName = model.Email, 
+                var user = new COMP1640User
+                {
+                    UserName = model.Email,
                     Email = model.Email,
                     FullName = model.FullName,
-                    ProfileImagePath  = model.ProfileImagePath,
+                    ProfileImagePath = model.ProfileImagePath,
                     PhoneNumber = model.PhoneNumber,
                     DayOfBirth = model.DayOfBirth,
                     Address = model.Address,
@@ -261,23 +262,35 @@ namespace COMP1640.Controllers
             // }
             // return View("admins/form_create_user", model);
         }
-        //================================ COORINATORS ================================//
         public IActionResult IndexCooridinators()
         {
             ViewData["Title"] = "Dashboard Coordinators";
             return View("coordinators/index");
         }
-        public IActionResult StudentSubmissionCoordinators()
+        public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
-            List<Contribution> contributions = _context.Contributions.Include(c => c.AnnualMagazine).ToList();
-            ViewData["Title"] = "List Student Submission";
+
+            ViewData["Title"] = "List Submission";
+
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null || currentUser.FacultyId == null)
+            {
+                return NotFound();
+            }
+            var currentFacultyId = currentUser.FacultyId;
+
+            var usersInSameFaculty = _context.Users.Where(u => u.FacultyId == currentFacultyId);
+
+            var contributions = _context.Contributions.Where(c => usersInSameFaculty.Any(u => u.Id == c.UserId));
+
             return View("coordinators/student_submission", contributions);
         }
         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
             var contribution = await _context.Contributions.FindAsync(id);
-         
+
             var contributions = _context.Contributions.ToList();
             var userId = _userManager.GetUserId(User);
             var anotherUserId = userId;
@@ -298,7 +311,7 @@ namespace COMP1640.Controllers
             ViewBag.userFullName = userFullName;
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
-          
+
             return View("coordinators/create_comment", contribution);
         }
         //================================ MANAGERS ================================//
@@ -438,15 +451,15 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateComment(Contribution contribution)
         {
-            
-                var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
-                if (existingContribution != null)
-                {
-                    
-                    existingContribution.Comment = contribution.Comment;
-                    
-                    _context.Update(existingContribution);
-                    await _context.SaveChangesAsync();
+
+            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+            if (existingContribution != null)
+            {
+
+                existingContribution.Comment = contribution.Comment;
+
+                _context.Update(existingContribution);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("StudentSubmissionCoordinators");
             }
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
