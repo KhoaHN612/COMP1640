@@ -67,12 +67,23 @@ namespace COMP1640.Controllers
             if (userResult is JsonResult jsonUserResult)
             {
                 ContributionUser = jsonUserResult.Value as List<ContributionUser>;
-            }            
+            }     
+
+
+            //GET ROLE STATISTICS
+            List<RoleStatistics> roleStatistics = new List<RoleStatistics>();
+            var roleResult = await GetRoleStatistics();
+
+            if (roleResult is JsonResult jsonRoleResult)
+            {
+                roleStatistics = jsonRoleResult.Value as List<RoleStatistics>;
+            }      
 
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
             ViewData["ContributionYear"] = ContributionDate;
             ViewData["ContributionUser"] = ContributionUser;
+            ViewData["RoleStatistics"] = roleStatistics;
             
             return View("admins/index");
         }
@@ -183,6 +194,37 @@ namespace COMP1640.Controllers
                 .ToListAsync();
             
             return Json(contributions);
+        }
+
+        //Thống kê mỗi role có bao nhiêu người
+        public async Task<IActionResult> GetRoleStatistics()
+        {
+            /*
+            SELECT 
+                r.Name AS 'Role',
+                COUNT(u.Id) AS 'Total'
+            FROM 
+                AspNetUsers u
+            JOIN 
+                AspNetUserRoles ur ON u.Id = ur.UserId
+            JOIN 
+                AspNetRoles r ON ur.RoleId = r.Id
+            GROUP BY 
+                r.Name;
+            */
+
+            List<RoleStatistics> roleStatistics = await _context.Users
+                .Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { User = u, UserRole = ur })
+                .Join(_context.Roles, ur => ur.UserRole.RoleId, r => r.Id, (ur, r) => new { UserRole = ur, Role = r })
+                .GroupBy(ur => ur.Role.Name)
+                .Select(g => new RoleStatistics
+                {
+                    Role = g.Key,
+                    Total = g.Count()
+                })
+                .ToListAsync();
+
+            return Json(roleStatistics);
         }
 
         public IActionResult TableFaculty()

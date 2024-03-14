@@ -46,29 +46,19 @@
     <div class="col-12 col-lg-6 col-xl-4 d-flex">
             <div class="card radius-10 w-100">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <h6 class="mb-0">Accounts</h6>
+                    @foreach (var item in ViewBag.ContributionFaculty)
+                    {
+                        <div class="card radius-10 border shadow-none mb-3">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="">
+                                        <p class="mb-1">@item.Role Accounts</p>
+                                        <h4 class="mb-0 text-primary">@item.Total</h4>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
-                    <div class="traffic-widget">
-                        <div class="progress-wrapper mb-3">
-                            <p class="mb-1">Social <span class="float-end">8,475</span></p>
-                            <div class="progress rounded-0" style="height: 8px;">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: 80%;"></div>
-                            </div>
-                        </div>
-                        <div class="progress-wrapper mb-3">
-                            <p class="mb-1">Direct <span class="float-end">7,989</span></p>
-                            <div class="progress rounded-0" style="height: 8px;">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: 65%;"></div>
-                            </div>
-                        </div>
-                        <div class="progress-wrapper mb-0">
-                            <p class="mb-1">Search <span class="float-end">6,359</span></p>
-                            <div class="progress rounded-0" style="height: 8px;">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: 50%;"></div>
-                            </div>
-                        </div>
-                    </div>
+                    }                    
                 </div>
             </div>
         </div> 
