@@ -273,8 +273,7 @@
                 success: function(pendingContributions) {
                     $('.header-notifications-list').empty();
                     $.each(pendingContributions, function(index, contribution) {
-                        var notificationItem = $('<a class="dropdown-item" href="#">' +
-                            '<div class="d-flex align-items-center">' +
+                        var notificationItem = $('<div class="d-flex align-items-center">' +
                             '<div class="notification-box bg-light-primary text-primary">' +
                             '<i class="bi bi-envelope-open-fill"></i>' +
                             '</div>' +
@@ -284,9 +283,11 @@
                             contribution.submissionDate +
                             '</small>' +
                             '</div>' +
-                            '</div>' +
-                            '</a>');
-                        $('.header-notifications-list').append(notificationItem);
+                            '</div>');
+                        var anchor = $('<a class="dropdown-item" href="/Managers/StudentSubmissionCoordinators"></a>');
+                        anchor.append(notificationItem); 
+
+                        $('.header-notifications-list').append(anchor);
                     });
                 },
                 error: function(xhr, status, error) {
