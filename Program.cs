@@ -12,6 +12,7 @@ builder.Services.AddDbContext<Comp1640Context>(options =>
 
 builder.Services.AddDefaultIdentity<COMP1640User>(options =>
     options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<Comp1640Context>();
 
 

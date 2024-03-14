@@ -1,4 +1,4 @@
-﻿@model List<COMP1640.Models.Contribution>
+﻿@model IEnumerable<COMP1640.Models.Contribution>
 
 @{
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
@@ -28,7 +28,6 @@
                         <tr>
                             <th>Contribution ID</th>
                             <th>User ID</th>
-                            <th>Annual Magazine</th>
                             <th>Title</th>
                             <th>Submission Date</th>
                             <th>Status</th>
@@ -36,24 +35,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var contribution in Model)
+                        @foreach (var contributions in Model)
                         {
                             <tr>
-                                <td>@contribution.ContributionId</td>
-                                <td>@contribution.UserId</td>
-                                <td>@contribution.AnnualMagazine.Title</td>
-                                <td>@contribution.Title</td>
-                                <td>@contribution.SubmissionDate.ToString("dd/MM/yyyy")</td>
+                                <td>@contributions.ContributionId</td>
+                                <td>@contributions.UserId</td>
+                                <td>@contributions.Title</td>
+                                <td>@contributions.SubmissionDate.ToString("dd/MM/yyyy")</td>
                                 <td>
-                                    @if (contribution.Status == "Pending")
+                                    @if (contributions.Status == "Pending")
                                     {
                                         <span class="badge bg-light-warning text-warning w-100">Pending</span>
                                     }
-                                    else if (contribution.Status == "Rejected")
+                                    else if (contributions.Status == "Rejected")
                                     {
                                         <span class="badge bg-light-danger text-danger w-100">Rejected</span>
                                     }
-                                    else if (contribution.Status == "Approved")
+                                    else if (contributions.Status == "Approved")
                                     {
                                         <span class="badge bg-light-success text-success w-100">Approved</span>
                                     }
@@ -65,26 +63,19 @@
 
                                         <a asp-controller="Managers" asp-action="CoordinatorComment" class="text-warning"
                                             data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment"
-                                            asp-route-id="@contribution.ContributionId">
+                                            asp-route-id="@contributions.ContributionId">
                                             <i class="bi bi-pencil-fill"></i>
                                         </a>
 
 
-                                        @* <a href="javascript:;" class="text-success" data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom" title="Approve"><i
-                                    class="bi bi-file-plus-fill"></i></a>
-                                    <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom" title="Reject"><i
-                                    class="bi bi-file-minus-fill"></i></a> *@
-
                                         <form asp-controller="Managers" asp-action="updatestatus" method="post">
-                                            <input type="hidden" name="id" value="@contribution.ContributionId" />
+                                            <input type="hidden" name="id" value="@contributions.ContributionId" />                                          
                                             <input type="hidden" name="status" value="Rejected" />
                                             <button type="submit" class="btn btn-danger">Reject</button>
                                         </form>
 
                                         <form asp-controller="Managers" asp-action="updatestatus" method="post">
-                                            <input type="hidden" name="id" value="@contribution.ContributionId" />
+                                            <input type="hidden" name="id" value="@contributions.ContributionId" />
                                             <input type="hidden" name="status" value="Approved" />
                                             <button type="submit" class="btn btn-success">Approved</button>
                                         </form>
@@ -97,7 +88,6 @@
                         <tr>
                             <th>Contribution ID</th>
                             <th>User ID</th>
-                            <th>Annual Magazine</th>
                             <th>Title</th>
                             <th>Submission Date</th>
                             <th>Status</th>

@@ -1,6 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.Security.Claims;
+using COMP1640.Areas.Identity.Data;
+using COMP1640.Migrations;
 using COMP1640.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,15 +16,20 @@ namespace COMP1640.Controllers
         private readonly ILogger<StudentsController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        private readonly UserManager<COMP1640User> _userManager;
+
         public StudentsController(Comp1640Context context,
             IWebHostEnvironment webHostEnvironment,
             ILogger<StudentsController> logger,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            UserManager<COMP1640User> userManager
+           )
         {
             _logger = logger;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
         // GET: StudentsController
@@ -51,13 +59,41 @@ namespace COMP1640.Controllers
         }
 
         // Action for the My Account page
-        public IActionResult MyAccount()
+        public async Task<IActionResult> MyAccount()
         {
             ViewData["Title"] = "My Account";
             var contributions = _context.Contributions.ToList();
+            var userId = _userManager.GetUserId(User);
+            var anotherUserId = userId;
+            var user = await _userManager.FindByIdAsync(userId);
+            var userFullName = user.FullName;
+            var userAddress = user.Address;
+            var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == user.FacultyId);
+            var userFaculty = facultyName != null ? facultyName.Name : null;
+            var userEmail = user.Email;
+            var userProfileImagePath = user.ProfileImagePath;
+
+            var fileTypes = new Dictionary<int, string>();
+            foreach (var contribution in contributions)
+            {
+                var fileDetail = _context.FileDetails.FirstOrDefault(fd => fd.ContributionId == contribution.ContributionId);
+                if (fileDetail != null)
+                {
+                    fileTypes[contribution.ContributionId] = fileDetail.Type;
+                }
+                else
+                {
+                    fileTypes[contribution.ContributionId] = "Unknown";
+                }
+            }
+            ViewBag.FileTypes = fileTypes;
+            ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            ViewBag.users = userId;
+            ViewBag.userFaculty = userFaculty;
+            ViewBag.userId = anotherUserId;
+            ViewBag.userFullName = userFullName;
+            ViewBag.userAddress = userAddress;
+            ViewBag.userProfileImagePath = userProfileImagePath;
             return View();
         }
 
@@ -82,6 +118,7 @@ namespace COMP1640.Controllers
         {
 
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
+            // Console.WriteLine(fileDetail.ContributionFile.FileName);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
             string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
             if (fileExtension == ".docx")
@@ -164,6 +201,56 @@ namespace COMP1640.Controllers
             {
                 return View();
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
+        {
+            var userToUpdate = await _context.FindAsync<COMP1640User>(user.Id);
+            var profileImageFile = ProfileImageFile;
+            if (user.ProfileImageFile == null)
+            {
+                ModelState.Remove("ProfileImageFile");
+            }
+            else
+            {
+                string uniqueFileName = GetUniqueFileName(user.ProfileImageFile.FileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await user.ProfileImageFile.CopyToAsync(fileStream);
+                }
+                user.ProfileImagePath = uniqueFileName;
+                userToUpdate.ProfileImagePath = user.ProfileImagePath;
+            }
+
+            userToUpdate.FullName = user.FullName;
+            userToUpdate.Address = user.Address;
+            userToUpdate.Email = user.Email;
+            _context.Update(userToUpdate);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(MyAccount));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdatePassword(string id, string inputOldPassword, string newPassword)
+        {
+            Console.WriteLine(inputOldPassword);
+            Console.WriteLine(newPassword);
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                var status = await _userManager.ChangePasswordAsync(user, inputOldPassword, newPassword);
+            }
+
+            return RedirectToAction(nameof(MyAccount));
         }
 
         private string GetUniqueFileName(string fileName)

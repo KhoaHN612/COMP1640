@@ -81,7 +81,6 @@ namespace COMP1640.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfileImagePath")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 

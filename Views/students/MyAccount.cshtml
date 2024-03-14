@@ -1,4 +1,4 @@
-﻿@model IEnumerable<COMP1640.Models.Contribution>;
+﻿@model COMP1640.Areas.Identity.Data.COMP1640User
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 8px !important;
@@ -20,7 +20,8 @@
                     </ul><!-- /#my-profile-tabs -->
                     <div class="tab-content my-account-tab-content">
                         <div class="tab-pane active" id="tab-profile">
-                            <form id="profile-form" method="post" enctype="multipart/form-data">
+                            <form asp-action="UpdateProfile" id="profile-form" enctype="multipart/form-data">
+                                <input type="hidden" id="userId" name="id" value="@ViewBag.userId">
                                 <!-- Thêm form tag với method POST và enctype cho file upload -->
                                 <section id="my-profile">
                                     <header>
@@ -29,7 +30,7 @@
                                     <div class="my-profile">
                                         <figure class="profile-avatar">
                                             <div class="image-wrapper"><img
-                                                    src="~/students/assets/img/profile-avatar.jpg" alt="Profile Avatar">
+                                                    src="~/uploads/@ViewBag.userProfileImagePath" alt="Profile Avatar">
                                             </div>
                                         </figure>
                                         <article>
@@ -40,36 +41,40 @@
                                                             <td class="title">Full Name</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="name"
-                                                                        name="name" value="John Doe">
+                                                                    <input asp-for="FullName" type="text"
+                                                                        class="form-control" id="name" name="Fullname"
+                                                                        value="@ViewBag.userFullName">
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="title">Location</td>
+                                                            <td class=" title">Address
+                                                            </td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control"
-                                                                        id="location" name="location" value="London UK">
+                                                                    <input asp-for="Address" type="text"
+                                                                        class="form-control" id="location"
+                                                                        name="Address" value="@ViewBag.userAddress">
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="title bio">Bio</td>
+                                                            <td class="title">Faculty</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <textarea id="bio"
-                                                                        name="bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit.In sollicitudin mi id urna pulvinar, in ornare dui scelerisque. Nunc nec odio eros. Integer placerat tempor nunc eget semper. Nulla vitae dictum est, et convallis mauris. Integer</textarea>
+                                                                    <input readonly asp-for="Faculty" type="text"
+                                                                        class="form-control" id="faculty"
+                                                                        name="FacultyId" value="@ViewBag.userFaculty">
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="title">Website</td>
+                                                            <td class="title">Email</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="website"
-                                                                        name="website"
-                                                                        value="http://www.theme-starz.com">
+                                                                    <input asp-for="Email" type="text"
+                                                                        class="form-control" id="website" name="Email"
+                                                                        value="@ViewBag.userEmail">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -77,7 +82,9 @@
                                                             <td class="title">Change Photo</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="file" id="change-photo" name="photo">
+                                                                    <input asp-for="ProfileImageFile" type="file"
+                                                                        id="change-photo" name="ProfileImageFile"
+                                                                        class="form-control">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -86,8 +93,8 @@
                                             </div>
                                             <button type="submit" class="btn pull-right">Save Changes</button>
                                         </article>
-                                    </div><!-- /.my-profile -->
-                                </section><!-- /#my-profile -->
+                                    </div>
+                                </section>
                             </form>
                         </div><!-- /tab-pane -->
                         <div class="tab-pane" id="tab-my-courses">
@@ -101,6 +108,7 @@
                                     <thead>
                                         <tr>
                                             <th>Title</th>
+                                            <th class="status">Type</th>
                                             <th class="starts">Date Submitted</th>
                                             <th class="status">Status</th>
                                         </tr>
@@ -108,16 +116,16 @@
                                     <tbody>
                                         @foreach (var item in ViewBag.contributions)
                                         {
-                                            if (item.UserId == ViewBag.users)
+                                            if (item.UserId == ViewBag.userId)
                                             {
                                                 <tr class="status-not-started">
                                                     <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
                                                     </th>
+                                                    <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th>
                                                     <th>@item.SubmissionDate</th>
                                                     <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
                                                 </tr>
                                             }
-
                                         }
                                     </tbody>
                                 </table>
@@ -138,18 +146,16 @@
                                 <div class="row">
                                     <div class="col-md-5 col-md-offset-4">
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                            In sollicitudin mi id urna pulvinar, in ornare dui scelerisque.
-                                            Nunc nec odio eros
+                                            Enter your old password
                                         </p>
-                                        <form role="form" class="clearfix" action="course-joined.html">
+                                        <form role="form" class="clearfix" asp-action="UpdatePassword">
                                             <div class="form-group">
                                                 <label for="current-password">Current Password</label>
-                                                <input type="password" class="form-control" id="current-password">
+                                                <input name="inputOldPassword"type="password" class="form-control" id="current-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="new-password">New Password</label>
-                                                <input type="password" class="form-control" id="new-password">
+                                                <input name="newPassword" type="password" class="form-control" id="new-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="repeat-new-password">Repeat New Password</label>

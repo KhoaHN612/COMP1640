@@ -6,19 +6,43 @@ using System.Linq;
 using System.Threading.Tasks;
 using COMP1640.Models;
 using COMP1640.Models.MultiModels;
+using Microsoft.AspNetCore.Identity;
+using COMP1640.Areas.Identity.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 
 namespace COMP1640.Controllers
 {
     public class ManagersController : Controller
     {
+        private readonly UserManager<COMP1640User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly Comp1640Context _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ManagersController(Comp1640Context context, IWebHostEnvironment webHostEnvironment)
+        public ManagersController(Comp1640Context context, IWebHostEnvironment webHostEnvironment,
+         UserManager<COMP1640User> UserManager, RoleManager<IdentityRole> roleManager)
         {
+            _roleManager = roleManager;
+            _userManager = UserManager;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
         //================================ ADMIN ================================//
+        public async Task<IActionResult> CreateRole()
+        {
+            string[] roleNames = { "Guest", "Manager", "Coordinator", "Student", "Admin" };
+            IdentityResult roleResult;
+            foreach (var roleName in roleNames)
+            {
+                var roleExist = await _roleManager.RoleExistsAsync(roleName);
+                if (!roleExist)
+                {
+                    //create the roles and seed them to the database: Question 1
+                    roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+            return RedirectToAction("TableUser");
+        }
         public async Task<IActionResult> Index(string task, string year)
         {
             Console.WriteLine($"Action: {task}task, Year: {year}");
@@ -228,35 +252,220 @@ namespace COMP1640.Controllers
 
         public IActionResult TableFaculty()
         {
+            List<Faculty> faculty = _context.Faculties.OrderBy(f => f.FacultyId).ToList();
             ViewData["Title"] = "Faculty Table page";
-            return View("admins/table_faculty");
+            return View("admins/table_faculty", faculty);
         }
-        public IActionResult FormCreateFaculty()
+        public IActionResult FormCreateFaculty(int? id)
         {
-            ViewData["Title"] = "Create Faculty Table page";
-            return View("admins/form_create_faculty");
+            if (id != null)
+            {
+                ViewData["Title"] = "Edit Faculty";
+                ViewData["ButtonLabel"] = "Update";
+            }
+            else
+            {
+                ViewData["Title"] = "Create Faculty";
+                ViewData["ButtonLabel"] = "Submit";
+            }
+            Faculty faculty = id != null ? _context.Faculties.Find(id) : new Faculty();
+            return View("admins/form_create_faculty", faculty);
         }
+
+        [HttpPost]
+        public IActionResult CreateFaculty(Faculty faculty)
+        {
+            if (ModelState.IsValid)
+            {
+                int? maxFacultyId = _context.Faculties.Max(f => (int?)f.FacultyId);
+                int newFacultyId = (maxFacultyId ?? 0) + 1;
+                faculty.FacultyId = newFacultyId;
+                _context.Faculties.Add(faculty);
+                _context.SaveChanges();
+                return RedirectToAction("TableFaculty");
+            }
+            return View("admins/form_create_faculty", faculty);
+        }
+        [HttpPost]
+        public IActionResult UpdateFaculty(Faculty faculty)
+        {
+            var existingFaculty = _context.Faculties.Find(faculty.FacultyId);
+            if (existingFaculty == null)
+            {
+                return RedirectToAction("TableFaculty");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Entry(existingFaculty).CurrentValues.SetValues(faculty);
+                _context.SaveChanges();
+                return RedirectToAction("TableFaculty");
+            }
+            return View("admins/form_create_faculty", faculty);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteFaculty(int id)
+        {
+            var facultyToDelete = _context.Faculties.Find(id);
+            if (facultyToDelete != null)
+            {
+                _context.Faculties.Remove(facultyToDelete);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("TableFaculty");
+        }
+
         public IActionResult TableSubmissionDate()
         {
+            List<AnnualMagazine> annualMagazine = _context.AnnualMagazines.OrderBy(f => f.AnnualMagazineId).ToList();
             ViewData["Title"] = "Submission Date Table page";
-            return View("admins/table_submission_date");
+            return View("admins/table_submission_date", annualMagazine);
         }
-        public IActionResult FormCreateSubmissionDate()
+        public IActionResult FormCreateSubmissionDate(int? id)
         {
-            ViewData["Title"] = "Create Submission Date page";
-            return View("admins/form_create_submission_date");
+            if (id != null)
+            {
+                ViewData["Title"] = "Edit Annual Magazine";
+                ViewData["ButtonLabel"] = "Update";
+            }
+            else
+            {
+                ViewData["Title"] = "Create Annual Magazine";
+                ViewData["ButtonLabel"] = "Submit";
+            }
+            AnnualMagazine annualMagazine = id != null ? _context.AnnualMagazines.Find(id) : new AnnualMagazine();
+            return View("admins/form_create_submission_date", annualMagazine);
         }
+
+        [HttpPost]
+        public IActionResult CreateAnnualMagazine(AnnualMagazine annualMagazine)
+        {
+            if (ModelState.IsValid)
+            {
+                int? maxAnnualMagazineId = _context.AnnualMagazines.Max(f => (int?)f.AnnualMagazineId);
+                int newFacultyId = (maxAnnualMagazineId ?? 0) + 1;
+                annualMagazine.AnnualMagazineId = newFacultyId;
+                _context.AnnualMagazines.Add(annualMagazine);
+                _context.SaveChanges();
+                return RedirectToAction("TableSubmissionDate");
+            }
+            return View("admins/form_create_submission_date", annualMagazine);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateAnnualMagazine(AnnualMagazine annualMagazine)
+        {
+            var existingAnnualMagazine = _context.AnnualMagazines.Find(annualMagazine.AnnualMagazineId);
+            if (existingAnnualMagazine == null)
+            {
+                return RedirectToAction("TableSubmissionDate");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Entry(existingAnnualMagazine).CurrentValues.SetValues(annualMagazine);
+                _context.SaveChanges();
+                return RedirectToAction("TableSubmissionDate");
+            }
+            return View("admins/form_create_submission_date", annualMagazine);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteAnnualMagazine(int id)
+        {
+            var annualManazineToDelete = _context.AnnualMagazines.Find(id);
+            if (annualManazineToDelete != null)
+            {
+                _context.AnnualMagazines.Remove(annualManazineToDelete);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("TableSubmissionDate"); // Chuyển hướng sau khi xóa
+        }
+
         public IActionResult TableUser()
         {
             ViewData["Title"] = "User Table page";
-            return View("admins/table_user");
+            var users = _userManager.Users.ToList();
+            return View("admins/table_user", users);
         }
         public IActionResult FormCreateUser()
         {
             ViewData["Title"] = "Create User page";
+            ViewBag.Roles = _roleManager.Roles.ToList();
+            var faculties = _context.Faculties.ToList();
+            if (faculties != null && faculties.Any())
+            {
+                ViewBag.FacultyId = new SelectList(faculties, "FacultyId", "Name");
+            }
+            else
+            {
+                ViewBag.FacultyId = new SelectList(new List<Faculty>(), "FacultyId", "Name");
+            }
             return View("admins/form_create_user");
         }
         //================================ COORINATORS ================================//
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FormCreateUser(COMP1640User model, string Role)
+        {
+            if (ModelState.IsValid)
+            {
+                // Create a new IdentityUser instance
+                var user = new COMP1640User
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FullName = model.FullName,
+                    ProfileImagePath = model.ProfileImagePath,
+                    PhoneNumber = model.PhoneNumber,
+                    DayOfBirth = model.DayOfBirth,
+                    Address = model.Address,
+                    FacultyId = model.FacultyId,
+                };
+
+                // Create the user in the database
+                var result = await _userManager.CreateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    // Find the role by its ID
+                    var selectedRole = await _roleManager.FindByIdAsync(Role);
+
+                    if (selectedRole != null)
+                    {
+                        // Assign the user to the selected role
+                        await _userManager.AddToRoleAsync(user, selectedRole.Name);
+                    }
+
+                    // Redirect to a success page or return a success message
+                    return RedirectToAction("TableUser");
+                }
+                else
+                {
+                    // If creation of user fails, add errors to model state
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+            }
+
+            return RedirectToAction("FormCreateUser");
+            // // If ModelState is invalid, return to the create user form with errors
+            // ViewData["Title"] = "Create User page";
+            // ViewBag.Roles = _roleManager.Roles.ToList();
+            // var faculties = _context.Faculties.ToList();
+            // if (faculties != null && faculties.Any())
+            // {
+            //     ViewBag.FacultyId = new SelectList(faculties, "FacultyId", "Name");
+            // }
+            // else
+            // {
+            //     ViewBag.FacultyId = new SelectList(new List<Faculty>(), "FacultyId", "Name");
+            // }
+            // return View("admins/form_create_user", model);
+        }
         public async Task<IActionResult> IndexCooridinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
@@ -386,18 +595,51 @@ namespace COMP1640.Controllers
         }
 
 
-        public IActionResult StudentSubmissionCoordinators()
+        public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
-            List<Contribution> contributions = _context.Contributions.Include(c => c.AnnualMagazine).ToList();
 
+            ViewData["Title"] = "List Submission";
 
-            ViewData["Title"] = "List Student Submission";
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null || currentUser.FacultyId == null)
+            {
+                return NotFound();
+            }
+            var currentFacultyId = currentUser.FacultyId;
+
+            var usersInSameFaculty = _context.Users.Where(u => u.FacultyId == currentFacultyId);
+
+            var contributions = _context.Contributions.Where(c => usersInSameFaculty.Any(u => u.Id == c.UserId));
+
             return View("coordinators/student_submission", contributions);
         }
         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
             var contribution = await _context.Contributions.FindAsync(id);
+
+            var contributions = _context.Contributions.ToList();
+            var userId = _userManager.GetUserId(User);
+            var anotherUserId = userId;
+            var user = await _userManager.FindByIdAsync(userId);
+            var userFullName = user.FullName;
+            var userAddress = user.Address;
+            var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == user.FacultyId);
+            var userFaculty = facultyName != null ? facultyName.Name : null;
+            var userEmail = user.Email;
+            var userProfileImagePath = user.ProfileImagePath;
+
+            ViewBag.userEmail = userEmail;
+            ViewBag.contributions = contributions;
+            ViewBag.userFaculty = userFaculty;
+            ViewBag.userId = anotherUserId;
+            ViewBag.contributionUserId = contribution.UserId;
+            ViewBag.contributionsTile = contribution.Title;
+            ViewBag.userFullName = userFullName;
+            ViewBag.userAddress = userAddress;
+            ViewBag.userProfileImagePath = userProfileImagePath;
+
             return View("coordinators/create_comment", contribution);
         }
         //================================ MANAGERS ================================//
@@ -537,23 +779,18 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateComment(Contribution contribution)
         {
-            
-                var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
-                if (existingContribution != null)
-                {
-                    
-                    existingContribution.Comment = contribution.Comment;
-                    
-                    _context.Update(existingContribution);
-                    await _context.SaveChangesAsync();
+
+            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+            if (existingContribution != null)
+            {
+
+                existingContribution.Comment = contribution.Comment;
+
+                _context.Update(existingContribution);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("StudentSubmissionCoordinators");
             }
-          
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
-
-
-
-
     }
 }
