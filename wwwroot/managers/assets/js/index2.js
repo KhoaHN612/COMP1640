@@ -176,7 +176,7 @@ var options = {
 var options = {
 	series: [{
 		name: "Revenue",
-		data: [240, 160, 555, 257, 671, 414]
+		data: [240, 360, 555, 257, 671, 414]
 	}],
 	chart: {
 		type: "line",
@@ -413,7 +413,7 @@ var options = {
 	},
 	colors: ["#3361ff"],
     xaxis: {
-        categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        categories: ["Airi Satou", "Ashton Cox", "Brielle Williamson", "Cedric Kelly", "Garrett Winters", "Herrod Chandler", "Rhona Davidson", "Tiger Nixon", "Sep", "Oct", "Nov", "Dec"]
     },
 	responsive: [
 		{

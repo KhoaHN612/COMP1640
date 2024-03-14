@@ -4,6 +4,7 @@ using COMP1640.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP1640.Migrations
 {
     [DbContext(typeof(Comp1640Context))]
-    partial class Comp1640ContextModelSnapshot : ModelSnapshot
+    [Migration("20240311155412_Update UserId type String in Contribution")]
+    partial class UpdateUserIdtypeStringinContribution
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,90 +26,32 @@ namespace COMP1640.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("COMP1640.Areas.Identity.Data.COMP1640User", b =>
+            modelBuilder.Entity("AspNetRoleAspNetUser", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("RoleId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.HasKey("RoleId", "UserId");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                    b.ToTable("AspNetRoleAspNetUser");
+                });
 
-                    b.Property<DateOnly>("DayOfBirth")
-                        .HasColumnType("date");
+            modelBuilder.Entity("AspNetUserRole", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                    b.HasKey("UserId", "RoleId");
 
-                    b.Property<int?>("FacultyId")
-                        .HasColumnType("int");
+                    b.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
 
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProfileImagePath")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FacultyId");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("COMP1640.Models.AnnualMagazine", b =>
@@ -134,7 +79,7 @@ namespace COMP1640.Migrations
                         .HasColumnName("title");
 
                     b.HasKey("AnnualMagazineId")
-                        .HasName("PK__AnnualMa__B59FC27F5CBC5719");
+                        .HasName("PK__AnnualMa__B59FC27FDFEF28B8");
 
                     b.ToTable("AnnualMagazines");
                 });
@@ -375,7 +320,7 @@ namespace COMP1640.Migrations
                         .HasColumnName("userId");
 
                     b.HasKey("ContributionId")
-                        .HasName("PK__Contribu__52B05C813D4CE088");
+                        .HasName("PK__Contribu__52B05C81F4193E07");
 
                     b.HasIndex(new[] { "AnnualMagazineId" }, "IX_Contributions_annualMagazineId");
 
@@ -404,7 +349,7 @@ namespace COMP1640.Migrations
                         .HasColumnName("name");
 
                     b.HasKey("FacultyId")
-                        .HasName("PK__Facultie__DBBF6FD15ADF4128");
+                        .HasName("PK__Facultie__DBBF6FD1EBCB2501");
 
                     b.ToTable("Faculties");
                 });
@@ -431,7 +376,7 @@ namespace COMP1640.Migrations
                         .HasColumnName("type");
 
                     b.HasKey("FileId")
-                        .HasName("PK__FileDeta__C2C6FFDCE73A7F89");
+                        .HasName("PK__FileDeta__C2C6FFDCEA78D4DE");
 
                     b.HasIndex(new[] { "ContributionId" }, "IX_FileDetails_contributionId");
 
@@ -464,7 +409,17 @@ namespace COMP1640.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("COMP1640.Models.AspNetUser", b =>
+                {
+                    b.HasOne("COMP1640.Models.Faculty", "Faculty")
+                        .WithMany("AspNetUsers")
+                        .HasForeignKey("FacultyId")
+                        .HasConstraintName("FK_AspNetUsers_Faculties");
+
+                    b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("COMP1640.Models.AspNetUserClaim", b =>
                 {
                     b.HasOne("COMP1640.Models.AspNetUser", "User")
                         .WithMany("AspNetUserClaims")
@@ -497,22 +452,13 @@ namespace COMP1640.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("COMP1640.Areas.Identity.Data.COMP1640User", b =>
-                {
-                    b.HasOne("COMP1640.Models.Faculty", "Faculty")
-                        .WithMany("COMP1640User")
-                        .HasForeignKey("FacultyId");
-
-                    b.Navigation("Faculty");
-                });
-
             modelBuilder.Entity("COMP1640.Models.Contribution", b =>
                 {
                     b.HasOne("COMP1640.Models.AnnualMagazine", "AnnualMagazine")
                         .WithMany("Contributions")
                         .HasForeignKey("AnnualMagazineId")
                         .IsRequired()
-                        .HasConstraintName("FK__Contribut__annua__656C112C");
+                        .HasConstraintName("FK__Contribut__annua__6477ECF3");
 
                     b.Navigation("AnnualMagazine");
                 });
@@ -523,60 +469,9 @@ namespace COMP1640.Migrations
                         .WithMany("FileDetails")
                         .HasForeignKey("ContributionId")
                         .IsRequired()
-                        .HasConstraintName("FK__FileDetai__contr__66603565");
+                        .HasConstraintName("FK__FileDetai__contr__656C112C");
 
                     b.Navigation("Contribution");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("COMP1640.Areas.Identity.Data.COMP1640User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.HasOne("COMP1640.Areas.Identity.Data.COMP1640User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("COMP1640.Areas.Identity.Data.COMP1640User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.HasOne("COMP1640.Areas.Identity.Data.COMP1640User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("COMP1640.Models.AnnualMagazine", b =>
@@ -605,7 +500,7 @@ namespace COMP1640.Migrations
 
             modelBuilder.Entity("COMP1640.Models.Faculty", b =>
                 {
-                    b.Navigation("COMP1640User");
+                    b.Navigation("AspNetUsers");
                 });
 #pragma warning restore 612, 618
         }
