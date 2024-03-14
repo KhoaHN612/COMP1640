@@ -55,17 +55,24 @@ namespace COMP1640.Controllers
             {
                 ContributionDate = jsonYearResult.Value as List<ContributionDate>;
             }
-            
+
+
+            //GET CONTRIBUTIONS BY USER
+            List<ContributionUser> ContributionUser = new List<ContributionUser>();
+            int selectedYearUser = DateTime.Now.Year;
+
+            if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
+            var userResult = await GetContributionByUser(selectedYearUser);
+
+            if (userResult is JsonResult jsonUserResult)
+            {
+                ContributionUser = jsonUserResult.Value as List<ContributionUser>;
+            }            
 
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
             ViewData["ContributionYear"] = ContributionDate;
-            
-            //print ContributionYear
-            foreach (var item in ContributionDate)
-            {
-                Console.WriteLine($"Year: {item.Year}, Month: {item.Month}, TotalByMonth: {item.TotalByMonth}");
-            }
+            ViewData["ContributionUser"] = ContributionUser;
             
             return View("admins/index");
         }
@@ -133,10 +140,50 @@ namespace COMP1640.Controllers
             return Json(contributions);
         }
 
+        // Quantity of contributions by user
+        public async Task<IActionResult> GetContributionByUser(int year)
+        {
+            /*
+            SELECT 
+                u.Id,
+                u.FullName,
+                f.name AS 'Faculty',
+                COUNT(c.status) AS 'Total contributions',
+                SUM(CASE WHEN c.status = 'Accepted' THEN 1 ELSE 0 END) AS 'Accepted',
+                SUM(CASE WHEN c.status = 'Rejected' THEN 1 ELSE 0 END) AS 'Rejected',
+                SUM(CASE WHEN c.status = 'Pending' THEN 1 ELSE 0 END) AS 'Pending'
+            FROM 
+                AspNetUsers u
+            JOIN 
+                Faculties f ON u.FacultyId = f.facultyID
+            JOIN 
+                Contributions c ON u.Id = c.userId
+            WHERE 
+                YEAR(c.submissionDate) = 2023
+            GROUP BY 
+                u.FullName, f.name;
+            */
 
-
-
-
+            List<ContributionUser> contributions = await _context.Users
+                .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
+                .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
+                .Where(uc => uc.Contributions.SubmissionDate.Year == year)
+                .GroupBy(uc => new { uc.UserFaculty.User.Id, uc.UserFaculty.User.FullName, uc.UserFaculty.Faculty.Name })
+                .Select(g => new ContributionUser
+                {
+                    Id = g.Key.Id,
+                    FullName = g.Key.FullName,
+                    Faculty = g.Key.Name,
+                    TotalContribution = g.Count(),
+                    TotalAccept = g.Where(c => c.Contributions.Status == "Accepted").Count(),
+                    TotalReject = g.Where(c => c.Contributions.Status == "Rejected").Count(),
+                    TotalPending = g.Where(c => c.Contributions.Status == "Pending").Count(),
+                    Year = year
+                })
+                .ToListAsync();
+            
+            return Json(contributions);
+        }
 
         public IActionResult TableFaculty()
         {

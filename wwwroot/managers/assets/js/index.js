@@ -1,3 +1,8 @@
+function SelectedYearUser(year) {
+	var url = '/Managers?task=ContributionUser&year=' + year;
+	//redirect to url
+	window.location.href = url;
+}
 
 function SelectedYear(year) {
     var url = '/Managers?task=ContributionYear&year=' + year;
@@ -10,6 +15,20 @@ function GetContributionByYear(year){
 	//redirect to url
 	window.location.href = url;
 }
+
+//total totalContributors
+document.addEventListener("DOMContentLoaded", function() {
+    var totalContributions = 0;
+
+    var contributionCells = document.querySelectorAll("#qtyContribution .totalContributionCell");
+    contributionCells.forEach(function(cell) {
+        if (!isNaN(parseInt(cell.textContent))) {
+            totalContributions += parseInt(cell.textContent);
+        }
+    });
+
+    document.getElementById("totalContributors").textContent = totalContributions + " contributors";
+});
 
 $(function () {
 	"use strict";
@@ -358,24 +377,38 @@ $(function () {
 
 	// chart 5
 	//Get Viewbag["ContributionYear"] 
+	//Nếu năm được chọn là năm hiện tại thì chỉ hiển thị đến tháng hiện tại
+	//Nếu năm được chọn là năm khác thì hiển thị đến tháng 12
 	var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-	var arrData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	var arrData = new Array(12).fill(0);
 	var contributionItems = document.querySelectorAll('.contribution-item');
 
 	for (var i = 0; i < contributionItems.length; i++) {
 		var contributionItem = contributionItems[i];
 		var month = parseInt(contributionItem.getAttribute('data-month'));
 		var total = contributionItem.getAttribute('data-total');
+
+		//Kiểm tra nếu 
 		arrData[month - 1] = total;
 	}
+
+	//Kiểm tra nếu năm được chọn là năm hiện tại thì chỉ hiển thị đến tháng hiện tại
+	//Nếu năm được chọn là năm khác thì hiển thị đến tháng 12
+	var selectedYear = document.getElementById("year").value;
+	var currentYear = new Date().getFullYear();
+	if (selectedYear == currentYear) {
+		var currentMonth = new Date().getMonth();
+		arrLabel = arrLabel.slice(0, currentMonth + 1);
+		arrData = arrData.slice(0, currentMonth + 1);
+	}
+
 
 	//Total Articles by sum of arrData
 	var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
 	document.getElementById('totalArticles').innerText = sum + ' articles';
 	
 
-	
 	var options = {
 		series: [{
 			name: "Articles",
@@ -1105,3 +1138,4 @@ var icons = document.querySelectorAll('.bi-square-fill');
 for (var i = 0; i < icons.length; i++) {
 	icons[i].style.backgroundColor = randomColor();
 }
+
