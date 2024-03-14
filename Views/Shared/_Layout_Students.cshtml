@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="COMP1640">
-    <link rel="icon" href="#" type="image/png" />
+    <link rel="icon" href="~/students/assets/img/logo/logo3.png" type="image/png" />
 
     <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <link href="~/students/assets/css/font-awesome.css" rel="stylesheet" type="text/css">
@@ -36,7 +36,7 @@
                                 <span class="icon-bar"></span>
                             </button>
                             <div class="navbar-brand nav" id="brand">
-                                <a href="index.html"><img src="~/students/assets/img/logo.png" alt="brand"></a>
+                                <a asp-controller="Students" asp-action="Index"><img src="~/students/assets/img/logo/logo2.png" alt="brand"></a>
                             </div>
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation">
@@ -57,7 +57,8 @@
                                     <a asp-controller="Students" asp-action="MyAccount">My Account</a>
                                 </li>
                                 <li>
-                                    <a asp-controller="Students" asp-action="LoginRegister" class="login">Login</a>
+                                    @* <a asp-controller="Students" asp-action="LoginRegister" class="login">Login</a> *@
+                                    <a asp-area="Identity" asp-page="/Account/Login" class="login">Login</a>
                                 </li>
                                 <li>
                                     <a asp-controller="Managers" asp-action="Index">Admin</a>
@@ -80,7 +81,7 @@
                     <div class="row">
                         <div class="col-md-3 col-sm-12">
                             <aside class="logo">
-                                <img src="~/students/assets/img/logo-white.png" class="vertical-center">
+                                <img src="~/students/assets/img/logo/logo3.png" class="vertical-center">
                             </aside>
                         </div><!-- /.col-md-3 -->
                         <div class="col-md-3 col-sm-4">

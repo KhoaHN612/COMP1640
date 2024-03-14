@@ -416,7 +416,7 @@ a {
 }
 
 .sidebar-wrapper .sidebar-header .logo-icon {
-    width: 35px;
+    width: 100%;
 }
 
 .sidebar-wrapper .sidebar-header  .logo-text {

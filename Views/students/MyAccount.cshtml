@@ -1,5 +1,4 @@
-﻿
-
+﻿@model IEnumerable<COMP1640.Models.Contribution>;
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 8px !important;
@@ -8,7 +7,9 @@
 <!-- Page Content -->
 <div id="page-content">
     <div class="container">
-        <header><h1>My Account</h1></header>
+        <header>
+            <h1>My Account</h1>
+        </header>
         <div class="row">
             <div class="col-md-12">
                 <section id="my-account">
@@ -22,10 +23,14 @@
                             <form id="profile-form" method="post" enctype="multipart/form-data">
                                 <!-- Thêm form tag với method POST và enctype cho file upload -->
                                 <section id="my-profile">
-                                    <header><h3>My Profile</h3></header>
+                                    <header>
+                                        <h3>My Profile</h3>
+                                    </header>
                                     <div class="my-profile">
                                         <figure class="profile-avatar">
-                                            <div class="image-wrapper"><img src="~/students/assets/img/profile-avatar.jpg" alt="Profile Avatar"></div>
+                                            <div class="image-wrapper"><img
+                                                    src="~/students/assets/img/profile-avatar.jpg" alt="Profile Avatar">
+                                            </div>
                                         </figure>
                                         <article>
                                             <div class="table-responsive">
@@ -35,7 +40,8 @@
                                                             <td class="title">Full Name</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="name" name="name" value="John Doe">
+                                                                    <input type="text" class="form-control" id="name"
+                                                                        name="name" value="John Doe">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -43,7 +49,8 @@
                                                             <td class="title">Location</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="location" name="location" value="London UK">
+                                                                    <input type="text" class="form-control"
+                                                                        id="location" name="location" value="London UK">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -51,7 +58,8 @@
                                                             <td class="title bio">Bio</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <textarea id="bio" name="bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit.In sollicitudin mi id urna pulvinar, in ornare dui scelerisque. Nunc nec odio eros. Integer placerat tempor nunc eget semper. Nulla vitae dictum est, et convallis mauris. Integer</textarea>
+                                                                    <textarea id="bio"
+                                                                        name="bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit.In sollicitudin mi id urna pulvinar, in ornare dui scelerisque. Nunc nec odio eros. Integer placerat tempor nunc eget semper. Nulla vitae dictum est, et convallis mauris. Integer</textarea>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -59,7 +67,9 @@
                                                             <td class="title">Website</td>
                                                             <td>
                                                                 <div class="input-group">
-                                                                    <input type="text" class="form-control" id="website" name="website" value="http://www.theme-starz.com">
+                                                                    <input type="text" class="form-control" id="website"
+                                                                        name="website"
+                                                                        value="http://www.theme-starz.com">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -82,72 +92,33 @@
                         </div><!-- /tab-pane -->
                         <div class="tab-pane" id="tab-my-courses">
                             <section id="course-list">
-                                <header><h3>My Submissions</h3> </header>
-                                <p><a asp-controller="Students" asp-action="FromCreateSubmission" class="btn btn-color-primary btn-small">Add new submission</a></p>
+                                <header>
+                                    <h3>My Submissions</h3>
+                                </header>
+                                <p><a asp-controller="Students" asp-action="FromCreateSubmission"
+                                        class="btn btn-color-primary btn-small">Add new submission</a></p>
                                 <table class="table table-hover table-responsive course-list-table tablesorter">
                                     <thead>
                                         <tr>
-                                            <th>Course Name</th>
-                                            <th>Course Type</th>
-                                            <th class="starts">Starts</th>
+                                            <th>Title</th>
+                                            <th class="starts">Date Submitted</th>
                                             <th class="status">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="status-not-started">
-                                            <th class="course-title"><a href="course-detail-v1.html">Introduction to modo 701</a></th>
-                                            <th class="course-category"><a href="#">Graphic Design and 3D</a></th>
-                                            <th>01-03-2014</th>
-                                            <th class="status"><i class="fa fa-calendar-o"></i>Not started yet</th>
-                                        </tr>
-                                        <tr class="status-not-started">
-                                            <th class="course-title"><a href="course-detail-v1.html">Become self marketer</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>03-03-2014</th>
-                                            <th class="status"><i class="fa fa-calendar-o"></i>Not started yet</th>
-                                        </tr>
-                                        <tr class="status-in-progress">
-                                            <th class="course-title"><a href="course-detail-v2.html">How to find long term customers</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>06-03-2014</th>
-                                            <th class="status"><i class="fa fa-clock-o"></i>In progress</th>
-                                        </tr>
-                                        <tr class="status-in-progress">
-                                            <th class="course-title"><a href="course-detail-v2.html">Neuroscience and the future</a></th>
-                                            <th class="course-category"><a href="#">Science</a></th>
-                                            <th>21-03-2014</th>
-                                            <th class="status"><i class="fa fa-clock-o"></i>In progress</th>
-                                        </tr>
-                                        <tr class="status-completed">
-                                            <th class="course-title"><a href="course-detail-v1.html">History in complex view</a></th>
-                                            <th class="course-category"><a href="#">History and Psychology</a></th>
-                                            <th>06-04-2014</th>
-                                            <th class="status"><i class="fa fa-check"></i>Completed</th>
-                                        </tr>
-                                        <tr class="status-completed">
-                                            <th class="course-title"><a href="course-detail-v1.html">Become self marketer</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>03-03-2014</th>
-                                            <th class="status"><i class="fa fa-check"></i>Completed</th>
-                                        </tr>
-                                        <tr class="status-completed">
-                                            <th class="course-title"><a href="course-detail-v1.html">How to find long term customers</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>06-03-2014</th>
-                                            <th class="status"><i class="fa fa-check"></i>Completed</th>
-                                        </tr>
-                                        <tr class="status-completed">
-                                            <th class="course-title"><a href="course-detail-v1.html">Neuroscience and the future</a></th>
-                                            <th class="course-category"><a href="#">Science</a></th>
-                                            <th>21-03-2014</th>
-                                            <th class="status"><i class="fa fa-check"></i>Completed</th>
-                                        </tr>
-                                        <tr class="status-completed">
-                                            <th class="course-title"><a href="course-detail-v1.html">History in complex view</a></th>
-                                            <th class="course-category"><a href="#">History and Psychology</a></th>
-                                            <th>06-04-2014</th>
-                                            <th class="status"><i class="fa fa-check"></i>Completed</th>
-                                        </tr>
+                                        @foreach (var item in ViewBag.contributions)
+                                        {
+                                            if (item.UserId == ViewBag.users)
+                                            {
+                                                <tr class="status-not-started">
+                                                    <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
+                                                    </th>
+                                                    <th>@item.SubmissionDate</th>
+                                                    <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
+                                                </tr>
+                                            }
+
+                                        }
                                     </tbody>
                                 </table>
                                 <div class="center">
@@ -161,7 +132,9 @@
                         </div><!-- /.tab-pane -->
                         <div class="tab-pane" id="tab-change-password">
                             <section id="password">
-                                <header><h3>Change Password</h3></header>
+                                <header>
+                                    <h3>Change Password</h3>
+                                </header>
                                 <div class="row">
                                     <div class="col-md-5 col-md-offset-4">
                                         <p>

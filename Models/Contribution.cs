@@ -14,7 +14,7 @@ public partial class Contribution
     public int ContributionId { get; set; }
 
     [Column("userId")]
-    public string UserId { get; set; }
+    public String UserId { get; set; }
 
     [Column("annualMagazineId")]
     public int AnnualMagazineId { get; set; }
@@ -40,3 +40,37 @@ public partial class Contribution
     [InverseProperty("Contribution")]
     public virtual ICollection<FileDetail> FileDetails { get; set; } = new List<FileDetail>();
 }
+
+// INSERT INTO [dbo].[Contributions]
+//            ([contributionId]
+//            ,[userId]
+//            ,[annualMagazineId]
+//            ,[title]
+//            ,[submissionDate]
+//            ,[comment]
+//            ,[status])
+// VALUES
+//            (1
+//            ,'4891e32b-3857-4d33-be0e-eb35fb34feb6'
+//            ,1
+//            ,'Sample Title 1'
+//            ,GETDATE() -- Ngày hiện tại
+//            ,'Sample comment 1'
+//            ,'Pending'),
+
+//            (2
+//            ,'6be2b819-ac98-42e8-a697-c2508b32badc'
+//            ,4
+//            ,'Sample Title 2'
+//            ,GETDATE() -- Ngày hiện tại
+//            ,'Sample comment 2'
+//            ,'Pending'),
+
+//            (3
+//            ,'8a265432-a08c-487a-af27-f8e49d783dc1'
+//            ,1
+//            ,'Sample Title 3'
+//            ,GETDATE() -- Ngày hiện tại
+//            ,'Sample comment 3'
+//            ,'Pending')
+// GO
