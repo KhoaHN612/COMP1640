@@ -387,6 +387,7 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "User Table page";
             var users = _userManager.Users.ToList();
+            ViewBag.Context = _context;
             return View("admins/table_user", users);
         }
         public IActionResult FormCreateUser()
