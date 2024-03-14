@@ -631,14 +631,15 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-
             if (contribution != null)
             {
                 var submissionDate = contribution.SubmissionDate;
                 var deadline = submissionDate.AddDays(14);
-                ViewBag.Deadline = deadline;
+                if (deadline >= submissionDate)
+                {
+                    ViewBag.Deadline = deadline;
+                }
             }
-
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
