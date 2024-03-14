@@ -269,7 +269,8 @@ namespace COMP1640.Controllers
         }
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
-            ViewData["Title"] = "Create Comment";
+
+            ViewData["Title"] = "List Submission";
 
             var currentUser = await _userManager.GetUserAsync(User);
 
