@@ -7,8 +7,6 @@ $(window).on('load', function () {
 	var totalContributionDataElement = document.getElementById("totalContributionData");
 	var totalContributionData = JSON.parse(totalContributionDataElement.dataset.totalcontribution);
 
-	console.log(totalContributionData);
-
 	//Sum of totalContributionData by totalContributionData
 	var sumContribution = totalContributionData.reduce((a, b) => a + b.total, 0);
 	document.getElementById('totalContributions').innerText = sumContribution + ' articles';
@@ -33,6 +31,18 @@ $(window).on('load', function () {
 
 	var sumPending = totalPendingData.reduce((a, b) => a + b.total, 0);
 	document.getElementById('totalPending').innerText = sumPending + ' articles';
+
+	//=======================================================COORDINATORS CHART=======================================================
+	//Retrieve the data from the HTML data attribute
+	console.log("Contributions without comments");
+
+	var totalContributionDataElement = document.getElementById("contributionWithoutCommentsData");
+	//print totalContributionDataElement
+	console.log(totalContributionDataElement);
+	var totalContributionData = JSON.parse(totalContributionDataElement.dataset.contributionwithoutcomments);
+
+	console.log(totalContributionData);
+
 });
 
 function SelectedYearInCoordinators(year) {
@@ -62,6 +72,44 @@ function GetContributionByYear(year){
 
 $(function () {
 	"use strict";
+	
+//Chart coordinators
+
+// arrWithoutCommentsData = [];
+// arrCategoriesDays = ["01/01/21", "02/01/21", "03/01/21", "04/01/21", "05/01/21", "06/01/21", "07/01/21", "08/01/21", "09/01/21", "10/01/21"];
+
+var options = {
+	series: [{
+	name: 'series1',
+	data: [31, 40, 28, 51, 42, 109, 100]
+}, {
+	name: 'series2',
+	data: [11, 32, 45, 32, 34, 52, 41]
+}],
+	chart: {
+	height: 350,
+	type: 'area'
+},
+dataLabels: {
+	enabled: false
+},
+stroke: {
+	curve: 'smooth'
+},
+xaxis: {
+	type: 'datetime',
+	categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+},
+tooltip: {
+	x: {
+	format: 'dd/MM/yy HH:mm'
+	},
+},
+};
+
+var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
+chart.render();
+
 
 	// Admin Chart
 	
@@ -625,6 +673,7 @@ $(function () {
 	chart.render();
 	//COORDINATORS END
 
+	
 
 	// chart 7
 
@@ -1019,100 +1068,6 @@ $(function () {
 	var chart = new ApexCharts(document.querySelector("#chart10"), options);
 	chart.render();
 
-
-
-	// // chart 11
-
-	// var options = {
-	// 	series: [{
-	// 		name: "New Visitors",
-	// 		data: [640, 560, 871, 614, 755, 457, 650]
-	// 	}, {
-	// 		name: "Old Visitors",
-	// 		data: [440, 360, 671, 414, 555, 257, 450]
-	// 	}],
-	// 	chart: {
-	// 		foreColor: '#9a9797',
-	// 		type: "bar",
-	// 		//width: 130,
-	// 		stacked: true,
-	// 		height: 280,
-	// 		toolbar: {
-	// 			show: !1
-	// 		},
-	// 		zoom: {
-	// 			enabled: !1
-	// 		},
-	// 		dropShadow: {
-	// 			enabled: 0,
-	// 			top: 3,
-	// 			left: 15,
-	// 			blur: 4,
-	// 			opacity: .12,
-	// 			color: "#3461ff"
-	// 		},
-	// 		sparkline: {
-	// 			enabled: !1
-	// 		}
-	// 	},
-	// 	markers: {
-	// 		size: 0,
-	// 		colors: ["#3461ff", "#c1cfff"],
-	// 		strokeColors: "#fff",
-	// 		strokeWidth: 2,
-	// 		hover: {
-	// 			size: 7
-	// 		}
-	// 	},
-	// 	plotOptions: {
-	// 		bar: {
-	// 			horizontal: !1,
-	// 			columnWidth: "35%",
-	// 			//endingShape: "rounded"
-	// 		}
-	// 	},
-	// 	dataLabels: {
-	// 		enabled: !1
-	// 	},
-	// 	legend: {
-	// 		show: false,
-	// 	},
-	// 	stroke: {
-	// 		show: !0,
-	// 		width: 0,
-	// 		curve: "smooth"
-	// 	},
-	// 	colors: ["#3461ff", "#c1cfff"],
-	// 	xaxis: {
-	// 		categories: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-	// 	},
-	// 	tooltip: {
-	// 		theme: "dark",
-	// 		fixed: {
-	// 			enabled: !1
-	// 		},
-	// 		x: {
-	// 			show: !1
-	// 		},
-	// 		y: {
-	// 			title: {
-	// 				formatter: function (e) {
-	// 					return ""
-	// 				}
-	// 			}
-	// 		},
-	// 		marker: {
-	// 			show: !1
-	// 		}
-	// 	}
-	// };
-
-	// var chart = new ApexCharts(document.querySelector("#chart11"), options);
-	// chart.render();
-
-
-
-
 	// worl map
 
 	jQuery('#geographic-map').vectorMap(
@@ -1182,49 +1137,6 @@ var icons = document.querySelectorAll('.bi-square-fill');
 for (var i = 0; i < icons.length; i++) {
 	icons[i].style.backgroundColor = randomColor();
 }
-
-
-//Chart coordinators
-
-//Retrieve the data from the HTML data attribute
-// var totalContributionDataElement = document.getElementById("contributionWithoutCommentsData");
-// var totalContributionData = JSON.parse(totalContributionDataElement.dataset.contributionWithoutComments);
-
-// console.log(totalContributionData);
-
-// var options = {
-// 	series: [{
-// 	name: 'Contributions without comments',
-// 	data: arrWithoutCommentsData
-//   }, {
-// 	name: 'Contributions without comments (14 days+)',
-// 	data: arrWithoutComments14DaysData
-//   }],
-// 	chart: {
-// 	height: 350,
-// 	type: 'area'
-//   },
-//   dataLabels: {
-// 	enabled: false
-//   },
-//   stroke: {
-// 	curve: 'smooth'
-//   },
-//   xaxis: {
-// 	type: 'datetime',
-// 	categories: arrCategoriesDays
-//   },
-//   tooltip: {
-// 	x: {
-// 	  format: 'dd/MM/yy HH:mm'
-// 	},
-//   },
-//   };
-// var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
-// chart.render();
-
-
-
 
 //total totalContributors
 document.addEventListener("DOMContentLoaded", function() {
