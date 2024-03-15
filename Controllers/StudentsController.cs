@@ -5,6 +5,7 @@ using COMP1640.Migrations;
 using COMP1640.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace COMP1640.Controllers
@@ -115,6 +116,20 @@ namespace COMP1640.Controllers
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
+        public async Task<IActionResult> FromEditSubmission(int id)
+        {
+            ViewData["Title"] = "From Submission";
+            var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+            var academicYear = await _context.Contributions
+                .Where(c => c.ContributionId == id)
+                .Select(c => c.AnnualMagazine.AcademicYear)
+                .FirstOrDefaultAsync();
+            if (academicYear != null)
+            {
+                ViewBag.academicYear = academicYear;
+            }
+            return View("~/Views/managers/student/student_edit_submission.cshtml", contribution);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -122,7 +137,6 @@ namespace COMP1640.Controllers
         {
 
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
-            // Console.WriteLine(fileDetail.ContributionFile.FileName);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
             string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
             if (fileExtension == ".docx")
@@ -165,25 +179,23 @@ namespace COMP1640.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: StudentsController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
         // POST: StudentsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> EditSubmission( int id, FileDetail newContribution)
         {
-            try
+            var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+
+            Console.WriteLine(newContribution.ContributionFile.FileName);
+            string uniqueFileName = GetUniqueFileName(newContribution.ContributionFile.FileName);
+            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
-                return RedirectToAction(nameof(Index));
+                await newContribution.ContributionFile.CopyToAsync(fileStream);
             }
-            catch
-            {
-                return View();
-            }
+            newContribution.FilePath = uniqueFileName;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: StudentsController/Delete/5
@@ -269,17 +281,21 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
-        public IActionResult SubmissionDetail(){
+        public async Task<IActionResult> SubmissionDetail(int id)
+        {
             ViewData["Title"] = "Submission Detail";
-            return View();
+            var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+            return View(contribution);
         }
 
-        public IActionResult PostLists(){
+        public IActionResult PostLists()
+        {
             ViewData["Title"] = "Post Lists";
             return View();
         }
-        
-        public IActionResult PostDetail(){
+
+        public IActionResult PostDetail()
+        {
             ViewData["Title"] = "Post Detail";
             return View();
         }
