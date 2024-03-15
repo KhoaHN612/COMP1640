@@ -1,0 +1,76 @@
+﻿@model COMP1640.Models.Contribution
+
+<main class="page-content">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <div class="breadcrumb-title pe-3">Forms</div>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCooridinators"><i
+                                class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active"><a asp-controller="Managers"
+                            asp-action="TablePost">List post</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">From @ViewData["Title"]</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-9 mx-auto">
+            <h6 class="mb-0 text-uppercase">@ViewData["Title"] Form</h6>
+            <hr />
+            <div class="card">
+                <div class="card-body">
+                    <div class="border p-4 rounded">
+                        <!-- Start of form -->
+                        <form action="@Url.Action(Model.ContributionId == 0 ? "CreatePost" : "UpdatePost", "Managers")" method="post">
+                            <div class="card-title d-flex align-items-center">
+                                <h5 class="mb-0">>@ViewData["Title"] Registration</h5>
+                            </div>
+                            <hr />
+                            <!-- Name Input -->
+                            <input type="hidden" id="facultyId" name="facultyId" value=""> 
+                            <div class="row mb-3">
+                                <label for="inputEnterArticleName" class="col-sm-3 col-form-label">
+                                    Post title
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputEnterArticleName"
+                                            name="name" placeholder="Enter title" value="">
+                                </div>
+                            </div>
+                            <!-- Email Address Input -->
+                            <div class="row mb-3">
+                                <label for="inputEmailAddress2" class="col-sm-3 col-form-label">
+                                    Topic
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputEmailAddress2"
+                                            name="deanName" placeholder="Enter topic" value="">
+                                </div>
+                            </div>
+                            <!-- Address Input -->
+                            <div class="row mb-3">
+                                <label for="inputDescription4"
+                                        class="col-sm-3 col-form-label">Description</label>
+                                <div class="col-sm-9">
+                                    <textarea class="form-control" id="inputDescription4" name="description"
+                                            rows="3" placeholder="Description"></textarea>
+                                </div>
+                            </div>
+                            <!-- Submit Button -->
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-9">
+                                    <button type="submit" class="btn btn-primary px-5">@ViewData["ButtonLabel"]</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- End of form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

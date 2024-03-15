@@ -127,7 +127,7 @@ namespace COMP1640.Controllers
             List<ContributionFaculty> contributions = await _context.Users
                 .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
                 .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
-                .Where(uc => uc.Contributions.SubmissionDate.Year == date.Year && uc.Contributions.Status == "Accepted")
+                .Where(uc => uc.Contributions.SubmissionDate.Year == date.Year && uc.Contributions.Status == "Approved")
                 .GroupBy(uc => uc.UserFaculty.Faculty.Name)
                 .Select(g => new ContributionFaculty
                 {
@@ -159,7 +159,7 @@ namespace COMP1640.Controllers
             */
 
             List<ContributionDate> contributions = await _context.Contributions
-                .Where(c => c.Status == "Accepted" && c.SubmissionDate.Year == year)
+                .Where(c => c.Status == "Approved" && c.SubmissionDate.Year == year)
                 .GroupBy(c => new { c.SubmissionDate.Year, c.SubmissionDate.Month })
                 .Select(g => new ContributionDate
                 {
@@ -209,7 +209,7 @@ namespace COMP1640.Controllers
                     FullName = g.Key.FullName,
                     Faculty = g.Key.Name,
                     TotalContribution = g.Count(),
-                    TotalAccept = g.Where(c => c.Contributions.Status == "Accepted").Count(),
+                    TotalAccept = g.Where(c => c.Contributions.Status == "Approved").Count(),
                     TotalReject = g.Where(c => c.Contributions.Status == "Rejected").Count(),
                     TotalPending = g.Where(c => c.Contributions.Status == "Pending").Count(),
                     Year = year
@@ -405,7 +405,7 @@ namespace COMP1640.Controllers
             }
             return View("admins/form_create_user");
         }
-        //================================ COORINATORS ================================//
+        //================================ COORDINATORS ================================//
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FormCreateUser(COMP1640User model, string Role)
@@ -572,7 +572,7 @@ namespace COMP1640.Controllers
             switch (action)
             {
                 case "TotalContributionsAccepted":
-                    query = query.Where(c => c.Status == "Accepted");
+                    query = query.Where(c => c.Status == "Approved");
                     break;
                 case "TotalContributionsRejected":
                     query = query.Where(c => c.Status == "Rejected");
@@ -653,6 +653,44 @@ namespace COMP1640.Controllers
 
             return View("coordinators/create_comment", contribution);
         }
+        //=============================== POSTS ====================================//
+        public IActionResult TablePost(){
+            ViewData["Title"] = "List of Posts";
+            return View("coordinators/table_post");
+        }
+
+        public IActionResult FormCreatePost(int? id)
+        {
+            if (id != null)
+            {
+                ViewData["Title"] = "Edit Post";
+                ViewData["ButtonLabel"] = "Update";
+            }
+            else
+            {
+                ViewData["Title"] = "Create Post";
+                ViewData["ButtonLabel"] = "Submit";
+            }
+            Contribution contribution = id != null ? _context.Contributions.Find(id) : new Contribution();
+            return View("coordinators/form_create_post", contribution);
+        }
+
+        // [HttpPost]
+        // public IActionResult CreatePost()
+        // {
+
+        // }
+        // [HttpPost]
+        // public IActionResult UpdatePost()
+        // {
+            
+        // }
+
+        // [HttpDelete]
+        // public IActionResult DeletePost()
+        // {
+
+        // }
         //================================ MANAGERS ================================//
         public IActionResult IndexManagers()
         {
