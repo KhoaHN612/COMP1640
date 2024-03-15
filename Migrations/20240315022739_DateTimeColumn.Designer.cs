@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP1640.Migrations
 {
     [DbContext(typeof(Comp1640Context))]
-    [Migration("20240311184827_ProfileImagePathCanBeNull")]
-    partial class ProfileImagePathCanBeNull
+    [Migration("20240315022739_DateTimeColumn")]
+    partial class DateTimeColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,8 +161,8 @@ namespace COMP1640.Migrations
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("status");
 
-                    b.Property<DateOnly>("SubmissionDate")
-                        .HasColumnType("date")
+                    b.Property<DateTime>("SubmissionDate")
+                        .HasColumnType("datetime2")
                         .HasColumnName("submissionDate");
 
                     b.Property<string>("Title")
