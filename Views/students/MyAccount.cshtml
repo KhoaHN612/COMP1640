@@ -119,7 +119,7 @@
                                             if (item.UserId == ViewBag.userId)
                                             {
                                                 <tr class="status-not-started">
-                                                    <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
+                                                    <th class="course-title"><a asp-action="SubmissionDetail" asp-controller="Students">@item.Title</a>
                                                     </th>
                                                     <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th>
                                                     <th>@item.SubmissionDate</th>

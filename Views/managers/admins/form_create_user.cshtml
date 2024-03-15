@@ -68,17 +68,19 @@
                                 </label>
                                 <div class="col-sm-9">
                                     <input type="date" class="form-control" asp-for="DayOfBirth"
-                                           placeholder="">
+                                            placeholder="">
                                 </div>
                                 <script>
                                     document.getElementById('DayOfBirth').valueAsDate = new Date();
                                 </script>
                             </div>
                             <div class="row mb-3">
-                                <label asp-for="FacultyId" class="control-label col-sm-3 col-form-label">Faculty</label>
-                                <select asp-for="FacultyId" asp-items="@ViewBag.FacultyId" class="col-sm-9 form-control">
-                                    <option disabled selected> -- Select a faculty -- </option>
-                                </select>
+                                <label asp-for="FacultyId" class="col-sm-3 col-form-label">Faculty</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="FacultyId" asp-items="@ViewBag.FacultyId" class="col-sm-9 form-control">
+                                        <option disabled selected> -- Select a faculty -- </option>
+                                    </select>
+                                </div> 
                             </div>
                             <input type="hidden" asp-for="ProfileImagePath" value="Waiting">
                             <div class="row mb-3">

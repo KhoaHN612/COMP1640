@@ -20,6 +20,11 @@
         </div>
     </div>
     <hr />
+    <div class="row">
+        <div class="col d-flex justify-content-end">
+            <a asp-action="FormCreatePost" asp-controller="Managers" type="button" class="btn btn-info px-5"><i class="bi bi-plus"></i> Create new</a>
+        </div>
+    </div>
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -36,7 +41,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @{
+                        @* @{
                             int index = 1;
                         }
                         @foreach (var contributions in Model)
@@ -89,7 +94,7 @@
                                 </td>
                             </tr>
                             index++;
-                        }
+                        } *@
                     </tbody>
                     <tfoot>
                         <tr>

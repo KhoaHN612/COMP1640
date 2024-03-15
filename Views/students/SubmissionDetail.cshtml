@@ -1,0 +1,188 @@
+<style>
+    .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after{
+        height:10px !important;
+    }
+    .vertical-center{
+        bottom: 0;
+        margin: auto;
+        top: 5vw;
+        position: absolute;
+    }
+</style>
+<!-- Breadcrumb -->
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Courses</a></li>
+        <li class="active">Detail v1</li>
+    </ol>
+</div>
+<!-- end Breadcrumb -->
+
+<!-- Page Content -->
+<div id="page-content">
+    <div class="container">
+        <header><h1>Submission Detail</h1></header>
+        <div class="row">
+            <!--MAIN Content-->
+            <div class="col-md-12">
+                <div id="page-main">
+                    <section id="course-detail">
+                        <article class="course-detail">
+                            <section id="course-header">
+                                <header>
+                                    <h2 class="course-date">Title of the Submission</h2>
+                                    <div class="course-category">Date: <span>10/3/2024</span></div>
+                                </header>
+                                <hr>
+                                <section id="join-to-course" class="center">
+                                    <a asp-controller="Students" asp-action="FromCreateSubmission" class="btn">Change Submission</a>
+                                </section>
+                                <hr>
+                                <figure id="course-summary">
+                                    <span class="course-summary" id="course-length"><i class="fa fa-book"></i>Magazine Name</span>
+                                    <span class="course-summary" id="course-time-amount"><i class="fa fa-rocket" aria-hidden="true"></i></i>Status</span>
+                                </figure><!-- /#course-summary -->
+                            </section><!-- /#course-header -->
+
+                            <section id="course-info">
+                                <header><h2>Submission Info</h2></header>
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse et urna fringilla, volutpat elit non,
+                                    tristique lectus. Nam blandit odio nisl, ac malesuada lacus fermentum sit amet. Vestibulum vitae
+                                    aliquet felis, ornare feugiat elit. Nulla varius condimentum elit, sed pulvinar leo sollicitudin vel.
+                                </p>
+                                <p>
+                                    Maecenas sodales, nisl eget dignissim molestie, ligula est consectetur metus, et mollis justo urna
+                                    sit amet nulla. Etiam lectus arcu, pellentesque eu tellus tempor, tristique ultrices leo. Nullam at
+                                    felis mauris. Aenean in neque eu ligula tempor ornare. Mauris tristique in elit a blandit. Nam laoreet
+                                    vulputate nisi eu accumsan. Sed faucibus arcu nec est facilisis dignissim. Fusce risus leo, euismod ut
+                                    cursus vitae, imperdiet id quam. Pellentesque habitant morbi tristique senectus et netus et malesuada
+                                    fames ac turpis egestas. Fusce mollis mi vulputate leo vestibulum, quis scelerisque libero condimentum.
+                                    Praesent rutrum consequat lacus quis suscipit. Proin dapibus mi non semper lobortis.
+                                </p>
+                                <p>
+                                    Ut dignissim placerat est, sit amet tincidunt enim. Sed nisi nisi, ornare vitae lacinia a, mattis quis tortor.
+                                    Suspendisse ornare adipiscing nunc, sit amet aliquam diam condimentum quis. Sed in leo sit amet sapien
+                                    porttitor vestibulum a ut est. In hac habitasse platea dictumst. Mauris quam dui, cursus nec lorem non,
+                                    pellentesque elementum dui. Vestibulum volutpat, risus vitae scelerisque fringilla, ligula nisi egestas
+                                    sem, id vulputate ligula nulla ac ligula.
+                                </p>
+                            </section><!-- /#course-info -->
+
+                            <section id="presentation">
+                                <header><h2>Your Current Submission </h2></header>
+                                <div class="presentation" style="width: 100%">
+                                    <a class="pdf-object" href="assets/pdf/presentation.pdf" style="width: 100%">Course Presentation</a>
+                                </div>
+                            </section>
+
+                            <section id="comments">
+                                <header><h2>Comments</h2></header>
+                                <ul class="discussion-list">
+                                    <li class="author-block">
+                                        <figure class="author-picture"><img src="assets/img/student-testimonial.jpg"></figure>
+                                        <article class="paragraph-wrapper">
+                                            <div class="inner">
+                                                <header><h5>Rachel Britain</h5></header>
+                                                <div class="rating-individual" data-score="5"></div>
+                                                <p>
+                                                    Mauris elementum et libero ac pharetra. Proin tristique dapibus tellus,
+                                                    lacinia blandit mi tincidunt at. Vivamus vitae interdum felis.
+                                                    Pellentesque congue mollis erat in imperdiet.
+                                                </p>
+                                            </div>
+                                            <div class="comment-controls">
+                                                <span>08-24-2014</span>
+                                                <a href="#leave-reply">Reply</a>
+                                            </div>
+                                        </article>
+                                    </li><!-- /parent item -->
+                                    <li>
+                                        <ul class="discussion-child">
+                                            <li class="author-block">
+                                                <figure class="author-picture"><img src="assets/img/discussion-author-03.jpg"></figure>
+                                                <article class="paragraph-wrapper">
+                                                    <div class="inner">
+                                                        <header><h5>John Doe</h5></header>
+                                                        <div class="rating-individual" data-score="4"></div>
+                                                        <p>
+                                                            Mauris elementum et libero ac pharetra. Proin tristique dapibus tellus,
+                                                            lacinia blandit mi tincidunt at. Vivamus vitae interdum felis.
+                                                            Pellentesque congue mollis erat in imperdiet.
+                                                        </p>
+                                                    </div>
+                                                    <div class="comment-controls">
+                                                        <span>08-24-2014</span>
+                                                        <a href="#leave-reply">Reply</a>
+                                                    </div>
+                                                </article>
+                                            </li>
+                                        </ul><!-- /.discussion-child -->
+                                    </li><!-- /parent item -->
+                                    <li class="author-block">
+                                        <figure class="author-picture"><img src="assets/img/discussion-author-02.jpg"></figure>
+                                        <article class="paragraph-wrapper">
+                                            <div class="inner">
+                                                <header><h5>Jane Mason</h5></header>
+                                                <div class="rating-individual" data-score="5"></div>
+                                                <p>
+                                                    Mauris elementum et libero ac pharetra. Proin tristique dapibus tellus,
+                                                    lacinia blandit mi tincidunt at. Vivamus vitae interdum felis.
+                                                    Pellentesque congue mollis erat in imperdiet.
+                                                </p>
+                                            </div>
+                                            <div class="comment-controls">
+                                                <span>08-24-2014</span>
+                                                <a href="#leave-reply">Reply</a>
+                                            </div>
+                                        </article>
+                                    </li><!-- /parent item -->
+                                </ul><!-- /.discussion-list -->
+                            </section><!-- /.comments -->
+
+                            <section id="leave-reply">
+                                <header><h2>Leave a Reply</h2></header>
+                                <form class="reply-form" method="post">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <div class="controls">
+                                                    <label for="name">Your Name</label>
+                                                    <input type="text" id="name" name="name" required="required">
+                                                </div><!-- /.controls -->
+                                            </div><!-- /.control-group -->
+                                        </div><!-- /.col-md-4 -->
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <div class="controls">
+                                                    <label for="email">Your Email</label>
+                                                    <input type="email"id="email" name="email" required="required">
+                                                </div><!-- /.controls -->
+                                            </div><!-- /.control-group -->
+                                        </div><!-- /.col-md-4 -->
+                                    </div><!-- /.row -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="input-group">
+                                                <div class="controls">
+                                                    <label for="message">Your Message</label>
+                                                    <textarea name="message" id="message" required="required"></textarea>
+                                                </div><!-- /.controls -->
+                                            </div><!-- /.control-group -->
+                                        </div><!-- /.col-md-4 -->
+                                    </div><!-- /.row -->
+                                    <div class="form-actions pull-right">
+                                        <input type="submit" class="btn btn-color-primary" value="Reply">
+                                    </div><!-- /.form-actions -->
+                                </form><!-- /.reply-form -->
+                            </section>
+
+                        </article><!-- /.course-detail -->
+                    </section><!-- /.course-detail -->
+                </div><!-- /#page-main -->
+            </div><!-- /.col-md-8 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</div>
+<!-- end Page Content -->

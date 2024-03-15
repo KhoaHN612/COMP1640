@@ -268,5 +268,20 @@ namespace COMP1640.Controllers
                    + Guid.NewGuid().ToString().Substring(0, 4)
                    + Path.GetExtension(fileName);
         }
+
+        public IActionResult SubmissionDetail(){
+            ViewData["Title"] = "Submission Detail";
+            return View();
+        }
+
+        public IActionResult PostLists(){
+            ViewData["Title"] = "Post Lists";
+            return View();
+        }
+        
+        public IActionResult PostDetail(){
+            ViewData["Title"] = "Post Detail";
+            return View();
+        }
     }
 }
