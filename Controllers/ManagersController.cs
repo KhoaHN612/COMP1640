@@ -43,6 +43,7 @@ namespace COMP1640.Controllers
             }
             return RedirectToAction("TableUser");
         }
+
         public async Task<IActionResult> Index(string task, string year)
         {
             Console.WriteLine($"Action: {task}task, Year: {year}");
@@ -127,7 +128,7 @@ namespace COMP1640.Controllers
             List<ContributionFaculty> contributions = await _context.Users
                 .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
                 .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
-                .Where(uc => uc.Contributions.SubmissionDate.Year == date.Year && uc.Contributions.Status == "Accepted")
+                .Where(uc => uc.Contributions.SubmissionDate.Year == date.Year && uc.Contributions.Status == "Approved")
                 .GroupBy(uc => uc.UserFaculty.Faculty.Name)
                 .Select(g => new ContributionFaculty
                 {
@@ -159,7 +160,7 @@ namespace COMP1640.Controllers
             */
 
             List<ContributionDate> contributions = await _context.Contributions
-                .Where(c => c.Status == "Accepted" && c.SubmissionDate.Year == year)
+                .Where(c => c.Status == "Approved" && c.SubmissionDate.Year == year)
                 .GroupBy(c => new { c.SubmissionDate.Year, c.SubmissionDate.Month })
                 .Select(g => new ContributionDate
                 {
@@ -209,7 +210,7 @@ namespace COMP1640.Controllers
                     FullName = g.Key.FullName,
                     Faculty = g.Key.Name,
                     TotalContribution = g.Count(),
-                    TotalAccept = g.Where(c => c.Contributions.Status == "Accepted").Count(),
+                    TotalAccept = g.Where(c => c.Contributions.Status == "Approved").Count(),
                     TotalReject = g.Where(c => c.Contributions.Status == "Rejected").Count(),
                     TotalPending = g.Where(c => c.Contributions.Status == "Pending").Count(),
                     Year = year
@@ -495,18 +496,19 @@ namespace COMP1640.Controllers
             FROM Contributions
             WHERE YEAR(SubmissionDate) = 2024
                 AND Comment IS NULL
-            GROUP BY MONTH(SubmissionDate);
+            GROUP BY SubmissionDate;
             */
 
-            List<ContributionWithoutComment> contributionWithoutComments = await _context.Contributions
-                .Where(c => c.SubmissionDate.Year == currentDate.Year && c.Comment == null)
-                .GroupBy(c => new { c.SubmissionDate.Year, c.SubmissionDate.Month })
-                .Select(g => new ContributionWithoutComment
+            var contributionWithoutComments = await _context.Contributions
+                .Where(c => c.SubmissionDate.Year == DateTime.Now.Year && c.Comment == null)
+                .GroupBy(c => c.SubmissionDate)
+                .Select(g => new 
                 {
-                    Date = new DateTime(g.Key.Year, g.Key.Month, 1),
+                    Date = g.Key,
                     ContributionsWithoutComments = g.Count()
                 })
                 .ToListAsync();
+
 
             foreach (var item in contributionWithoutComments)
             {
@@ -515,36 +517,34 @@ namespace COMP1640.Controllers
 
             Console.WriteLine("==============================================");
             
-            //Check after 14 days from contribution date
-            if(year != null)
-            {
-                foreach (var item in contributionWithoutComments)
-                {
-                    item.ContributionsWithoutCommentsAfter14Days = item.ContributionsWithoutComments;
-                }
-            }else{
-                //Kiểm tra quá 14 ngày từ ngày nộp bài hay không
-                foreach (var item in contributionWithoutComments)
-                {
-                    var date = item.Date;
-                    var dateAfter14Days = date.AddDays(14);
-                    var contributions = await _context.Contributions
-                        .Where(c => c.SubmissionDate.Year == date.Year && c.SubmissionDate.Month == date.Month && c.Comment == null)
-                        .ToListAsync();
-                    foreach (var contribution in contributions)
-                    {
-                        if (contribution.SubmissionDate.Day < DateTime.Now.Day)
-                        {
-                            item.ContributionsWithoutCommentsAfter14Days++;
-                        }
-                    }
-                }
-            }   
+            //Get contribution without comment and withou comment after 14 days
+            /*
+            SELECT MONTH(submissionDate) AS Date,
+                COUNT(*) AS ContributionsWithoutComments
+            FROM Contributions
+            WHERE YEAR(submissionDate) = 2022
+                AND Comment IS NULL
+                AND DATEDIFF(DAY, submissionDate, GETDATE()) > 14
+            GROUP BY MONTH(submissionDate);
+            */
             
-            foreach (var item in contributionWithoutComments)
-            {
-                Console.WriteLine($"Date: {item.Date}, ContributionsWithoutComments: {item.ContributionsWithoutComments}, ContributionsWithoutCommentsAfter14Days: {item.ContributionsWithoutCommentsAfter14Days}");
-            }
+            // DateTime currentDates = DateTime.Now;
+
+            // List<ContributionWithoutComment> contributionWithoutCommentsAfter14Days = await _context.Contributions
+            //     .Where(c => c.SubmissionDate.Year == currentDates.Year && c.Comment == null && (currentDates - c.SubmissionDate).Day > 14)
+            //     .GroupBy(c => new { c.SubmissionDate.Year, c.SubmissionDate.Month })
+            //     .Select(g => new ContributionWithoutComment
+            //     {
+            //         Date = new DateTime(g.Key.Year, g.Key.Month, 1),
+            //         ContributionsWithoutComments = g.Count()
+            //     })
+            //     .ToListAsync();
+
+            // foreach (var item in contributionWithoutCommentsAfter14Days)
+            // {
+            //     Console.WriteLine($"Date: {item.Date}, ContributionsWithoutComments: {item.ContributionsWithoutComments}");
+            // }
+
 
             //GET ALL YEARS
             List<int> years = await _context.Contributions
@@ -569,7 +569,7 @@ namespace COMP1640.Controllers
             switch (action)
             {
                 case "TotalContributionsAccepted":
-                    query = query.Where(c => c.Status == "Accepted");
+                    query = query.Where(c => c.Status == "Approved");
                     break;
                 case "TotalContributionsRejected":
                     query = query.Where(c => c.Status == "Rejected");
@@ -643,11 +643,73 @@ namespace COMP1640.Controllers
             return View("coordinators/create_comment", contribution);
         }
         //================================ MANAGERS ================================//
-        public IActionResult IndexManagers()
+        public async Task<IActionResult> IndexManagers(string task, string year)
         {
             ViewData["Title"] = "Dashboard Managers";
+            
+            //GET ALL YEARS
+            List<int> years = await _context.Contributions
+                .Select(c => c.SubmissionDate.Year)
+                .Distinct()
+                .ToListAsync();
+
+
+            //GET CONTRIBUTIONS BY YEAR
+            List<ContributionDate> ContributionDate = new List<ContributionDate>();
+            int selectedYear = DateTime.Now.Year; 
+
+            if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
+            var yearResult = await GetContributionByYear(selectedYear);
+
+            if (yearResult is JsonResult jsonYearResult)
+            {
+                ContributionDate = jsonYearResult.Value as List<ContributionDate>;
+            }
+            
+            ViewData["Years"] = years;
+            ViewData["ContributionDate"] = ContributionDate;
+
             return View("head_managers/index");
         }
+
+        //Number of Student by Faculty GetStudentByFaculty
+        // public async Task<IActionResult> GetStudentByFaculty()
+        // {
+        //     /*
+        //     SELECT 
+        //         f.name AS 'Faculty',
+        //         COUNT(u.Id) AS 'Total'
+        //     FROM 
+        //         AspNetUsers u
+        //     JOIN 
+        //         AspNetUserRoles ur ON u.Id = ur.UserId
+        //     JOIN 
+        //         AspNetRoles r ON ur.RoleId = r.Id
+        //     JOIN 
+        //         Faculties f ON u.FacultyId = f.facultyID
+        //     WHERE 
+        //         u.Role = 'Student'
+        //     GROUP BY 
+        //         f.name;
+        //     */
+
+        //     List<StudentByFaculty> students = await _context.Users
+        //         .Join(_context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { User = u, UserRole = ur })
+        //         .Join(_context.Roles, ur => ur.UserRole.RoleId, r => r.Id, (ur, r) => new { UserRole = ur, Role = r })
+        //         .Join(_context.Faculties, ur => ur.User.User.FacultyId, f => f.FacultyId, (ur, f) => new { UserRole = ur, Faculty = f })
+        //         .Where(urf => urf.UserRole.User.Role == "Student")
+        //         .GroupBy(urf => urf.Faculty.Name)
+        //         .Select(g => new StudentByFaculty
+        //         {
+        //             Faculty = g.Key,
+        //             Total = g.Count()
+        //         })
+        //         .ToListAsync();
+
+        //     return Json(students);
+        // }
+        
+
         public IActionResult StudentSubmissionManagers()
         {
             List<Contribution> contributions = _context.Contributions
