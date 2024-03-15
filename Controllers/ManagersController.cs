@@ -503,7 +503,7 @@ namespace COMP1640.Controllers
             var contributionWithoutComments = await _context.Contributions
                 .Where(c => c.SubmissionDate.Year == DateTime.Now.Year && c.Comment == null)
                 .GroupBy(c => c.SubmissionDate)
-                .Select(g => new 
+                .Select(g => new
                 {
                     Date = g.Key,
                     ContributionsWithoutComments = g.Count()
@@ -517,7 +517,7 @@ namespace COMP1640.Controllers
             }
 
             Console.WriteLine("==============================================");
-            
+
             //Get contribution without comment and withou comment after 14 days
             /*
             SELECT MONTH(submissionDate) AS Date,
@@ -528,7 +528,7 @@ namespace COMP1640.Controllers
                 AND DATEDIFF(DAY, submissionDate, GETDATE()) > 14
             GROUP BY MONTH(submissionDate);
             */
-            
+
             // DateTime currentDates = DateTime.Now;
 
             // List<ContributionWithoutComment> contributionWithoutCommentsAfter14Days = await _context.Contributions
@@ -619,6 +619,9 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "Create Comment";
             var contribution = await _context.Contributions.FindAsync(id);
+            var comments = await _context.Comments
+                                .Where(c => c.ContributionId == id)
+                                .ToListAsync();
 
             var contributions = _context.Contributions.ToList();
             var userId = _userManager.GetUserId(User);
@@ -648,11 +651,16 @@ namespace COMP1640.Controllers
             ViewBag.userFullName = userFullName;
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
+            ViewBag.Comments = comments;
+
+
+
 
             return View("coordinators/create_comment", contribution);
         }
         //=============================== POSTS ====================================//
-        public IActionResult TablePost(){
+        public IActionResult TablePost()
+        {
             ViewData["Title"] = "List of Posts";
             return View("coordinators/table_post");
         }
@@ -681,7 +689,7 @@ namespace COMP1640.Controllers
         // [HttpPost]
         // public IActionResult UpdatePost()
         // {
-            
+
         // }
 
         // [HttpDelete]
@@ -693,7 +701,7 @@ namespace COMP1640.Controllers
         public async Task<IActionResult> IndexManagers(string task, string year)
         {
             ViewData["Title"] = "Dashboard Managers";
-            
+
             //GET ALL YEARS
             List<int> years = await _context.Contributions
                 .Select(c => c.SubmissionDate.Year)
@@ -703,7 +711,7 @@ namespace COMP1640.Controllers
 
             //GET CONTRIBUTIONS BY YEAR
             List<ContributionDate> ContributionDate = new List<ContributionDate>();
-            int selectedYear = DateTime.Now.Year; 
+            int selectedYear = DateTime.Now.Year;
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
             var yearResult = await GetContributionByYear(selectedYear);
@@ -712,7 +720,7 @@ namespace COMP1640.Controllers
             {
                 ContributionDate = jsonYearResult.Value as List<ContributionDate>;
             }
-            
+
             ViewData["Years"] = years;
             ViewData["ContributionDate"] = ContributionDate;
 
@@ -755,7 +763,7 @@ namespace COMP1640.Controllers
 
         //     return Json(students);
         // }
-        
+
 
         public IActionResult StudentSubmissionManagers()
         {
@@ -883,23 +891,48 @@ namespace COMP1640.Controllers
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
+       [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> UpdateComment(Contribution contribution)
+{
+    
+    var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+    if (existingContribution != null)
+    {
+        // Tìm user và contribution tương ứng
+        var user = await _context.Users.FindAsync(existingContribution.UserId);
+        var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateComment(Contribution contribution)
+        // Tạo một đối tượng Comment mới
+        var newComment = new Comment
         {
+            UserId = user.Id,
+            ContributionId = contribution.ContributionId,
+            CommentField = contribution.Comment, // Sử dụng comment từ contribution được gửi lên
+            CommentDate = DateTime.Now // Đặt ngày bình luận là ngày hiện tại
+        };
 
-            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
-            if (existingContribution != null)
-            {
+        // Thêm Comment mới vào cơ sở dữ liệu
+        _context.Comments.Add(newComment);
+        await _context.SaveChangesAsync();
 
-                existingContribution.Comment = contribution.Comment;
+        // Lấy danh sách comment cho contribution này
+        var comments = await _context.Comments
+            .Where(c => c.ContributionId == contribution.ContributionId)
+            .ToListAsync();
 
-                _context.Update(existingContribution);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("StudentSubmissionCoordinators");
-            }
-            return RedirectToAction("StudentSubmissionCoordinators", "Managers");
-        }
+        ViewBag.Comments = comments;
+
+        return RedirectToAction("StudentSubmissionCoordinators");
+    }
+
+    return RedirectToAction("StudentSubmissionCoordinators", "Managers");
+}
+
+
+
+
+
+
     }
 }
