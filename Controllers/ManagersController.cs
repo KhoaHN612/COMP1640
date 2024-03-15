@@ -51,11 +51,11 @@ namespace COMP1640.Controllers
 
             // GET CONTRIBUTION BY FACULTY
             List<ContributionFaculty> contributionFaculty = new List<ContributionFaculty>();
-            DateTime currentDate = DateTime.Now; 
+            DateTime currentDate = DateTime.Now;
 
             if (task == "ContributionFaculty" && !string.IsNullOrEmpty(year)) { currentDate = new DateTime(Convert.ToInt32(year), 1, 1); }
             var result = await GetContributionByFaculty(currentDate);
-            
+
             if (result is JsonResult jsonResult)
             {
                 contributionFaculty = jsonResult.Value as List<ContributionFaculty>;
@@ -70,7 +70,7 @@ namespace COMP1640.Controllers
 
             //GET CONTRIBUTIONS BY YEAR
             List<ContributionDate> ContributionDate = new List<ContributionDate>();
-            int selectedYear = DateTime.Now.Year; 
+            int selectedYear = DateTime.Now.Year;
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
             var yearResult = await GetContributionByYear(selectedYear);
@@ -91,7 +91,7 @@ namespace COMP1640.Controllers
             if (userResult is JsonResult jsonUserResult)
             {
                 ContributionUser = jsonUserResult.Value as List<ContributionUser>;
-            }     
+            }
 
 
             //GET ROLE STATISTICS
@@ -101,21 +101,21 @@ namespace COMP1640.Controllers
             if (roleResult is JsonResult jsonRoleResult)
             {
                 roleStatistics = jsonRoleResult.Value as List<RoleStatistics>;
-            }      
+            }
 
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
             ViewData["ContributionYear"] = ContributionDate;
             ViewData["ContributionUser"] = ContributionUser;
             ViewData["RoleStatistics"] = roleStatistics;
-            
+
             return View("admins/index");
         }
 
         //ContributionFaculty
         public async Task<IActionResult> GetContributionByFaculty(DateTime date)
         {
-            
+
             /*SELECT COUNT(a.Id) AS 'Total', 
             f.name AS 'Faculties', 
             CONVERT(date, GETDATE()) AS 'Date' 
@@ -216,7 +216,7 @@ namespace COMP1640.Controllers
                     Year = year
                 })
                 .ToListAsync();
-            
+
             return Json(contributions);
         }
 
@@ -629,7 +629,15 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-
+            if (contribution != null)
+            {
+                var submissionDate = contribution.SubmissionDate;
+                var deadline = submissionDate.AddDays(14);
+                if (deadline >= submissionDate)
+                {
+                    ViewBag.Deadline = deadline;
+                }
+            }
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;

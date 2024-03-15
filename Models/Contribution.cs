@@ -24,7 +24,7 @@ public partial class Contribution
     public string Title { get; set; } = null!;
 
     [Column("submissionDate")]
-    public DateOnly SubmissionDate { get; set; }
+    public DateTime SubmissionDate { get; set; }
 
     [Column("comment")]
     public string? Comment { get; set; }

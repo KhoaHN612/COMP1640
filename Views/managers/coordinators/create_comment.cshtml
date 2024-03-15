@@ -59,7 +59,7 @@
                     <div class="border p-3 rounded">
                         <h6 class="mb-0 text-uppercase">Comment Form</h6>
                         <hr />
-                         <form class="row g-3" method="post">
+                        <form class="row g-3" method="post">
                             <div class="col-6">
                                 <label class="form-label"> COORDINATORS NAME</label>
                                 <input type="text" class="form-control" readonly value="@ViewBag.userFullName">
@@ -80,6 +80,14 @@
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary">Send</button>
                                 </div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <div class="alert alert-warning" role="alert">
+                                    The deadline to comment on this contribution is <strong>
+                                        @ViewBag.Deadline
+                                    </strong>
+                                </div>
+                                <input type="hidden" name="contributionId" value="">
                             </div>
                         </form>
                     </div>

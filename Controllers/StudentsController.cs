@@ -215,6 +215,12 @@ namespace COMP1640.Controllers
             }
             else
             {
+                if (userToUpdate.ProfileImagePath != null)
+                {
+                    string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    string imageFilePath = Path.Combine(uploadsFolderPath, userToUpdate.ProfileImagePath);
+                    System.IO.File.Delete(imageFilePath);
+                }
                 string uniqueFileName = GetUniqueFileName(user.ProfileImageFile.FileName);
                 string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -224,7 +230,6 @@ namespace COMP1640.Controllers
                 user.ProfileImagePath = uniqueFileName;
                 userToUpdate.ProfileImagePath = user.ProfileImagePath;
             }
-
             userToUpdate.FullName = user.FullName;
             userToUpdate.Address = user.Address;
             userToUpdate.Email = user.Email;
@@ -237,8 +242,6 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdatePassword(string id, string inputOldPassword, string newPassword)
         {
-            Console.WriteLine(inputOldPassword);
-            Console.WriteLine(newPassword);
             var userId = _userManager.GetUserId(User);
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
