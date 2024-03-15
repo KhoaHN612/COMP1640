@@ -406,7 +406,7 @@ namespace COMP1640.Controllers
             }
             return View("admins/form_create_user");
         }
-        //================================ COORINATORS ================================//
+        //================================ COORDINATORS ================================//
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FormCreateUser(COMP1640User model, string Role)
@@ -651,6 +651,44 @@ namespace COMP1640.Controllers
 
             return View("coordinators/create_comment", contribution);
         }
+        //=============================== POSTS ====================================//
+        public IActionResult TablePost(){
+            ViewData["Title"] = "List of Posts";
+            return View("coordinators/table_post");
+        }
+
+        public IActionResult FormCreatePost(int? id)
+        {
+            if (id != null)
+            {
+                ViewData["Title"] = "Edit Post";
+                ViewData["ButtonLabel"] = "Update";
+            }
+            else
+            {
+                ViewData["Title"] = "Create Post";
+                ViewData["ButtonLabel"] = "Submit";
+            }
+            Contribution contribution = id != null ? _context.Contributions.Find(id) : new Contribution();
+            return View("coordinators/form_create_post", contribution);
+        }
+
+        // [HttpPost]
+        // public IActionResult CreatePost()
+        // {
+
+        // }
+        // [HttpPost]
+        // public IActionResult UpdatePost()
+        // {
+            
+        // }
+
+        // [HttpDelete]
+        // public IActionResult DeletePost()
+        // {
+
+        // }
         //================================ MANAGERS ================================//
         public async Task<IActionResult> IndexManagers(string task, string year)
         {
