@@ -31,34 +31,56 @@ namespace COMP1640.Controllers
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
+        private async Task<string> GetUserFullName()
+        {
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            return user?.FullName; // This will return null if user is null.
+        }
 
         // GET: StudentsController
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Home Page";
-            var userId = _userManager.GetUserId(User);
-            var user = await _userManager.FindByIdAsync(userId);
-            var userFullName = user.FullName;
-            ViewBag.userFullName = userFullName;
+            var userFullName = await GetUserFullName(); 
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName; 
+            }
             return View();
         }
-        public IActionResult SubmissionList()
+        public async Task<IActionResult> SubmissionList()
         {
             ViewData["Title"] = "Submission List";
+            var userFullName = await GetUserFullName(); 
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName; 
+            }
             return View();
         }
 
         // Action for the About Us page
-        public IActionResult AboutUs()
+        public async Task<IActionResult> AboutUs()
         {
             ViewData["Title"] = "About Us";
+            var userFullName = await GetUserFullName(); 
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName; 
+            }
             return View();
         }
 
         // Action for the Contact Us page
-        public IActionResult ContactUs()
+        public async Task<IActionResult> ContactUs()
         {
             ViewData["Title"] = "Contact Us";
+            var userFullName = await GetUserFullName(); 
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName; 
+            }
             return View();
         }
 
@@ -269,18 +291,33 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
-        public IActionResult SubmissionDetail(){
+        public async Task<IActionResult> SubmissionDetail(){
             ViewData["Title"] = "Submission Detail";
+            var userFullName = await GetUserFullName(); 
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName; 
+            }
             return View();
         }
 
-        public IActionResult PostLists(){
+        public async Task<IActionResult> PostLists(){
             ViewData["Title"] = "Post Lists";
+            var userFullName = await GetUserFullName(); 
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName; 
+            }
             return View();
         }
         
-        public IActionResult PostDetail(){
+        public async Task<IActionResult> PostDetail(){
             ViewData["Title"] = "Post Detail";
+            var userFullName = await GetUserFullName(); 
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName; 
+            }
             return View();
         }
     }
