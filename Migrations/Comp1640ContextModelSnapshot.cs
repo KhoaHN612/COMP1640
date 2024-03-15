@@ -138,6 +138,43 @@ namespace COMP1640.Migrations
                     b.ToTable("AnnualMagazines");
                 });
 
+            modelBuilder.Entity("COMP1640.Models.Comment", b =>
+                {
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("comment_id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentId"));
+
+                    b.Property<DateTime>("CommentDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("comment_date");
+
+                    b.Property<string>("CommentField")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("comment_Field");
+
+                    b.Property<int>("ContributionId")
+                        .HasColumnType("int")
+                        .HasColumnName("contributionId");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("userId");
+
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex(new[] { "ContributionId" }, "IX_Comment_contributionId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("COMP1640.Models.Contribution", b =>
                 {
                     b.Property<int>("ContributionId")
@@ -383,6 +420,25 @@ namespace COMP1640.Migrations
                     b.Navigation("Faculty");
                 });
 
+            modelBuilder.Entity("COMP1640.Models.Comment", b =>
+                {
+                    b.HasOne("COMP1640.Models.Contribution", "Contribution")
+                        .WithMany("Comments")
+                        .HasForeignKey("ContributionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("COMP1640.Areas.Identity.Data.COMP1640User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contribution");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("COMP1640.Models.Contribution", b =>
                 {
                     b.HasOne("COMP1640.Models.AnnualMagazine", "AnnualMagazine")
@@ -463,6 +519,8 @@ namespace COMP1640.Migrations
 
             modelBuilder.Entity("COMP1640.Models.Contribution", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("FileDetails");
                 });
 

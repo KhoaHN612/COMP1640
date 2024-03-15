@@ -36,6 +36,7 @@ public partial class Comp1640Context : IdentityDbContext<COMP1640User>
     public virtual DbSet<Faculty> Faculties { get; set; }
 
     public virtual DbSet<FileDetail> FileDetails { get; set; }
+    public virtual DbSet<Comment> Comments { get; set; }
     
     public object COMP1640Users { get; internal set; }
 
