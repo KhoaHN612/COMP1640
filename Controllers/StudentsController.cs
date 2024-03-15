@@ -33,9 +33,13 @@ namespace COMP1640.Controllers
         }
 
         // GET: StudentsController
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Home Page";
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            var userFullName = user.FullName;
+            ViewBag.userFullName = userFullName;
             return View();
         }
         public IActionResult SubmissionList()
