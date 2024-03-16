@@ -1,8 +1,467 @@
+function GetTotalContributionsData() {
+	//Retrieve the data from the HTML data attribute
+	var contriDataElement = document.getElementById("ContributionsTotalData");
+	var contributionsData = JSON.parse(contriDataElement.dataset.total);
+
+	var dataTotalPie = [[], []];
+
+	//Lấy tất cả tên faculty
+	for (var i = 0; i < contributionsData.length; i++) {
+		var facultyName = contributionsData[i].facultyName;
+		if (!dataTotalPie[0].includes(facultyName)) {
+			dataTotalPie[0].push(facultyName);
+		}
+	}
+
+	//Lấy số lượng bài viết theo faculty
+	for (var i = 0; i < dataTotalPie[0].length; i++) {
+		var total = 0;
+		for (var j = 0; j < contributionsData.length; j++) {
+			if (dataTotalPie[0][i] == contributionsData[j].facultyName) {
+				total += contributionsData[j].totalByMonth;
+			}
+		}
+		dataTotalPie[1].push(total);
+	}
+	var selectedTotalYear = document.getElementById("yearTotal").value;
+
+	//Get all months name
+	var dataTotalColumn = [[], []];
+	dataTotalColumn[0] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	tempTotalMonth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+	var currentTotalYear = new Date().getFullYear();
+	if (selectedTotalYear == currentTotalYear) {
+		var currentMonth = new Date().getMonth();
+		dataTotalColumn[0] = dataTotalColumn[0].slice(0, currentMonth + 1);
+		tempTotalMonth = tempTotalMonth.slice(0, currentMonth + 1);
+	}
+	console.log(tempTotalMonth);
+
+	//Lấy số lượng bài viết theo tháng
+	for (var i = 0; i < tempTotalMonth.length; i++) {
+		var total = 0;
+		for (var j = 0; j < contributionsData.length; j++) {
+			if (tempTotalMonth[i] == contributionsData[j].month) {
+				total += contributionsData[j].totalByMonth;
+			}
+		}
+		dataTotalColumn[1].push(total);
+	}
+
+	// CHART TOTAL CONTRIBUTIONS
+	var optionsPie = {
+		series: dataTotalPie[1],
+		chart: {
+			width: 380,
+			type: 'pie',
+		},
+		labels: dataTotalPie[0],
+		responsive: [{
+			breakpoint: 480,
+			options: {
+				chart: {
+					width: 800
+				},
+				legend: {
+					position: 'bottom'
+				}
+			}
+		}]
+	};
+
+	// Dữ liệu mẫu cho biểu đồ cột
+	var optionsColumn =  {
+		series: [{
+		name: 'Inflation',
+		data: dataTotalColumn[1]
+	}],
+		chart: {
+		height: 350,
+		type: 'bar',
+	},
+	plotOptions: {
+		bar: {
+		borderRadius: 10,
+		dataLabels: {
+			position: 'top', // top, center, bottom
+		},
+		}
+	},
+	dataLabels: {
+		enabled: true,
+		formatter: function (val) {
+		return val + "";
+		},
+		offsetY: -20,
+		style: {
+		fontSize: '12px',
+		colors: ["#304758"]
+		}
+	},
+	
+	xaxis: {
+		categories: dataTotalColumn[0],
+		position: 'top',
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false
+		},
+		crosshairs: {
+		fill: {
+			type: 'gradient',
+			gradient: {
+			colorFrom: '#D8E3F0',
+			colorTo: '#BED1E6',
+			stops: [0, 100],
+			opacityFrom: 0.4,
+			opacityTo: 0.5,
+			}
+		}
+		},
+		tooltip: {
+		enabled: true,
+		}
+	},
+	yaxis: {
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false,
+		},
+		labels: {
+		show: false,
+		formatter: function (val) {
+			return val + "";
+		}
+		}
+	
+	}
+	};
+
+	// tổng contributions
+	var sum = dataTotalPie[1].reduce((a, b) => a + b, 0);
+	$('#totalArticles').text(sum + ' articles');
+
+	// Render biểu đồ tròn
+	var chartPie = new ApexCharts(document.querySelector("#chartPieContributions"), optionsPie);
+	chartPie.render();
+
+	// Render biểu đồ cột
+	var chartColumn = new ApexCharts(document.querySelector("#chartColumnContributions"), optionsColumn);
+	chartColumn.render();
+}
+
+function GetApprovedContributionData() {
+	//Tương tự như GetTotalContributionsData
+	var approvedDataElement = document.getElementById("ContributionsApprovedData");
+	var approvedData = JSON.parse(approvedDataElement.dataset.approved);
+
+	var dataApprovedPie = [[], []];
+	for (var i = 0; i < approvedData.length; i++) {
+		var facultyName = approvedData[i].facultyName;
+		if (!dataApprovedPie[0].includes(facultyName)) {
+			dataApprovedPie[0].push(facultyName);
+		}
+	}
+
+	for (var i = 0; i < dataApprovedPie[0].length; i++) {
+		var total = 0;
+		for (var j = 0; j < approvedData.length; j++) {
+			if (dataApprovedPie[0][i] == approvedData[j].facultyName) {
+				total += approvedData[j].totalByMonth;
+			}
+		}
+		dataApprovedPie[1].push(total);
+	}
+
+	var selectedApprovedYear = document.getElementById("yearApproved").value;
+	var dataApprovedColumn = [[], []];
+	dataApprovedColumn[0] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	tempApprovedMonth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+	var currentApprovedYear = new Date().getFullYear();
+	if (selectedApprovedYear == currentApprovedYear) {
+		var currentMonth = new Date().getMonth();
+		dataApprovedColumn[0] = dataApprovedColumn[0].slice(0, currentMonth + 1);
+		tempApprovedMonth = tempApprovedMonth.slice(0, currentMonth + 1);
+	}
+
+	for (var i = 0; i < tempApprovedMonth.length; i++) {
+		var total = 0;
+		for (var j = 0; j < approvedData.length; j++) {
+			if (tempApprovedMonth[i] == approvedData[j].month) {
+				total += approvedData[j].totalByMonth;
+			}
+		}
+		dataApprovedColumn[1].push(total);
+	}
+
+	var optionsPie = {
+		series: dataApprovedPie[1],
+		chart: {
+			width: 380,
+			type: 'pie',
+		},
+		labels: dataApprovedPie[0],
+		responsive: [{
+			breakpoint: 480,
+			options: {
+				chart: {
+					width: 800
+				},
+				legend: {
+					position: 'bottom'
+				}
+			}
+		}]
+	};
+
+	var optionsColumn =  {
+		series: [{
+		name: 'Inflation',
+		data: dataApprovedColumn[1]
+	}],
+		chart: {
+		height: 350,
+		type: 'bar',
+	},
+	plotOptions: {
+		bar: {
+		borderRadius: 10,
+		dataLabels: {
+			position: 'top', // top, center, bottom
+		},
+		}
+	},
+	dataLabels: {
+		enabled: true,
+		formatter: function (val) {
+		return val + "";
+		},
+		offsetY: -20,
+		style: {
+		fontSize: '12px',
+		colors: ["#304758"]
+		}
+	},
+
+	xaxis: {
+		categories: dataApprovedColumn[0],
+		position: 'top',
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false
+		},
+		crosshairs: {
+		fill: {
+			type: 'gradient',
+			gradient: {
+			colorFrom: '#D8E3F0',
+			colorTo: '#BED1E6',
+			stops: [0, 100],
+			opacityFrom: 0.4,
+			opacityTo: 0.5,
+			}
+		}
+		},
+		tooltip: {
+		enabled: true,
+		}
+	},
+	yaxis: {
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false,
+		},
+		labels: {
+		show: false,
+		formatter: function (val) {
+			return val + "";
+		}
+		}
+
+	}
+	};
+
+	var sum = dataApprovedPie[1].reduce((a, b) => a + b, 0);
+	$('#totalApproved').text(sum + ' articles');
+
+	var chartPie = new ApexCharts(document.querySelector("#chartPieApproved"), optionsPie);
+	chartPie.render();
+
+	var chartColumn = new ApexCharts(document.querySelector("#chartColumnApproved"), optionsColumn);
+	chartColumn.render();
+}
+
+function GetRejectedContributionData() {
+	//Tương tự như GetTotalContributionsData
+	var rejectedDataElement = document.getElementById("ContributionsRejectedData");
+	var rejectedData = JSON.parse(rejectedDataElement.dataset.rejected);
+
+	var dataRejectedPie = [[], []];
+	for (var i = 0; i < rejectedData.length; i++) {
+		var facultyName = rejectedData[i].facultyName;
+		if (!dataRejectedPie[0].includes(facultyName)) {
+			dataRejectedPie[0].push(facultyName);
+		}
+	}
+
+	for (var i = 0; i < dataRejectedPie[0].length; i++) {
+		var total = 0;
+		for (var j = 0; j < rejectedData.length; j++) {
+			if (dataRejectedPie[0][i] == rejectedData[j].facultyName) {
+				total += rejectedData[j].totalByMonth;
+			}
+		}
+		dataRejectedPie[1].push(total);
+	}
+
+	var selectedRejectedYear = document.getElementById("yearRejected").value;
+	var dataRejectedColumn = [[], []];
+	dataRejectedColumn[0] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	tempRejectedMonth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+	var currentRejectedYear = new Date().getFullYear();
+	if (selectedRejectedYear == currentRejectedYear) {
+		var currentMonth = new Date().getMonth();
+		dataRejectedColumn[0] = dataRejectedColumn[0].slice(0, currentMonth + 1);
+		tempRejectedMonth = tempRejectedMonth.slice(0, currentMonth + 1);
+	}
+
+	for (var i = 0; i < tempRejectedMonth.length; i++) {
+		var total = 0;
+		for (var j = 0; j < rejectedData.length; j++) {
+			if (tempRejectedMonth[i] == rejectedData[j].month) {
+				total += rejectedData[j].totalByMonth;
+			}
+		}
+		dataRejectedColumn[1].push(total);
+	}
+
+	var optionsPie = {
+		series: dataRejectedPie[1],
+		chart: {
+			width
+			: 380,
+			type: 'pie',
+		},	
+		labels: dataRejectedPie[0],
+		responsive: [{
+			breakpoint: 480,
+			options: {
+				chart: {
+					height: 800
+				},
+				legend: {
+					position: 'bottom'
+				}
+			}
+		}]
+	};
+
+	var optionsColumn =  {
+		series: [{
+		name: 'Inflation',
+		data: dataRejectedColumn[1]
+	}],
+		chart: {
+		height: 350,
+		type: 'bar',
+	},
+	plotOptions: {
+		bar: {
+		borderRadius: 10,
+		dataLabels: {
+			position: 'top', // top, center, bottom
+		},
+		}
+	},
+	dataLabels: {
+		enabled: true,
+		formatter: function (val) {
+		return val + "";
+		},
+		offsetY: -20,
+		style: {
+		fontSize: '12px',
+		colors: ["#304758"]
+		}
+	},
+
+	xaxis: {
+		categories: dataRejectedColumn[0],
+		position: 'top',
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false
+		},
+		crosshairs: {
+		fill: {
+			type: 'gradient',
+			gradient: {
+			colorFrom: '#D8E3F0',
+			colorTo: '#BED1E6',
+			stops: [0, 100],
+			opacityFrom: 0.4,
+			opacityTo: 0.5,
+			}
+		}
+		},
+		tooltip: {
+		enabled: true,
+		}
+	},
+	yaxis: {
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false,
+		},
+		labels: {
+		show: false,
+		formatter: function (val) {
+			return val + "";
+		}
+		}
+
+	}
+	};
+
+	var sum = dataRejectedPie[1].reduce((a, b) => a + b, 0);
+	$('#totalRejected').text(sum + ' articles');
+
+	var chartPie = new ApexCharts(document.querySelector("#chartPieRejected"), optionsPie);
+	chartPie.render();
+
+	var chartColumn = new ApexCharts(document.querySelector("#chartColumnRejected"), optionsColumn);
+	chartColumn.render();
+}
+
+
 //sk onload
 $(window).on('load', function () {
-	//COORDINATORS START
-	// chart 1
 	
+	//======================================================= MANAGER START =======================================================
+	GetTotalContributionsData();
+	GetApprovedContributionData();
+	GetRejectedContributionData();
+	GetPendingContributionData();
+	//======================================================= MANAGER END =======================================================
+
+
+	//=======================================================COORDINATOR DASHBOARD=======================================================
+	// chart 1
 	// Retrieve the data from the HTML data attribute
 	var totalContributionDataElement = document.getElementById("totalContributionData");
 	var totalContributionData = JSON.parse(totalContributionDataElement.dataset.totalcontribution);
@@ -31,6 +490,8 @@ $(window).on('load', function () {
 
 	var sumPending = totalPendingData.reduce((a, b) => a + b.total, 0);
 	document.getElementById('totalPending').innerText = sumPending + ' articles';	
+
+
 
 	//=======================================================COORDINATORS CHART=======================================================
 	//Retrieve the data from the HTML data attribute
@@ -130,11 +591,9 @@ $(window).on('load', function () {
 
 	var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
 	chart.render();
-
 });
 
 function GetData(startDate, endDate, contributionsData, totalContributionData, totalContributionAfter14DaysData) {
-	console.log("Get Data Contribution Without Comments");
 	const dates = [];
 	var totalcontributions = [];
 	var totalContributionWithoutComment = [];
@@ -199,8 +658,26 @@ function SelectedYearUser(year) {
 	window.location.href = url;
 }
 
-function SelectedYear(year) {
-    var url = '/Managers?task=ContributionYear&year=' + year;
+function SelectedYearContributions(year) {
+    var url = '/Managers/IndexManagers?task=TotalContribution&year=' + year;
+    //redirect to url
+    window.location.href = url;
+}
+
+function SelectedYearApproved(year) {
+    var url = '/Managers/IndexManagers?task=ApprovedContribution&year=' + year;
+    //redirect to url
+    window.location.href = url;
+}
+
+function SelectedYearRejected(year) {
+    var url = '/Managers/IndexManagers?task=RejectedContribution&year=' + year;
+    //redirect to url
+    window.location.href = url;
+}
+
+function SelectedYearPending(year) {
+    var url = '/Managers/IndexManagers?task=PendingContribution&year=' + year;
     //redirect to url
     window.location.href = url;
 }
@@ -214,12 +691,8 @@ function GetContributionByYear(year){
 $(function () {
 	"use strict";
 
-	// Admin Chart
-	
+	//=======================================================ADMIN DASHBOARD=======================================================
 	// chart 5
-	//Get Viewbag["ContributionYear"] 
-	//Nếu năm được chọn là năm hiện tại thì chỉ hiển thị đến tháng hiện tại
-	//Nếu năm được chọn là năm khác thì hiển thị đến tháng 12
 	var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 	var arrData = new Array(12).fill(0);
@@ -229,13 +702,9 @@ $(function () {
 		var contributionItem = contributionItems[i];
 		var month = parseInt(contributionItem.getAttribute('data-month'));
 		var total = contributionItem.getAttribute('data-total');
-
-		//Kiểm tra nếu 
 		arrData[month - 1] = total;
 	}
 
-	//Kiểm tra nếu năm được chọn là năm hiện tại thì chỉ hiển thị đến tháng hiện tại
-	//Nếu năm được chọn là năm khác thì hiển thị đến tháng 12
 	var selectedYear = document.getElementById("year").value;
 	var currentYear = new Date().getFullYear();
 	if (selectedYear == currentYear) {
@@ -350,14 +819,10 @@ $(function () {
 	chart.render();
  
 	// chart6
-	// khai báo mảng chứa nhãn và giá trị
 	var lstLabels = [];
 	var lstValues = [];
 
-	// Lấy tất cả các phần tử span có class là 'lstContributions'
 	var spans = document.querySelectorAll('.lstContributions');
-
-	// Duyệt qua từng phần tử span và lấy nội dung của chúng
 	spans.forEach(function (span) {
 		var faculty = span.nextElementSibling.innerText; // Lấy nội dung của phần tử span kế tiếp
 		var cleanedFaculty = faculty.replace(' -', '').trim();
@@ -367,15 +832,14 @@ $(function () {
 		lstLabels.push(cleanedFaculty);
 		lstValues.push(cleanedTotalArticles);
 	});
+
 	var lstPercent = lstValues.map(function (value) {
 		return (value / lstValues.reduce((a, b) => parseInt(a) + parseInt(b), 0) * 100).toFixed(2);
 	});
 
-	// Tạo mảng màu ngẫu nhiên
 	var backgroundColors = lstLabels.map(function () {
 		return randomColor();
 	});
-
 
 	spans.forEach(function (span, index) {
 		// Thiết lập màu sắc cho biểu tượng bằng cách thêm class có chứa màu sắc từ mảng backgroundColors
@@ -1170,528 +1634,6 @@ $(function () {
 
 	var chart = new ApexCharts(document.querySelector("#chart10"), options);
 	chart.render();
-
-	//======================================================= MANAGER START =======================================================
-	
-	// CHART TOTAL CONTRIBUTIONS
-	var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-	var arrData = new Array(12).fill(0);
-	var contributionItems = document.querySelectorAll('.contribution-item');
-
-	for (var i = 0; i < contributionItems.length; i++) {
-		var contributionItem = contributionItems[i];
-		var month = parseInt(contributionItem.getAttribute('data-month'));
-		var total = contributionItem.getAttribute('data-total');
-		arrData[month - 1] = total;
-	}
-
-	var selectedYear = document.getElementById("year").value;
-	var currentYear = new Date().getFullYear();
-	if (selectedYear == currentYear) {
-		var currentMonth = new Date().getMonth();
-		arrLabel = arrLabel.slice(0, currentMonth + 1);
-		arrData = arrData.slice(0, currentMonth + 1);
-	}
-
-	//Total Articles by sum of arrData
-	var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-	document.getElementById('totalArticles').innerText = sum + ' articles';
-	
-
-	var options = {
-		series: [{
-			name: "Articles",
-			data: arrData
-		}],
-		chart: {
-			type: "area",
-			// width: 130,
-			stacked: true,
-			height: 280,
-			toolbar: {
-				show: !1
-			},
-			zoom: {
-				enabled: !1
-			},
-			dropShadow: {
-				enabled: 0,
-				top: 3,
-				left: 14,
-				blur: 4,
-				opacity: .12,
-				color: "#3461ff"
-			},
-			sparkline: {
-				enabled: !1
-			}
-		},
-		markers: {
-			size: 0,
-			colors: ["#3461ff"],
-			strokeColors: "#fff",
-			strokeWidth: 2,
-			hover: {
-				size: 7
-			}
-		},
-		grid: {
-			row: {
-				colors: ["transparent", "transparent"],
-				opacity: .2
-			},
-			borderColor: "#f1f1f1"
-		},
-		plotOptions: {
-			bar: {
-				horizontal: !1,
-				columnWidth: "25%",
-				//endingShape: "rounded"
-			}
-		},
-		dataLabels: {
-			enabled: !1
-		},
-		stroke: {
-			show: !0,
-			width: [2.5],
-			//colors: ["#3461ff"],
-			curve: "smooth"
-		},
-		fill: {
-			type: 'gradient',
-			gradient: {
-				shade: 'light',
-				type: 'vertical',
-				shadeIntensity: 0.5,
-				gradientToColors: ['#3461ff'],
-				inverseColors: false,
-				opacityFrom: 0.5,
-				opacityTo: 0.1,
-				// stops: [0, 100]
-			}
-		},
-		colors: ["#3461ff"],
-		xaxis: {
-			categories: arrLabel
-		},
-		responsive: [
-			{
-				breakpoint: 1000,
-				options: {
-					chart: {
-						type: "area",
-						// width: 130,
-						stacked: true,
-					}
-				}
-			}
-		],
-		legend: {
-			show: false
-		},
-		tooltip: {
-			theme: "dark"
-		}
-	};
-
-	var chart = new ApexCharts(document.querySelector("#chartTotal"), options);
-	chart.render();
-	//END CHART TOTAL CONTRIBUTIONS
-	
-	// CHART APPROVED START
-	// var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-	// var arrData = new Array(12).fill(0);
-	// var contributionItems = document.querySelectorAll('.contribution-item');
-
-	// for (var i = 0; i < contributionItems.length; i++) {
-	// 	var contributionItem = contributionItems[i];
-	// 	var month = parseInt(contributionItem.getAttribute('data-month'));
-	// 	var total = contributionItem.getAttribute('data-total');
-
-	// 	//Kiểm tra nếu 
-	// 	arrData[month - 1] = total;
-	// }
-
-	// var selectedYear = document.getElementById("year").value;
-	// var currentYear = new Date().getFullYear();
-	// if (selectedYear == currentYear) {
-	// 	var currentMonth = new Date().getMonth();
-	// 	arrLabel = arrLabel.slice(0, currentMonth + 1);
-	// 	arrData = arrData.slice(0, currentMonth + 1);
-	// }
-	
-	// //Total Articles by sum of arrData
-	// var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-	// document.getElementById('totalArticles').innerText = sum + ' articles';
-	
-
-	// var options = {
-	// 	series: [{
-	// 		name: "Articles",
-	// 		data: arrData
-	// 	}],
-	// 	chart: {
-	// 		type: "area",
-	// 		// width: 130,
-	// 		stacked: true,
-	// 		height: 280,
-	// 		toolbar: {
-	// 			show: !1
-	// 		},
-	// 		zoom: {
-	// 			enabled: !1
-	// 		},
-	// 		dropShadow: {
-	// 			enabled: 0,
-	// 			top: 3,
-	// 			left: 14,
-	// 			blur: 4,
-	// 			opacity: .12,
-	// 			color: "#3461ff"
-	// 		},
-	// 		sparkline: {
-	// 			enabled: !1
-	// 		}
-	// 	},
-	// 	markers: {
-	// 		size: 0,
-	// 		colors: ["#3461ff"],
-	// 		strokeColors: "#fff",
-	// 		strokeWidth: 2,
-	// 		hover: {
-	// 			size: 7
-	// 		}
-	// 	},
-	// 	grid: {
-	// 		row: {
-	// 			colors: ["transparent", "transparent"],
-	// 			opacity: .2
-	// 		},
-	// 		borderColor: "#f1f1f1"
-	// 	},
-	// 	plotOptions: {
-	// 		bar: {
-	// 			horizontal: !1,
-	// 			columnWidth: "25%",
-	// 			//endingShape: "rounded"
-	// 		}
-	// 	},
-	// 	dataLabels: {
-	// 		enabled: !1
-	// 	},
-	// 	stroke: {
-	// 		show: !0,
-	// 		width: [2.5],
-	// 		//colors: ["#3461ff"],
-	// 		curve: "smooth"
-	// 	},
-	// 	fill: {
-	// 		type: 'gradient',
-	// 		gradient: {
-	// 			shade: 'light',
-	// 			type: 'vertical',
-	// 			shadeIntensity: 0.5,
-	// 			gradientToColors: ['#3461ff'],
-	// 			inverseColors: false,
-	// 			opacityFrom: 0.5,
-	// 			opacityTo: 0.1,
-	// 			// stops: [0, 100]
-	// 		}
-	// 	},
-	// 	colors: ["#3461ff"],
-	// 	xaxis: {
-	// 		categories: arrLabel
-	// 	},
-	// 	responsive: [
-	// 		{
-	// 			breakpoint: 1000,
-	// 			options: {
-	// 				chart: {
-	// 					type: "area",
-	// 					// width: 130,
-	// 					stacked: true,
-	// 				}
-	// 			}
-	// 		}
-	// 	],
-	// 	legend: {
-	// 		show: false
-	// 	},
-	// 	tooltip: {
-	// 		theme: "dark"
-	// 	}
-	// };
-
-	
-	// var chart = new ApexCharts(document.querySelector("#chartApproved"), options);
-	// chart.render();
-	//END CHART APPROVED
-
-
-
-
-	// CHART REJECTED START
-	// var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-	// var arrData = new Array(12).fill(0);
-	// var contributionItems = document.querySelectorAll('.contribution-item');
-
-	// for (var i = 0; i < contributionItems.length; i++) {
-	// 	var contributionItem = contributionItems[i];
-	// 	var month = parseInt(contributionItem.getAttribute('data-month'));
-	// 	var total = contributionItem.getAttribute('data-total');
-
-	// 	//Kiểm tra nếu 
-	// 	arrData[month - 1] = total;
-	// }
-
-	// var selectedYear = document.getElementById("year").value;
-	// var currentYear = new Date().getFullYear();
-	// if (selectedYear == currentYear) {
-	// 	var currentMonth = new Date().getMonth();
-	// 	arrLabel = arrLabel.slice(0, currentMonth + 1);
-	// 	arrData = arrData.slice(0, currentMonth + 1);
-	// }
-
-	// //Total Articles by sum of arrData
-	// var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-	// document.getElementById('totalArticles').innerText = sum + ' articles';
-	
-
-	// var options = {
-	// 	series: [{
-	// 		name: "Articles",
-	// 		data: arrData
-	// 	}],
-	// 	chart: {
-	// 		type: "area",
-	// 		// width: 130,
-	// 		stacked: true,
-	// 		height: 280,
-	// 		toolbar: {
-	// 			show: !1
-	// 		},
-	// 		zoom: {
-	// 			enabled: !1
-	// 		},
-	// 		dropShadow: {
-	// 			enabled: 0,
-	// 			top: 3,
-	// 			left: 14,
-	// 			blur: 4,
-	// 			opacity: .12,
-	// 			color: "#3461ff"
-	// 		},
-	// 		sparkline: {
-	// 			enabled: !1
-	// 		}
-	// 	},
-	// 	markers: {
-	// 		size: 0,
-	// 		colors: ["#3461ff"],
-	// 		strokeColors: "#fff",
-	// 		strokeWidth: 2,
-	// 		hover: {
-	// 			size: 7
-	// 		}
-	// 	},
-	// 	grid: {
-	// 		row: {
-	// 			colors: ["transparent", "transparent"],
-	// 			opacity: .2
-	// 		},
-	// 		borderColor: "#f1f1f1"
-	// 	},
-	// 	plotOptions: {
-	// 		bar: {
-	// 			horizontal: !1,
-	// 			columnWidth: "25%",
-	// 			//endingShape: "rounded"
-	// 		}
-	// 	},
-	// 	dataLabels: {
-	// 		enabled: !1
-	// 	},
-	// 	stroke: {
-	// 		show: !0,
-	// 		width: [2.5],
-	// 		//colors: ["#3461ff"],
-	// 		curve: "smooth"
-	// 	},
-	// 	fill: {
-	// 		type: 'gradient',
-	// 		gradient: {
-	// 			shade: 'light',
-	// 			type: 'vertical',
-	// 			shadeIntensity: 0.5,
-	// 			gradientToColors: ['#3461ff'],
-	// 			inverseColors: false,
-	// 			opacityFrom: 0.5,
-	// 			opacityTo: 0.1,
-	// 			// stops: [0, 100]
-	// 		}
-	// 	},
-	// 	colors: ["#3461ff"],
-	// 	xaxis: {
-	// 		categories: arrLabel
-	// 	},
-	// 	responsive: [
-	// 		{
-	// 			breakpoint: 1000,
-	// 			options: {
-	// 				chart: {
-	// 					type: "area",
-	// 					// width: 130,
-	// 					stacked: true,
-	// 				}
-	// 			}
-	// 		}
-	// 	],
-	// 	legend: {
-	// 		show: false
-	// 	},
-	// 	tooltip: {
-	// 		theme: "dark"
-	// 	}
-	// };
-
-	// var chart = new ApexCharts(document.querySelector("#chartRejected"), options);
-	// chart.render();
-	//END CHART REJECTED
-
-
-	//Pending START
-	// var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-	// var arrData = new Array(12).fill(0);
-	// var contributionItems = document.querySelectorAll('.contribution-item');
-
-	// for (var i = 0; i < contributionItems.length; i++) {
-	// 	var contributionItem = contributionItems[i];
-	// 	var month = parseInt(contributionItem.getAttribute('data-month'));
-	// 	var total = contributionItem.getAttribute('data-total');
-
-	// 	//Kiểm tra nếu 
-	// 	arrData[month - 1] = total;
-	// }
-
-	// //Kiểm tra nếu năm được chọn là năm hiện tại thì chỉ hiển thị đến tháng hiện tại
-	// //Nếu năm được chọn là năm khác thì hiển thị đến tháng 12
-	// var selectedYear = document.getElementById("year").value;
-	// var currentYear = new Date().getFullYear();
-	// if (selectedYear == currentYear) {
-	// 	var currentMonth = new Date().getMonth();
-	// 	arrLabel = arrLabel.slice(0, currentMonth + 1);
-	// 	arrData = arrData.slice(0, currentMonth + 1);
-	// }
-
-	// //Total Articles by sum of arrData
-	// var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-	// document.getElementById('totalArticles').innerText = sum + ' articles';
-	
-	// var options = {
-	// 	series: [{
-	// 		name: "Articles",
-	// 		data: arrData
-	// 	}],
-	// 	chart: {
-	// 		type: "area",
-	// 		// width: 130,
-	// 		stacked: true,
-	// 		height: 280,
-	// 		toolbar: {
-	// 			show: !1
-	// 		},
-	// 		zoom: {
-	// 			enabled: !1
-	// 		},
-	// 		dropShadow: {
-	// 			enabled: 0,
-	// 			top: 3,
-	// 			left: 14,
-	// 			blur: 4,
-	// 			opacity: .12,
-	// 			color: "#3461ff"
-	// 		},
-	// 		sparkline: {
-	// 			enabled: !1
-	// 		}
-	// 	},
-	// 	markers: {
-	// 		size: 0,
-	// 		colors: ["#3461ff"],
-	// 		strokeColors: "#fff",
-	// 		strokeWidth: 2,
-	// 		hover: {
-	// 			size: 7
-	// 		}
-	// 	},
-	// 	grid: {
-	// 		row: {
-	// 			colors: ["transparent", "transparent"],
-	// 			opacity: .2
-	// 		},
-	// 		borderColor: "#f1f1f1"
-	// 	},
-	// 	plotOptions: {
-	// 		bar: {
-	// 			horizontal: !1,
-	// 			columnWidth: "25%",
-	// 			//endingShape: "rounded"
-	// 		}
-	// 	},
-	// 	dataLabels: {
-	// 		enabled: !1
-	// 	},
-	// 	stroke: {
-	// 		show: !0,
-	// 		width: [2.5],
-	// 		//colors: ["#3461ff"],
-	// 		curve: "smooth"
-	// 	},
-	// 	fill: {
-	// 		type: 'gradient',
-	// 		gradient: {
-	// 			shade: 'light',
-	// 			type: 'vertical',
-	// 			shadeIntensity: 0.5,
-	// 			gradientToColors: ['#3461ff'],
-	// 			inverseColors: false,
-	// 			opacityFrom: 0.5,
-	// 			opacityTo: 0.1,
-	// 			// stops: [0, 100]
-	// 		}
-	// 	},
-	// 	colors: ["#3461ff"],
-	// 	xaxis: {
-	// 		categories: arrLabel
-	// 	},
-	// 	responsive: [
-	// 		{
-	// 			breakpoint: 1000,
-	// 			options: {
-	// 				chart: {
-	// 					type: "area",
-	// 					// width: 130,
-	// 					stacked: true,
-	// 				}
-	// 			}
-	// 		}
-	// 	],
-	// 	legend: {
-	// 		show: false
-	// 	},
-	// 	tooltip: {
-	// 		theme: "dark"
-	// 	}
-	// };
-
-	// var chart = new ApexCharts(document.querySelector("#chartPending"), options);
-	// chart.render();
-	//END CHART PENDING
 });
 
 

@@ -9,20 +9,13 @@
                         <div class="">
                             <p>Total Contributions</p>
                             <h4 class="" id="totalArticles">0 article</h4>
-                        </div>
-                        <div class="card-body">
-                                <div id="chartTotal"></div>
-                                @foreach (var item in ViewBag.ContributionDate)
-                                {
-                                    <div class="contribution-item" data-month="@item.Month" data-total="@item.TotalByMonth"></div>
-                                }
-                            </div>
+                        </div>              
                         <div class="w-5">   
                             <!-- Select year, display current year first access-->
-                            <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
+                            <select class="form-select" id="yearTotal" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
                                 @foreach (var item in ViewBag.Years)
                                 {
-                                    if (item == ViewBag.ContributionDate[0].Year)
+                                    if (item == ViewBag.Contributions[0].Year)
                                     {
                                         <option value="@item" selected>@item</option>
                                     }
@@ -34,32 +27,33 @@
                             </select>
                         </div>
                     </div>
+                    <div id="ContributionsTotalData" data-total='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'></div>
+                      
+                        <div class="d-flex">
+                            <div id="chartColumnContributions"></div>
+                            <div id="chartPieContributions"></div>
+                        </div>   
                 </div>
             </div>
         </div>
     </div>
     <!--end row-->
+
+    <!-- Tương tự Total Contributions -->
     <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
         <div class="card overflow-hidden radius-10">
                 <div class="card-body">
                     <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                         <div class="">
-                            <p>Contributions Approved</p>
-                            <h4 class="" id="totalArticles">0 article</h4>
-                        </div>
-                        <div class="card-body">
-                                <div id="chartApproved"></div>
-                                @foreach (var item in ViewBag.ContributionDate)
-                                {
-                                    <div class="contribution-item" data-month="@item.Month" data-total="@item.TotalByMonth"></div>
-                                }
-                            </div>
+                            <p>Approved Contributions</p>
+                            <h4 class="" id="totalApproved">0 article</h4>
+                        </div>              
                         <div class="w-5">   
                             <!-- Select year, display current year first access-->
-                            <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
+                            <select class="form-select" id="yearApproved" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
                                 @foreach (var item in ViewBag.Years)
                                 {
-                                    if (item == ViewBag.ContributionDate[0].Year)
+                                    if (item == ViewBag.Contributions[0].Year)
                                     {
                                         <option value="@item" selected>@item</option>
                                     }
@@ -71,10 +65,19 @@
                             </select>
                         </div>
                     </div>
+                    <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))' data-rejected= '@Html.Raw(Json.Serialize(ViewData["ContributionsRejected"]))' data-pending= '@Html.Raw(Json.Serialize(ViewData["ContributionsPending"]))'></div>
+                        <div class="d-flex">
+                            <div id="chartPieApproved"></div>
+                            <div id="chartColumnApproved"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
         </div>
     </div>
     <!--end row-->
+
+    <!-- Tương tự Total Contributions -->
+
+
 </main>
 <!--end page main-->

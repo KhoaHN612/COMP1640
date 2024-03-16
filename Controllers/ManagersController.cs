@@ -673,22 +673,91 @@ namespace COMP1640.Controllers
 
 
             //GET CONTRIBUTIONS BY YEAR
-            List<ContributionDate> ContributionDate = new List<ContributionDate>();
-            int selectedYear = DateTime.Now.Year; 
+            int selectedYearAll = DateTime.Now.Year; 
+            int selectedYearApproved = DateTime.Now.Year; 
+            int selectedYearRejected = DateTime.Now.Year; 
+            int selectedYearPending = DateTime.Now.Year;
 
-            if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
-            var yearResult = await GetContributionByYear(selectedYear);
+            if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { selectedYearAll = Convert.ToInt32(year); }
+            List<ContributionDate> allResults = await GetContributionsByStatus(selectedYearAll, "All");
 
-            if (yearResult is JsonResult jsonYearResult)
-            {
-                ContributionDate = jsonYearResult.Value as List<ContributionDate>;
-            }
+            if (task == "ApprovedContribution" && !string.IsNullOrEmpty(year)) { selectedYearApproved = Convert.ToInt32(year); }
+            var approvedResults = await GetContributionsByStatus(selectedYearApproved, "Approved");
+
+            if (task == "RejectedContribution" && !string.IsNullOrEmpty(year)) { selectedYearRejected = Convert.ToInt32(year); }
+            var rejectedResults = await GetContributionsByStatus(selectedYearRejected, "Rejected");
+
+            if (task == "PendingContribution" && !string.IsNullOrEmpty(year)) { selectedYearPending = Convert.ToInt32(year); }
+            var pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
             
             ViewData["Years"] = years;
-            ViewData["ContributionDate"] = ContributionDate;
+            ViewData["Contributions"] = allResults;
+            ViewData["ApprovedContribution"] = approvedResults;
+            ViewData["RejectedContribution"] = rejectedResults;
+            ViewData["PendingContribution"] = pendingResults;
 
             return View("head_managers/index");
         }
+
+        public async Task<List<ContributionDate>> GetContributionsByStatus(int year, string status)
+        {
+            /*
+            SELECT 
+                YEAR(C.submissionDate) AS SubmissionYear, 
+                MONTH(C.submissionDate) AS SubmissionMonth, 
+                COUNT(*) AS TotalContributions, 
+                F.name AS Faculty
+            FROM 
+                AspNetUsers U
+            JOIN 
+                Faculties F ON U.FacultyId = F.facultyID
+            JOIN 
+                Contributions C ON C.userId = U.Id
+            WHERE 
+                YEAR(C.submissionDate) = 2024
+            GROUP BY 
+                MONTH(C.submissionDate), YEAR(C.submissionDate), F.facultyID, F.name
+            ORDER BY 
+                MONTH(C.submissionDate) ASC;
+            */
+            List<ContributionDate> contributions = new List<ContributionDate>();
+
+            if(status == "All"){
+                contributions = await _context.Users
+                .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
+                .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
+                .Where(uc => uc.Contributions.SubmissionDate.Year == year)
+                .GroupBy(uc => new { uc.Contributions.SubmissionDate.Year, uc.Contributions.SubmissionDate.Month, uc.UserFaculty.Faculty.FacultyId, uc.UserFaculty.Faculty.Name })
+                .Select(g => new ContributionDate
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    FacultyName = g.Key.Name,
+                    TotalByMonth = g.Count()
+                })
+                .OrderBy(c => c.Year)
+                .ThenBy(c => c.Month)
+                .ToListAsync();
+            }else{
+                contributions = await _context.Users
+                .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
+                .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
+                .Where(uc => uc.Contributions.SubmissionDate.Year == year && uc.Contributions.Status == status)
+                .GroupBy(uc => new { uc.Contributions.SubmissionDate.Year, uc.Contributions.SubmissionDate.Month, uc.UserFaculty.Faculty.FacultyId, uc.UserFaculty.Faculty.Name })
+                .Select(g => new ContributionDate
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    FacultyName = g.Key.Name,
+                    TotalByMonth = g.Count()
+                })
+                .OrderBy(c => c.Year)
+                .ThenBy(c => c.Month)
+                .ToListAsync();
+            }
+            return contributions;
+        }
+
 
         //Number of Student by Faculty GetStudentByFaculty
         // public async Task<IActionResult> GetStudentByFaculty()
