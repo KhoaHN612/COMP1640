@@ -792,7 +792,7 @@ namespace COMP1640.Controllers
             {
                 foreach (var fileDetail in fileDetails)
                 {
-                    var completeFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", fileDetail.FilePath);
+                    var completeFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", fileDetail.FilePath);
                     if (!System.IO.File.Exists(completeFilePath))
                     {
                         continue; // Ideally, add some error logging here
@@ -830,7 +830,7 @@ namespace COMP1640.Controllers
                     {
                         foreach (var fileDetail in contribution.FileDetails)
                         {
-                            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", fileDetail.FilePath);
+                            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", fileDetail.FilePath);
 
                             if (System.IO.File.Exists(filePath))
                             {
