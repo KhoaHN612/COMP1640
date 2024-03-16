@@ -39,7 +39,6 @@
     </div>
     <!--end row-->
 
-    <!-- Tương tự Total Contributions -->
     <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
         <div class="card overflow-hidden radius-10">
                 <div class="card-body">
@@ -75,7 +74,6 @@
         </div>
     </div>
 
-    <!-- Tương tự Total Contributions viết Rejected-->
     <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
         <div class="card overflow-hidden radius-10">
                 <div class="card-body">
@@ -101,7 +99,7 @@
                             </select>
                         </div>
                     </div>
-                    <div id="ContributionsRejectedData" data-rejected= '@Html.Raw(Json.Serialize(ViewData["ContributionsRejected"]))'></div>
+                    <div id="ContributionsRejectedData" data-rejected= '@Html.Raw(Json.Serialize(ViewData["RejectedContribution"]))'></div>
                         <div class="d-flex">
                             <div id="chartPieRejected"></div>
                             <div id="chartColumnRejected"></div>
@@ -111,5 +109,39 @@
         </div>
     </div>
 
+    <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
+        <div class="card overflow-hidden radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                        <div class="">
+                            <p>Pending Contributions</p>
+                            <h4 class="" id="totalPending">0 article</h4>
+                        </div>              
+                        <div class="w-5">   
+                            <!-- Select year, display current year first access-->
+                            <select class="form-select" id="yearPending" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
+                                @foreach (var item in ViewBag.Years)
+                                {
+                                    if (item == ViewBag.Contributions[0].Year)
+                                    {
+                                        <option value="@item" selected>@item</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item" >@item</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div id="ContributionsPendingData" data-pending= '@Html.Raw(Json.Serialize(ViewData["PendingContribution"]))'></div>
+                        <div class="d-flex">
+                            <div id="chartPiePending"></div>
+                            <div id="chartColumnPending"></div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
 </main>
 <!--end page main-->

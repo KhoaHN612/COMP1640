@@ -448,6 +448,150 @@ function GetRejectedContributionData() {
 	chartColumn.render();
 }
 
+function GetPendingContributionData() {
+	//Tương tự như GetTotalContributionsData
+	var pendingDataElement = document.getElementById("ContributionsPendingData");
+	var pendingData = JSON.parse(pendingDataElement.dataset.pending);
+
+	var dataPendingPie = [[], []];
+	for (var i = 0; i < pendingData.length; i++) {
+		var facultyName = pendingData[i].facultyName;
+		if (!dataPendingPie[0].includes(facultyName)) {
+			dataPendingPie[0].push(facultyName);
+		}
+	}
+
+	for (var i = 0; i < dataPendingPie[0].length; i++) {
+		var total = 0;
+		for (var j = 0; j < pendingData.length; j++) {
+			if (dataPendingPie[0][i] == pendingData[j].facultyName) {
+				total += pendingData[j].totalByMonth;
+			}
+		}
+		dataPendingPie[1].push(total);
+	}
+
+	var selectedPendingYear = document.getElementById("yearPending").value;
+	var dataPendingColumn = [[], []];
+	dataPendingColumn[0] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	tempPendingMonth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+	var currentPendingYear = new Date().getFullYear();
+	if (selectedPendingYear == currentPendingYear) {
+		var currentMonth = new Date().getMonth();
+		dataPendingColumn[0] = dataPendingColumn[0].slice(0, currentMonth + 1);
+		tempPendingMonth = tempPendingMonth.slice(0, currentMonth + 1);
+	}
+
+	for (var i = 0; i < tempPendingMonth.length; i++) {
+		var total = 0;
+		for (var j = 0; j < pendingData.length; j++) {
+			if (tempPendingMonth[i] == pendingData[j].month) {
+				total += pendingData[j].totalByMonth;
+			}
+		}
+		dataPendingColumn[1].push(total);
+	}
+
+	var optionsPie = {
+		series: dataPendingPie[1],
+		chart: {
+			width: 380,
+			type: 'pie',
+		},
+		labels: dataPendingPie[0],
+		responsive: [{
+			breakpoint: 480,
+			options: {
+				chart: {
+					width: 800
+				},
+				legend: {
+					position: 'bottom'
+				}
+			}
+		}]
+	};
+
+	var optionsColumn =  {
+		series: [{
+		name: 'Inflation',
+		data: dataPendingColumn[1]
+	}],
+		chart: {
+		height: 350,
+		type: 'bar',
+	},
+	plotOptions: {
+		bar: {
+		borderRadius: 10,
+		dataLabels: {
+			position: 'top', // top, center, bottom
+		},
+		}
+	},
+	dataLabels: {
+		enabled: true,
+		formatter: function (val) {
+		return val + "";
+		},
+		offsetY: -20,
+		style: {
+		fontSize: '12px',
+		colors: ["#304758"]
+		}
+	},
+	xaxis: {
+		categories: dataPendingColumn[0],
+		position: 'top',
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false
+		},
+		crosshairs: {
+		fill: {
+			type: 'gradient',
+			gradient: {
+			colorFrom: '#D8E3F0',
+			colorTo: '#BED1E6',
+			stops: [0, 100],
+			opacityFrom: 0.4,
+			opacityTo: 0.5,
+			}
+		}
+		},
+		tooltip: {
+		enabled: true,
+		}
+	},
+	yaxis: {
+		axisBorder: {
+		show: false
+		},
+		axisTicks: {
+		show: false,
+		},
+		labels: {
+		show: false,
+		formatter: function (val) {
+			return val + "";
+		}
+		}
+
+	}
+	};
+
+	var sum = dataPendingPie[1].reduce((a, b) => a + b, 0);
+	$('#totalPending').text(sum + ' articles');
+
+	var chartPie = new ApexCharts(document.querySelector("#chartPiePending"), optionsPie);
+	chartPie.render();
+
+	var chartColumn = new ApexCharts(document.querySelector("#chartColumnPending"), optionsColumn);
+	chartColumn.render();
+}
 
 
 //sk onload
