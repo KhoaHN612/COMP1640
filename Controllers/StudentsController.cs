@@ -155,11 +155,11 @@ namespace COMP1640.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
+        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
 
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
-            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
             string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
             if (fileExtension == ".docx")
             {
@@ -188,9 +188,9 @@ namespace COMP1640.Controllers
 
             maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.ContributionId = maxId + 1;
-            contribution.AnnualMagazineId = 1;
+            contribution.AnnualMagazineId = AnnualMagazineId;
 
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userManager.GetUserId(User);
             contribution.Comment = null;
             contribution.Status = "Pending";
             contribution.UserId = userId;
@@ -206,24 +206,26 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditSubmission(int id, FileDetail newContribution)
         {
-            var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+            // var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+            var currentFile = await _context.FileDetails
+                .FirstOrDefaultAsync(fd => fd.ContributionId == id);
+            if (currentFile != null)
+            {
+                string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
+                string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
+                System.IO.File.Delete(currentFilePath);
+            }
 
-            Console.WriteLine(newContribution.ContributionFile.FileName);
             string uniqueFileName = GetUniqueFileName(newContribution.ContributionFile.FileName);
-            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+            using (var fileStream = new FileStream(newFilePath, FileMode.Create))
             {
                 await newContribution.ContributionFile.CopyToAsync(fileStream);
             }
-            newContribution.FilePath = uniqueFileName;
+
+            currentFile.FilePath = uniqueFileName;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        // GET: StudentsController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
         }
 
         // POST: StudentsController/Delete/5
@@ -255,12 +257,12 @@ namespace COMP1640.Controllers
             {
                 if (userToUpdate.ProfileImagePath != null)
                 {
-                    string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "profileImageUpload");
                     string imageFilePath = Path.Combine(uploadsFolderPath, userToUpdate.ProfileImagePath);
                     System.IO.File.Delete(imageFilePath);
                 }
                 string uniqueFileName = GetUniqueFileName(user.ProfileImageFile.FileName);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "profileImageUpload", uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await user.ProfileImageFile.CopyToAsync(fileStream);
