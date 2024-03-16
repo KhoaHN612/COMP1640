@@ -671,7 +671,6 @@ namespace COMP1640.Controllers
                 .Distinct()
                 .ToListAsync();
 
-
             //GET CONTRIBUTIONS BY YEAR
             int selectedYearAll = DateTime.Now.Year; 
             int selectedYearApproved = DateTime.Now.Year; 
@@ -689,7 +688,12 @@ namespace COMP1640.Controllers
 
             if (task == "PendingContribution" && !string.IsNullOrEmpty(year)) { selectedYearPending = Convert.ToInt32(year); }
             var pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
-            
+
+            if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
+            if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = int.Parse(year) }); }
+            if (rejectedResults.Count == 0) { rejectedResults.Add(new ContributionDate { Year = int.Parse(year) }); }
+            if (pendingResults.Count == 0) { pendingResults.Add(new ContributionDate { Year = int.Parse(year) }); }
+
             ViewData["Years"] = years;
             ViewData["Contributions"] = allResults;
             ViewData["ApprovedContribution"] = approvedResults;

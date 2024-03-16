@@ -49,10 +49,10 @@
                         </div>              
                         <div class="w-5">   
                             <!-- Select year, display current year first access-->
-                            <select class="form-select" id="yearApproved" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
+                            <select class="form-select" id="yearApproved" aria-label="Default select example" onchange="SelectedYearApproved(this.value)">
                                 @foreach (var item in ViewBag.Years)
                                 {
-                                    if (item == ViewBag.Contributions[0].Year)
+                                    if (item == ViewBag.ApprovedContribution[0].Year)
                                     {
                                         <option value="@item" selected>@item</option>
                                     }
@@ -64,7 +64,7 @@
                             </select>
                         </div>
                     </div>
-                    <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))' data-rejected= '@Html.Raw(Json.Serialize(ViewData["ContributionsRejected"]))' data-pending= '@Html.Raw(Json.Serialize(ViewData["ContributionsPending"]))'></div>
+                    <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))'></div>
                         <div class="d-flex">
                             <div id="chartPieApproved"></div>
                             <div id="chartColumnApproved"></div>
@@ -84,10 +84,10 @@
                         </div>              
                         <div class="w-5">   
                             <!-- Select year, display current year first access-->
-                            <select class="form-select" id="yearRejected" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
+                            <select class="form-select" id="yearRejected" aria-label="Default select example" onchange="SelectedYearRejected(this.value)">
                                 @foreach (var item in ViewBag.Years)
                                 {
-                                    if (item == ViewBag.Contributions[0].Year)
+                                    if (item == ViewBag.RejectedContribution[0].Year)
                                     {
                                         <option value="@item" selected>@item</option>
                                     }
@@ -119,10 +119,10 @@
                         </div>              
                         <div class="w-5">   
                             <!-- Select year, display current year first access-->
-                            <select class="form-select" id="yearPending" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
+                            <select class="form-select" id="yearPending" aria-label="Default select example" onchange="SelectedYearPending(this.value)">
                                 @foreach (var item in ViewBag.Years)
                                 {
-                                    if (item == ViewBag.Contributions[0].Year)
+                                    if (item == ViewBag.PendingContribution[0].Year)
                                     {
                                         <option value="@item" selected>@item</option>
                                     }
