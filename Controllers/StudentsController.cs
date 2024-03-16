@@ -43,20 +43,20 @@ namespace COMP1640.Controllers
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Home Page";
-            var userFullName = await GetUserFullName(); 
+            var userFullName = await GetUserFullName();
             if (userFullName != null)
             {
-                ViewBag.userFullName = userFullName; 
+                ViewBag.userFullName = userFullName;
             }
             return View();
         }
         public async Task<IActionResult> SubmissionList()
         {
             ViewData["Title"] = "Submission List";
-            var userFullName = await GetUserFullName(); 
+            var userFullName = await GetUserFullName();
             if (userFullName != null)
             {
-                ViewBag.userFullName = userFullName; 
+                ViewBag.userFullName = userFullName;
             }
             return View();
         }
@@ -65,10 +65,10 @@ namespace COMP1640.Controllers
         public async Task<IActionResult> AboutUs()
         {
             ViewData["Title"] = "About Us";
-            var userFullName = await GetUserFullName(); 
+            var userFullName = await GetUserFullName();
             if (userFullName != null)
             {
-                ViewBag.userFullName = userFullName; 
+                ViewBag.userFullName = userFullName;
             }
             return View();
         }
@@ -77,10 +77,10 @@ namespace COMP1640.Controllers
         public async Task<IActionResult> ContactUs()
         {
             ViewData["Title"] = "Contact Us";
-            var userFullName = await GetUserFullName(); 
+            var userFullName = await GetUserFullName();
             if (userFullName != null)
             {
-                ViewBag.userFullName = userFullName; 
+                ViewBag.userFullName = userFullName;
             }
             return View();
         }
@@ -204,7 +204,7 @@ namespace COMP1640.Controllers
         // POST: StudentsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditSubmission( int id, FileDetail newContribution)
+        public async Task<ActionResult> EditSubmission(int id, FileDetail newContribution)
         {
             var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
 
@@ -303,32 +303,36 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
-        public async Task<IActionResult> SubmissionDetail(){
+        public async Task<IActionResult> SubmissionDetail(int id)
+        {
             ViewData["Title"] = "Submission Detail";
-            var userFullName = await GetUserFullName(); 
+            var userFullName = await GetUserFullName();
             if (userFullName != null)
             {
-                ViewBag.userFullName = userFullName; 
+                ViewBag.userFullName = userFullName;
+            }
+            var contribution = await _context.Contributions.FindAsync(id);
+            return View(contribution);
+        }
+
+        public async Task<IActionResult> PostLists()
+        {
+            ViewData["Title"] = "Post Lists";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
             }
             return View();
         }
 
-        public async Task<IActionResult> PostLists(){
-            ViewData["Title"] = "Post Lists";
-            var userFullName = await GetUserFullName(); 
-            if (userFullName != null)
-            {
-                ViewBag.userFullName = userFullName; 
-            }
-            return View();
-        }
-        
-        public async Task<IActionResult> PostDetail(){
+        public async Task<IActionResult> PostDetail()
+        {
             ViewData["Title"] = "Post Detail";
-            var userFullName = await GetUserFullName(); 
+            var userFullName = await GetUserFullName();
             if (userFullName != null)
             {
-                ViewBag.userFullName = userFullName; 
+                ViewBag.userFullName = userFullName;
             }
             return View();
         }
