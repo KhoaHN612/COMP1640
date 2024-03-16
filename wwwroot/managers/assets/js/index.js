@@ -30,20 +30,161 @@ $(window).on('load', function () {
 	var totalPendingData = JSON.parse(totalPendingDataElement.dataset.totalpending);
 
 	var sumPending = totalPendingData.reduce((a, b) => a + b.total, 0);
-	document.getElementById('totalPending').innerText = sumPending + ' articles';
+	document.getElementById('totalPending').innerText = sumPending + ' articles';	
 
 	//=======================================================COORDINATORS CHART=======================================================
 	//Retrieve the data from the HTML data attribute
-	console.log("Contributions without comments");
+	var contributionDataElement = document.getElementById("totalContributionsData");
+	var contributionsData = JSON.parse(contributionDataElement.dataset.totalcontributions);
 
 	var totalContributionDataElement = document.getElementById("contributionWithoutCommentsData");
-	//print totalContributionDataElement
-	console.log(totalContributionDataElement);
 	var totalContributionData = JSON.parse(totalContributionDataElement.dataset.contributionwithoutcomments);
 
-	console.log(totalContributionData);
+	var totalContributionAfter14DaysDataElement = document.getElementById("contributionWithoutCommentsAfter14DaysData");
+	var totalContributionAfter14DaysData = JSON.parse(totalContributionAfter14DaysDataElement.dataset.contributionwithoutcommentsafter14days);
+	
+	//Lấy tất tháng hiện tại
+	const today = new Date();
+	const startOfYear = new Date(today.getFullYear(), 0, 1);
+
+	const formattedStartDate = `${startOfYear.getFullYear()}-${(startOfYear.getMonth() + 1).toString().padStart(2, '0')}-${startOfYear.getDate().toString().padStart(2, '0')}`;
+	const formattedDate = new Date().toISOString().slice(0, 10);
+
+	//Lấy dữ liệu từ totalContributionData và totalContributionAfter14DaysData
+	var data = GetData(formattedStartDate, formattedDate, contributionsData, totalContributionData, totalContributionAfter14DaysData);
+	
+	console.log(data);
+
+	var arrLabelDate = data[0];
+	var arrData1 = data[1];
+	var arrData2 = data[2];
+	var arrData3 = data[3];
+
+	var options = {
+		series: [{
+		name: 'All Contributions',
+		type: 'column',
+		data: arrData1
+	  }, {
+		name: 'Contribution Without Comments',
+		type: 'area',
+		data: arrData2
+	  }, {
+		name: 'Contributions After 14 Days Without Comments',
+		type: 'line',
+		data: arrData3
+	  }],
+		chart: {
+		height: 350,
+		type: 'line',
+		stacked: false,
+	  },
+	  stroke: {
+		width: [0, 2, 5],
+		curve: 'smooth'
+	  },
+	  plotOptions: {
+		bar: {
+		  columnWidth: '50%'
+		}
+	  },
+	  
+	  fill: {
+		opacity: [0.85, 0.25, 1],
+		gradient: {
+		  inverseColors: false,
+		  shade: 'light',
+		  type: "vertical",
+		  opacityFrom: 0.85,
+		  opacityTo: 0.55,
+		  stops: [0, 100, 100, 100]
+		}
+	  },
+	  labels: arrLabelDate,
+	  markers: {
+		size: 0
+	  },
+	  xaxis: {
+		type: 'datetime'
+	  },
+	  yaxis: {
+		title: {
+		  text: 'Points',
+		},
+		min: 0
+	  },
+	  tooltip: {
+		shared: true,
+		intersect: false,
+		y: {
+		  formatter: function (y) {
+			if (typeof y !== "undefined") {
+			  return y.toFixed(0) + " points";
+			}
+			return y;
+	  
+		  }
+		}
+	  }
+	  };
+
+	var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
+	chart.render();
 
 });
+
+function GetData(startDate, endDate, contributionsData, totalContributionData, totalContributionAfter14DaysData) {
+	console.log("Get Data Contribution Without Comments");
+	const dates = [];
+	var totalcontributions = [];
+	var totalContributionWithoutComment = [];
+	var totalContributionAfter14Days = [];
+	let currentDate = new Date(startDate);
+
+	// Lặp cho đến khi currentDate lớn hơn endDate
+	while (currentDate <= new Date(endDate)) {
+		dates.push(currentDate.toISOString().slice(0, 10));
+		//Duyệt qua vòng lặp mà không có ngày nào trong totalContributionData thì gán giá trị 0
+		let total = 0;
+		let total1 = 0;
+		let total2 = 0;
+
+		for (var i = 0; i < contributionsData.length; i++) {
+			var formatDate = new Date(contributionsData[i].date + 'Z').toISOString().slice(0, 10);
+
+			if (formatDate == currentDate.toISOString().slice(0, 10)) {
+				total = contributionsData[i].quantity;
+				break;
+			}
+		}
+
+		for (var i = 0; i < totalContributionData.length; i++) {
+			var formatDate = new Date(totalContributionData[i].date + 'Z').toISOString().slice(0, 10);
+
+			if (formatDate == currentDate.toISOString().slice(0, 10)){
+				total1 = totalContributionData[i].quantity;
+				break;
+			}
+		}
+
+		for (var i = 0; i < totalContributionAfter14DaysData.length; i++) {
+			var formatDate = new Date(totalContributionAfter14DaysData[i].date + 'Z').toISOString().slice(0, 10);
+
+			if (formatDate == currentDate.toISOString().slice(0, 10)) {
+				total2 = totalContributionAfter14DaysData[i].quantity;
+				break;
+			}
+		}
+		
+		totalcontributions.push(total);
+		totalContributionAfter14Days.push(total2);
+		totalContributionWithoutComment.push(total1);
+
+		currentDate.setDate(currentDate.getDate() + 1);
+	}
+	
+	return [dates, totalcontributions, totalContributionWithoutComment, totalContributionAfter14Days];
+}
 
 function SelectedYearInCoordinators(year) {
 	var url = '/Managers/IndexCooridinators?task=TotalContribution&year=' + year;
@@ -72,44 +213,6 @@ function GetContributionByYear(year){
 
 $(function () {
 	"use strict";
-	
-//Chart coordinators
-
-// arrWithoutCommentsData = [];
-// arrCategoriesDays = ["01/01/21", "02/01/21", "03/01/21", "04/01/21", "05/01/21", "06/01/21", "07/01/21", "08/01/21", "09/01/21", "10/01/21"];
-
-var options = {
-	series: [{
-	name: 'series1',
-	data: [31, 40, 28, 51, 42, 109, 100]
-}, {
-	name: 'series2',
-	data: [11, 32, 45, 32, 34, 52, 41]
-}],
-	chart: {
-	height: 350,
-	type: 'area'
-},
-dataLabels: {
-	enabled: false
-},
-stroke: {
-	curve: 'smooth'
-},
-xaxis: {
-	type: 'datetime',
-	categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-},
-tooltip: {
-	x: {
-	format: 'dd/MM/yy HH:mm'
-	},
-},
-};
-
-var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
-chart.render();
-
 
 	// Admin Chart
 	

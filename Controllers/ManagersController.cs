@@ -467,6 +467,7 @@ namespace COMP1640.Controllers
             // }
             // return View("admins/form_create_user", model);
         }
+
         public async Task<IActionResult> IndexCooridinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
@@ -489,62 +490,69 @@ namespace COMP1640.Controllers
             //Total Contributions Pending
             List<TotalContribution> TotalContributionsPending = await GetTotalContributions(currentDate.Year, "TotalContributionsPending");
 
-            //Get contribution without comment and withou comment after 14 days 
+            //GET ALL CONTRIBUTIONS
+            List<ContributionWithoutComment> contributions =  await _context.Contributions
+                .Where(c => c.SubmissionDate.Year == DateTime.Now.Year)
+                .GroupBy(c => new { Date = c.SubmissionDate.Date})
+                .Select(g => new ContributionWithoutComment
+                {
+                    Date = g.Key.Date,
+                    Quantity = g.Count()
+                })
+                .ToListAsync();   
+                
+            //Get contribution without comment
             /*
-            SELECT SubmissionDate AS Date,
-                COUNT(*) AS ContributionsWithoutComments
-            FROM Contributions
-            WHERE YEAR(SubmissionDate) = 2024
-                AND Comment IS NULL
-            GROUP BY SubmissionDate;
+            SELECT 
+				YEAR(c.submissionDate) as 'Year',
+                c.submissionDate AS 'Date',
+                COUNT(*) AS Quantity
+            FROM 
+                Contributions c
+            WHERE 
+                YEAR(c.submissionDate) = YEAR(GETDATE()) 
+                AND c.Comment IS NULL 
+            GROUP BY 
+                YEAR(c.submissionDate), c.submissionDate;
             */
 
-            var contributionWithoutComments = await _context.Contributions
+            List<ContributionWithoutComment> contributionWithoutComments =  await _context.Contributions
                 .Where(c => c.SubmissionDate.Year == DateTime.Now.Year && c.Comment == null)
-                .GroupBy(c => c.SubmissionDate)
-                .Select(g => new 
+                .GroupBy(c => new { Date = c.SubmissionDate.Date})
+                .Select(g => new ContributionWithoutComment
                 {
-                    Date = g.Key,
-                    ContributionsWithoutComments = g.Count()
+                    Date = g.Key.Date,
+                    Quantity = g.Count()
+                })
+                .ToListAsync();   
+
+            //Get contribution without comment after 14 days
+            /*
+            SELECT 
+				YEAR(c.submissionDate) as 'Year',
+                c.submissionDate AS 'Date',
+                COUNT(*) AS Quantity
+            FROM 
+                Contributions c
+            WHERE 
+                YEAR(c.submissionDate) = YEAR(GETDATE()) 
+                AND c.Comment IS NULL 
+                AND DATEDIFF(day, c.submissionDate, GETDATE()) > 14
+            GROUP BY 
+                YEAR(c.submissionDate), c.submissionDate;
+            */
+
+            List<ContributionWithoutComment> contributionWithoutCommentsAfter14Days = await _context.Contributions
+                .Where(c => c.SubmissionDate.Year == DateTime.Now.Year
+                            && c.Comment == null
+                            && EF.Functions.DateDiffDay(c.SubmissionDate, DateTime.Now.Date) > 14)
+                .GroupBy(c => new { Date = c.SubmissionDate.Date})
+                .Select(g => new ContributionWithoutComment
+                {
+                    Date = g.Key.Date,
+                    Quantity = g.Count()
                 })
                 .ToListAsync();
-
-
-            foreach (var item in contributionWithoutComments)
-            {
-                Console.WriteLine($"Date: {item.Date}, ContributionsWithoutComments: {item.ContributionsWithoutComments}");
-            }
-
-            Console.WriteLine("==============================================");
-            
-            //Get contribution without comment and withou comment after 14 days
-            /*
-            SELECT MONTH(submissionDate) AS Date,
-                COUNT(*) AS ContributionsWithoutComments
-            FROM Contributions
-            WHERE YEAR(submissionDate) = 2022
-                AND Comment IS NULL
-                AND DATEDIFF(DAY, submissionDate, GETDATE()) > 14
-            GROUP BY MONTH(submissionDate);
-            */
-            
-            // DateTime currentDates = DateTime.Now;
-
-            // List<ContributionWithoutComment> contributionWithoutCommentsAfter14Days = await _context.Contributions
-            //     .Where(c => c.SubmissionDate.Year == currentDates.Year && c.Comment == null && (currentDates - c.SubmissionDate).Day > 14)
-            //     .GroupBy(c => new { c.SubmissionDate.Year, c.SubmissionDate.Month })
-            //     .Select(g => new ContributionWithoutComment
-            //     {
-            //         Date = new DateTime(g.Key.Year, g.Key.Month, 1),
-            //         ContributionsWithoutComments = g.Count()
-            //     })
-            //     .ToListAsync();
-
-            // foreach (var item in contributionWithoutCommentsAfter14Days)
-            // {
-            //     Console.WriteLine($"Date: {item.Date}, ContributionsWithoutComments: {item.ContributionsWithoutComments}");
-            // }
-
 
             //GET ALL YEARS
             List<int> years = await _context.Contributions
@@ -557,6 +565,8 @@ namespace COMP1640.Controllers
             ViewData["TotalContributionsPending"] = TotalContributionsPending;
             ViewData["TotalContribution"] = TotalContribution;
             ViewData["ContributionWithoutComments"] = contributionWithoutComments;
+            ViewData["ContributionWithoutCommentsAfter14Days"] = contributionWithoutCommentsAfter14Days;
+            ViewData["Contributions"] = contributions;
             ViewData["Years"] = years;
 
             return View("coordinators/index");
