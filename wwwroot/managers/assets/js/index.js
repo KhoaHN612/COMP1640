@@ -1171,46 +1171,527 @@ $(function () {
 	var chart = new ApexCharts(document.querySelector("#chart10"), options);
 	chart.render();
 
-	// worl map
+	//======================================================= MANAGER START =======================================================
+	
+	// CHART TOTAL CONTRIBUTIONS
+	var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-	jQuery('#geographic-map').vectorMap(
-		{
-			map: 'world_mill_en',
-			backgroundColor: 'transparent',
-			borderColor: '#818181',
-			borderOpacity: 0.25,
-			borderWidth: 1,
-			zoomOnScroll: false,
-			color: '#009efb',
-			regionStyle: {
-				initial: {
-					fill: '#3461ff'
+	var arrData = new Array(12).fill(0);
+	var contributionItems = document.querySelectorAll('.contribution-item');
+
+	for (var i = 0; i < contributionItems.length; i++) {
+		var contributionItem = contributionItems[i];
+		var month = parseInt(contributionItem.getAttribute('data-month'));
+		var total = contributionItem.getAttribute('data-total');
+		arrData[month - 1] = total;
+	}
+
+	var selectedYear = document.getElementById("year").value;
+	var currentYear = new Date().getFullYear();
+	if (selectedYear == currentYear) {
+		var currentMonth = new Date().getMonth();
+		arrLabel = arrLabel.slice(0, currentMonth + 1);
+		arrData = arrData.slice(0, currentMonth + 1);
+	}
+
+	//Total Articles by sum of arrData
+	var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+	document.getElementById('totalArticles').innerText = sum + ' articles';
+	
+
+	var options = {
+		series: [{
+			name: "Articles",
+			data: arrData
+		}],
+		chart: {
+			type: "area",
+			// width: 130,
+			stacked: true,
+			height: 280,
+			toolbar: {
+				show: !1
+			},
+			zoom: {
+				enabled: !1
+			},
+			dropShadow: {
+				enabled: 0,
+				top: 3,
+				left: 14,
+				blur: 4,
+				opacity: .12,
+				color: "#3461ff"
+			},
+			sparkline: {
+				enabled: !1
+			}
+		},
+		markers: {
+			size: 0,
+			colors: ["#3461ff"],
+			strokeColors: "#fff",
+			strokeWidth: 2,
+			hover: {
+				size: 7
+			}
+		},
+		grid: {
+			row: {
+				colors: ["transparent", "transparent"],
+				opacity: .2
+			},
+			borderColor: "#f1f1f1"
+		},
+		plotOptions: {
+			bar: {
+				horizontal: !1,
+				columnWidth: "25%",
+				//endingShape: "rounded"
+			}
+		},
+		dataLabels: {
+			enabled: !1
+		},
+		stroke: {
+			show: !0,
+			width: [2.5],
+			//colors: ["#3461ff"],
+			curve: "smooth"
+		},
+		fill: {
+			type: 'gradient',
+			gradient: {
+				shade: 'light',
+				type: 'vertical',
+				shadeIntensity: 0.5,
+				gradientToColors: ['#3461ff'],
+				inverseColors: false,
+				opacityFrom: 0.5,
+				opacityTo: 0.1,
+				// stops: [0, 100]
+			}
+		},
+		colors: ["#3461ff"],
+		xaxis: {
+			categories: arrLabel
+		},
+		responsive: [
+			{
+				breakpoint: 1000,
+				options: {
+					chart: {
+						type: "area",
+						// width: 130,
+						stacked: true,
+					}
 				}
-			},
-			markerStyle: {
-				initial: {
-					r: 9,
-					'fill': '#fff',
-					'fill-opacity': 1,
-					'stroke': '#000',
-					'stroke-width': 5,
-					'stroke-opacity': 0.4
-				},
-			},
-			enableZoom: true,
-			hoverColor: '#009efb',
-			markers: [{
-				latLng: [21.00, 78.00],
-				name: 'Lorem Ipsum Dollar'
+			}
+		],
+		legend: {
+			show: false
+		},
+		tooltip: {
+			theme: "dark"
+		}
+	};
 
-			}],
-			hoverOpacity: null,
-			normalizeFunction: 'linear',
-			scaleColors: ['#b6d6ff', '#005ace'],
-			selectedColor: '#c9dfaf',
-			selectedRegions: [],
-			showTooltip: true,
-		});
+	var chart = new ApexCharts(document.querySelector("#chartTotal"), options);
+	chart.render();
+	//END CHART TOTAL CONTRIBUTIONS
+	
+	// CHART APPROVED START
+	// var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+	// var arrData = new Array(12).fill(0);
+	// var contributionItems = document.querySelectorAll('.contribution-item');
+
+	// for (var i = 0; i < contributionItems.length; i++) {
+	// 	var contributionItem = contributionItems[i];
+	// 	var month = parseInt(contributionItem.getAttribute('data-month'));
+	// 	var total = contributionItem.getAttribute('data-total');
+
+	// 	//Kiểm tra nếu 
+	// 	arrData[month - 1] = total;
+	// }
+
+	// var selectedYear = document.getElementById("year").value;
+	// var currentYear = new Date().getFullYear();
+	// if (selectedYear == currentYear) {
+	// 	var currentMonth = new Date().getMonth();
+	// 	arrLabel = arrLabel.slice(0, currentMonth + 1);
+	// 	arrData = arrData.slice(0, currentMonth + 1);
+	// }
+	
+	// //Total Articles by sum of arrData
+	// var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+	// document.getElementById('totalArticles').innerText = sum + ' articles';
+	
+
+	// var options = {
+	// 	series: [{
+	// 		name: "Articles",
+	// 		data: arrData
+	// 	}],
+	// 	chart: {
+	// 		type: "area",
+	// 		// width: 130,
+	// 		stacked: true,
+	// 		height: 280,
+	// 		toolbar: {
+	// 			show: !1
+	// 		},
+	// 		zoom: {
+	// 			enabled: !1
+	// 		},
+	// 		dropShadow: {
+	// 			enabled: 0,
+	// 			top: 3,
+	// 			left: 14,
+	// 			blur: 4,
+	// 			opacity: .12,
+	// 			color: "#3461ff"
+	// 		},
+	// 		sparkline: {
+	// 			enabled: !1
+	// 		}
+	// 	},
+	// 	markers: {
+	// 		size: 0,
+	// 		colors: ["#3461ff"],
+	// 		strokeColors: "#fff",
+	// 		strokeWidth: 2,
+	// 		hover: {
+	// 			size: 7
+	// 		}
+	// 	},
+	// 	grid: {
+	// 		row: {
+	// 			colors: ["transparent", "transparent"],
+	// 			opacity: .2
+	// 		},
+	// 		borderColor: "#f1f1f1"
+	// 	},
+	// 	plotOptions: {
+	// 		bar: {
+	// 			horizontal: !1,
+	// 			columnWidth: "25%",
+	// 			//endingShape: "rounded"
+	// 		}
+	// 	},
+	// 	dataLabels: {
+	// 		enabled: !1
+	// 	},
+	// 	stroke: {
+	// 		show: !0,
+	// 		width: [2.5],
+	// 		//colors: ["#3461ff"],
+	// 		curve: "smooth"
+	// 	},
+	// 	fill: {
+	// 		type: 'gradient',
+	// 		gradient: {
+	// 			shade: 'light',
+	// 			type: 'vertical',
+	// 			shadeIntensity: 0.5,
+	// 			gradientToColors: ['#3461ff'],
+	// 			inverseColors: false,
+	// 			opacityFrom: 0.5,
+	// 			opacityTo: 0.1,
+	// 			// stops: [0, 100]
+	// 		}
+	// 	},
+	// 	colors: ["#3461ff"],
+	// 	xaxis: {
+	// 		categories: arrLabel
+	// 	},
+	// 	responsive: [
+	// 		{
+	// 			breakpoint: 1000,
+	// 			options: {
+	// 				chart: {
+	// 					type: "area",
+	// 					// width: 130,
+	// 					stacked: true,
+	// 				}
+	// 			}
+	// 		}
+	// 	],
+	// 	legend: {
+	// 		show: false
+	// 	},
+	// 	tooltip: {
+	// 		theme: "dark"
+	// 	}
+	// };
+
+	
+	// var chart = new ApexCharts(document.querySelector("#chartApproved"), options);
+	// chart.render();
+	//END CHART APPROVED
+
+
+
+
+	// CHART REJECTED START
+	// var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+	// var arrData = new Array(12).fill(0);
+	// var contributionItems = document.querySelectorAll('.contribution-item');
+
+	// for (var i = 0; i < contributionItems.length; i++) {
+	// 	var contributionItem = contributionItems[i];
+	// 	var month = parseInt(contributionItem.getAttribute('data-month'));
+	// 	var total = contributionItem.getAttribute('data-total');
+
+	// 	//Kiểm tra nếu 
+	// 	arrData[month - 1] = total;
+	// }
+
+	// var selectedYear = document.getElementById("year").value;
+	// var currentYear = new Date().getFullYear();
+	// if (selectedYear == currentYear) {
+	// 	var currentMonth = new Date().getMonth();
+	// 	arrLabel = arrLabel.slice(0, currentMonth + 1);
+	// 	arrData = arrData.slice(0, currentMonth + 1);
+	// }
+
+	// //Total Articles by sum of arrData
+	// var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+	// document.getElementById('totalArticles').innerText = sum + ' articles';
+	
+
+	// var options = {
+	// 	series: [{
+	// 		name: "Articles",
+	// 		data: arrData
+	// 	}],
+	// 	chart: {
+	// 		type: "area",
+	// 		// width: 130,
+	// 		stacked: true,
+	// 		height: 280,
+	// 		toolbar: {
+	// 			show: !1
+	// 		},
+	// 		zoom: {
+	// 			enabled: !1
+	// 		},
+	// 		dropShadow: {
+	// 			enabled: 0,
+	// 			top: 3,
+	// 			left: 14,
+	// 			blur: 4,
+	// 			opacity: .12,
+	// 			color: "#3461ff"
+	// 		},
+	// 		sparkline: {
+	// 			enabled: !1
+	// 		}
+	// 	},
+	// 	markers: {
+	// 		size: 0,
+	// 		colors: ["#3461ff"],
+	// 		strokeColors: "#fff",
+	// 		strokeWidth: 2,
+	// 		hover: {
+	// 			size: 7
+	// 		}
+	// 	},
+	// 	grid: {
+	// 		row: {
+	// 			colors: ["transparent", "transparent"],
+	// 			opacity: .2
+	// 		},
+	// 		borderColor: "#f1f1f1"
+	// 	},
+	// 	plotOptions: {
+	// 		bar: {
+	// 			horizontal: !1,
+	// 			columnWidth: "25%",
+	// 			//endingShape: "rounded"
+	// 		}
+	// 	},
+	// 	dataLabels: {
+	// 		enabled: !1
+	// 	},
+	// 	stroke: {
+	// 		show: !0,
+	// 		width: [2.5],
+	// 		//colors: ["#3461ff"],
+	// 		curve: "smooth"
+	// 	},
+	// 	fill: {
+	// 		type: 'gradient',
+	// 		gradient: {
+	// 			shade: 'light',
+	// 			type: 'vertical',
+	// 			shadeIntensity: 0.5,
+	// 			gradientToColors: ['#3461ff'],
+	// 			inverseColors: false,
+	// 			opacityFrom: 0.5,
+	// 			opacityTo: 0.1,
+	// 			// stops: [0, 100]
+	// 		}
+	// 	},
+	// 	colors: ["#3461ff"],
+	// 	xaxis: {
+	// 		categories: arrLabel
+	// 	},
+	// 	responsive: [
+	// 		{
+	// 			breakpoint: 1000,
+	// 			options: {
+	// 				chart: {
+	// 					type: "area",
+	// 					// width: 130,
+	// 					stacked: true,
+	// 				}
+	// 			}
+	// 		}
+	// 	],
+	// 	legend: {
+	// 		show: false
+	// 	},
+	// 	tooltip: {
+	// 		theme: "dark"
+	// 	}
+	// };
+
+	// var chart = new ApexCharts(document.querySelector("#chartRejected"), options);
+	// chart.render();
+	//END CHART REJECTED
+
+
+	//Pending START
+	// var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+	// var arrData = new Array(12).fill(0);
+	// var contributionItems = document.querySelectorAll('.contribution-item');
+
+	// for (var i = 0; i < contributionItems.length; i++) {
+	// 	var contributionItem = contributionItems[i];
+	// 	var month = parseInt(contributionItem.getAttribute('data-month'));
+	// 	var total = contributionItem.getAttribute('data-total');
+
+	// 	//Kiểm tra nếu 
+	// 	arrData[month - 1] = total;
+	// }
+
+	// //Kiểm tra nếu năm được chọn là năm hiện tại thì chỉ hiển thị đến tháng hiện tại
+	// //Nếu năm được chọn là năm khác thì hiển thị đến tháng 12
+	// var selectedYear = document.getElementById("year").value;
+	// var currentYear = new Date().getFullYear();
+	// if (selectedYear == currentYear) {
+	// 	var currentMonth = new Date().getMonth();
+	// 	arrLabel = arrLabel.slice(0, currentMonth + 1);
+	// 	arrData = arrData.slice(0, currentMonth + 1);
+	// }
+
+	// //Total Articles by sum of arrData
+	// var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+	// document.getElementById('totalArticles').innerText = sum + ' articles';
+	
+	// var options = {
+	// 	series: [{
+	// 		name: "Articles",
+	// 		data: arrData
+	// 	}],
+	// 	chart: {
+	// 		type: "area",
+	// 		// width: 130,
+	// 		stacked: true,
+	// 		height: 280,
+	// 		toolbar: {
+	// 			show: !1
+	// 		},
+	// 		zoom: {
+	// 			enabled: !1
+	// 		},
+	// 		dropShadow: {
+	// 			enabled: 0,
+	// 			top: 3,
+	// 			left: 14,
+	// 			blur: 4,
+	// 			opacity: .12,
+	// 			color: "#3461ff"
+	// 		},
+	// 		sparkline: {
+	// 			enabled: !1
+	// 		}
+	// 	},
+	// 	markers: {
+	// 		size: 0,
+	// 		colors: ["#3461ff"],
+	// 		strokeColors: "#fff",
+	// 		strokeWidth: 2,
+	// 		hover: {
+	// 			size: 7
+	// 		}
+	// 	},
+	// 	grid: {
+	// 		row: {
+	// 			colors: ["transparent", "transparent"],
+	// 			opacity: .2
+	// 		},
+	// 		borderColor: "#f1f1f1"
+	// 	},
+	// 	plotOptions: {
+	// 		bar: {
+	// 			horizontal: !1,
+	// 			columnWidth: "25%",
+	// 			//endingShape: "rounded"
+	// 		}
+	// 	},
+	// 	dataLabels: {
+	// 		enabled: !1
+	// 	},
+	// 	stroke: {
+	// 		show: !0,
+	// 		width: [2.5],
+	// 		//colors: ["#3461ff"],
+	// 		curve: "smooth"
+	// 	},
+	// 	fill: {
+	// 		type: 'gradient',
+	// 		gradient: {
+	// 			shade: 'light',
+	// 			type: 'vertical',
+	// 			shadeIntensity: 0.5,
+	// 			gradientToColors: ['#3461ff'],
+	// 			inverseColors: false,
+	// 			opacityFrom: 0.5,
+	// 			opacityTo: 0.1,
+	// 			// stops: [0, 100]
+	// 		}
+	// 	},
+	// 	colors: ["#3461ff"],
+	// 	xaxis: {
+	// 		categories: arrLabel
+	// 	},
+	// 	responsive: [
+	// 		{
+	// 			breakpoint: 1000,
+	// 			options: {
+	// 				chart: {
+	// 					type: "area",
+	// 					// width: 130,
+	// 					stacked: true,
+	// 				}
+	// 			}
+	// 		}
+	// 	],
+	// 	legend: {
+	// 		show: false
+	// 	},
+	// 	tooltip: {
+	// 		theme: "dark"
+	// 	}
+	// };
+
+	// var chart = new ApexCharts(document.querySelector("#chartPending"), options);
+	// chart.render();
+	//END CHART PENDING
 });
 
 
