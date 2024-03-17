@@ -22,6 +22,5 @@ public class COMP1640User : IdentityUser
     [InverseProperty("COMP1640User")]
     public virtual Faculty? Faculty { get; set; }
     [NotMapped]
-    public IFormFile 
-    ProfileImageFile { get; set; }
+    public IFormFile? ProfileImageFile { get; set; }
 }

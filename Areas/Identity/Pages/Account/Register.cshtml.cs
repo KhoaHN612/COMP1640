@@ -200,6 +200,16 @@ namespace COMP1640.Areas.Identity.Pages.Account
                 }
             }
 
+            var faculties = await _context.Faculties.ToListAsync();
+            if (faculties != null && faculties.Any())
+            {
+                ViewData["FacultyId"] = new SelectList(faculties, "FacultyId", "Name");
+            }
+            else
+            {
+                ViewData["FacultyId"] = new SelectList(new List<Faculty>(), "FacultyId", "Name");
+            }
+            
             // If we got this far, something failed, redisplay form
             return Page();
         }
