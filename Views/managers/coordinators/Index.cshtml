@@ -5,9 +5,10 @@
     <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-4">
         <div class="card radius-10 w-100">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center justify-content-between">
                         <h6 class="mb-0">Contribution</h6>
                         <!-- Select year, display current year first access-->
+                        <div class="w-5"> 
                             <select class="form-select" id="yearCoordinator" aria-label="Default select example" onchange="SelectedYearInCoordinators(this.value)">
                                 @foreach (var item in ViewBag.Years)
                                 {
@@ -21,6 +22,7 @@
                                     }
                                 }
                             </select>
+                        </div>
                     </div>
                     <div class="d-flex align-items-center gap-5 justify-content-center mt-3 p-2 radius-10 border">
                         <div class="text-center">
@@ -34,7 +36,7 @@
                         <div class="border-end sepration"></div>
                         <div class="text-center">
                             <h3 class="mb-2 text-primary-2" id="totalAccepted">0 article</h3>
-                            <p class="mb-0">Total Contribution Accepted</p>
+                            <p class="mb-0">Contribution Accepted</p>
                         </div>                        
                         <div id="totalAcceptedData"
                                 data-totalaccepted='@Html.Raw(Json.Serialize(ViewData["TotalContributionsAccepted"]))'>
@@ -43,7 +45,7 @@
                         <div class="border-end sepration"></div>
                         <div class="text-center">
                             <h3 class="mb-2 text-primary-2" id="totalRejected">0 article</h3>
-                            <p class="mb-0">Total Contribution Rejected</p>
+                            <p class="mb-0">Contribution Rejected</p>
                         </div>                     
                         <div id="totalRejectedData"
                                 data-totalrejected='@Html.Raw(Json.Serialize(ViewData["TotalContributionsRejected"]))'>
@@ -52,7 +54,7 @@
                         <div class="border-end sepration"></div>
                         <div class="text-center">
                             <h3 class="mb-2 text-primary-2" id="totalPending">0 article</h3>
-                            <p class="mb-0">Total Contribution Pending</p>
+                            <p class="mb-0">Contribution Pending</p>
                         </div>                        
                         <div id="totalPendingData"
                                 data-totalpending='@Html.Raw(Json.Serialize(ViewData["TotalContributionsPending"]))'>
@@ -67,9 +69,15 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <h6 class="mb-0">Contribution without Comment</h6>
+                    </div>                    
+                     <div id="totalContributionsData"
+                            data-totalcontributions='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'>
                     </div>
                      <div id="contributionWithoutCommentsData"
                             data-contributionWithoutComments='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutComments"]))'>
+                    </div>
+                     <div id="contributionWithoutCommentsAfter14DaysData"
+                            data-contributionWithoutCommentsAfter14Days='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutCommentsAfter14Days"]))'>
                     </div>
                     <div id="chartCoordinators1"></div>
                 </div>

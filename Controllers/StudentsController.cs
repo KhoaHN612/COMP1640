@@ -16,14 +16,16 @@ namespace COMP1640.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<StudentsController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
         private readonly UserManager<COMP1640User> _userManager;
-
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailSenderCustom _emailSender;
         public StudentsController(Comp1640Context context,
             IWebHostEnvironment webHostEnvironment,
             ILogger<StudentsController> logger,
             IHttpContextAccessor httpContextAccessor,
-            UserManager<COMP1640User> userManager
+            UserManager<COMP1640User> userManager,
+            RoleManager<IdentityRole> RoleManager,
+            IEmailSenderCustom EmailSender
            )
         {
             _logger = logger;
@@ -31,6 +33,8 @@ namespace COMP1640.Controllers
             _webHostEnvironment = webHostEnvironment;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
+            _roleManager = RoleManager;
+            _emailSender = EmailSender;
         }
         private async Task<string> GetUserFullName()
         {
@@ -198,6 +202,55 @@ namespace COMP1640.Controllers
             _context.Add(contribution);
             _context.Add(fileDetail);
             var result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+
+                if (currentUser == null)
+                {
+                    return NotFound("User not found.");
+                }
+
+                // Get the Faculty ID of the current user
+                var facultyId = currentUser.FacultyId;
+
+                // Get the role ID for "Coordinator"
+                var coordinatorRole = (await _roleManager.FindByNameAsync("Coordinator"));
+
+                if (facultyId != null && coordinatorRole != null)
+                {
+                    // // Retrieve users with the same Faculty and "Coordinator" role
+                    // var coordinators = await _userManager.Users
+                    //     .Include(u => u.Faculty) // Eager load the Faculty navigation property
+                    //     .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
+                    //     .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result) // Check if user has the "Coordinator" role
+                    //     .ToListAsync();
+
+                    var sameFacultyUsers = await _userManager.Users
+                        .Include(u => u.Faculty) // Eager load the Faculty navigation property
+                        .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
+                        .ToListAsync();
+
+                    // Filter users who have the "Coordinator" role
+                    var coordinators = sameFacultyUsers
+                        .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result)
+                        .ToList();
+
+                    var coordinatorEmails = coordinators.Select(u => u.Email).ToArray();
+                    var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
+
+                    string body =  "Title: New Contribution\n" +
+                    "Dear sir/madam, \n" +
+                    "There are new contribution(s) for the annual magazine.\n" +
+                    "- Name Contribution: "+  contribution.Title + "\n" +
+                    "- Annual Magazine name:" + annualMagazine.Title + "\n" +
+                    "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
+                    "Sincerely, \n" +
+                    "Developer team";
+                    var message = new Message(coordinatorEmails, "New Contribution", body);
+                    await _emailSender.SendEmailAsync(message);
+                }
+            }
             return RedirectToAction(nameof(Index));
         }
 
