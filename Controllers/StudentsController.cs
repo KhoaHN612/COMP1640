@@ -314,7 +314,40 @@ namespace COMP1640.Controllers
                 ViewBag.userFullName = userFullName;
             }
             var contribution = await _context.Contributions.FindAsync(id);
+            var comments = await _context.Comments
+                                .Where(c => c.ContributionId == id)
+                                .ToListAsync();
+
+            var contributions = _context.Contributions.ToList();
+            var userId = _userManager.GetUserId(User);
+            var anotherUserId = userId;
+            var user = await _userManager.FindByIdAsync(userId);
+            var userAddress = user.Address;
+            var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == user.FacultyId);
+            var userFaculty = facultyName != null ? facultyName.Name : null;
+            var userEmail = user.Email;
+            var userProfileImagePath = user.ProfileImagePath;
+            if (contribution != null)
+            {
+                var submissionDate = contribution.SubmissionDate;
+                var deadline = submissionDate.AddDays(14);
+                if (deadline >= submissionDate)
+                {
+                    ViewBag.Deadline = deadline;
+                }
+            }
+            ViewBag.userEmail = userEmail;
+            ViewBag.contributions = contributions;
+            ViewBag.userFaculty = userFaculty;
+            ViewBag.userId = anotherUserId;
+            ViewBag.contributionUserId = contribution.UserId;
+            ViewBag.contributionsTile = contribution.Title;
+            ViewBag.userFullName = userFullName;
+            ViewBag.userAddress = userAddress;
+            ViewBag.userProfileImagePath = userProfileImagePath;
+            ViewBag.Comments = comments;
             return View(contribution);
+            
         }
 
         public async Task<IActionResult> PostLists()

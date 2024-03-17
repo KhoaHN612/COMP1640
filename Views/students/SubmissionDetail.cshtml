@@ -1,4 +1,4 @@
-@model COMP1640.Models.Contribution;
+@model COMP1640.Models.Contribution
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 10px !important;
@@ -9,6 +9,51 @@
         margin: auto;
         top: 5vw;
         position: absolute;
+    }
+
+    .comment-list {
+        margin-top: 20px;
+    }
+
+    .comment-card {
+        margin-bottom: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .comment-card .card-body {
+        padding: 15px;
+    }
+
+    .comment-card .card-text {
+        color: #333;
+    }
+
+    .comment-card .card-text small {
+        color: #888;
+    }
+
+    .comment-card .card-text.comment-content {
+        font-weight: bold;
+        color: #0c14a9;
+    }
+    /* CSS cho nút */
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 10px 20px; /* Kích thước nút */
+        font-size: 16px; /* Kích thước chữ trong nút */
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    /* CSS cho khoảng cách giữa các phần tử */
+    .form-group {
+        margin-bottom: 20px; /* Khoảng cách giữa các form group */
     }
 </style>
 <!-- Breadcrumb -->
@@ -53,174 +98,70 @@
                                 </figure><!-- /#course-summary -->
                             </section><!-- /#course-header -->
 
-                            <section id="course-info">
-                                <header>
-                                    <h2>Submission Info</h2>
-                                </header>
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse et urna
-                                    fringilla, volutpat elit non,
-                                    tristique lectus. Nam blandit odio nisl, ac malesuada lacus fermentum sit amet.
-                                    Vestibulum vitae
-                                    aliquet felis, ornare feugiat elit. Nulla varius condimentum elit, sed pulvinar leo
-                                    sollicitudin vel.
-                                </p>
-                                <p>
-                                    Maecenas sodales, nisl eget dignissim molestie, ligula est consectetur metus, et
-                                    mollis justo urna
-                                    sit amet nulla. Etiam lectus arcu, pellentesque eu tellus tempor, tristique ultrices
-                                    leo. Nullam at
-                                    felis mauris. Aenean in neque eu ligula tempor ornare. Mauris tristique in elit a
-                                    blandit. Nam laoreet
-                                    vulputate nisi eu accumsan. Sed faucibus arcu nec est facilisis dignissim. Fusce
-                                    risus leo, euismod ut
-                                    cursus vitae, imperdiet id quam. Pellentesque habitant morbi tristique senectus et
-                                    netus et malesuada
-                                    fames ac turpis egestas. Fusce mollis mi vulputate leo vestibulum, quis scelerisque
-                                    libero condimentum.
-                                    Praesent rutrum consequat lacus quis suscipit. Proin dapibus mi non semper lobortis.
-                                </p>
-                                <p>
-                                    Ut dignissim placerat est, sit amet tincidunt enim. Sed nisi nisi, ornare vitae
-                                    lacinia a, mattis quis tortor.
-                                    Suspendisse ornare adipiscing nunc, sit amet aliquam diam condimentum quis. Sed in
-                                    leo sit amet sapien
-                                    porttitor vestibulum a ut est. In hac habitasse platea dictumst. Mauris quam dui,
-                                    cursus nec lorem non,
-                                    pellentesque elementum dui. Vestibulum volutpat, risus vitae scelerisque fringilla,
-                                    ligula nisi egestas
-                                    sem, id vulputate ligula nulla ac ligula.
-                                </p>
-                            </section><!-- /#course-info -->
-
-                            <section id="presentation">
-                                <header>
-                                    <h2>Your Current Submission </h2>
-                                </header>
-                                <div class="presentation" style="width: 100%">
-                                    <a class="pdf-object" href="assets/pdf/presentation.pdf" style="width: 100%">Course
-                                        Presentation</a>
+                            <div class="row">
+                                <div class="col-xl-6 mx-auto">
+                                    <div class="card comment-list">
+                                        <div class="card-body">
+                                            <h6 class="mb-0 text-uppercase">COMMENT LIST OF COORDINATORS</h6>
+                                            <hr />
+                                            <div class="card text-wrap" style="height: 300px; overflow-y: auto;">
+                                                @if (ViewBag.Comments != null && ViewBag.Comments.Count > 0)
+                                                {
+                                                    foreach (var comment in ViewBag.Comments)
+                                                    {
+                                                        <div class="card mb-3 comment-card">
+                                                            <div class="card-body">
+                                                                @* <h6 class="card-title" style="color: red; font-weight:
+                                        bold;">@comment.User.FullName</h6> *@
+                                                                <p class="card-text comment-content">@comment.CommentField</p>
+                                                                <p class="card-text"><small class="text-muted">Comment Date:
+                                                                        @comment.CommentDate</small></p>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <p>No comments available.</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </section>
+                            </div>
 
-                            <section id="comments">
-                                <header>
-                                    <h2>Comments</h2>
-                                </header>
-                                <ul class="discussion-list">
-                                    <li class="author-block">
-                                        <figure class="author-picture"><img src="assets/img/student-testimonial.jpg">
-                                        </figure>
-                                        <article class="paragraph-wrapper">
-                                            <div class="inner">
-                                                <header>
-                                                    <h5>Rachel Britain</h5>
-                                                </header>
-                                                <div class="rating-individual" data-score="5"></div>
-                                                <p>
-                                                    Mauris elementum et libero ac pharetra. Proin tristique dapibus
-                                                    tellus,
-                                                    lacinia blandit mi tincidunt at. Vivamus vitae interdum felis.
-                                                    Pellentesque congue mollis erat in imperdiet.
-                                                </p>
-                                            </div>
-                                            <div class="comment-controls">
-                                                <span>08-24-2014</span>
-                                                <a href="#leave-reply">Reply</a>
-                                            </div>
-                                        </article>
-                                    </li><!-- /parent item -->
-                                    <li>
-                                        <ul class="discussion-child">
-                                            <li class="author-block">
-                                                <figure class="author-picture"><img
-                                                        src="assets/img/discussion-author-03.jpg"></figure>
-                                                <article class="paragraph-wrapper">
-                                                    <div class="inner">
-                                                        <header>
-                                                            <h5>John Doe</h5>
-                                                        </header>
-                                                        <div class="rating-individual" data-score="4"></div>
-                                                        <p>
-                                                            Mauris elementum et libero ac pharetra. Proin tristique
-                                                            dapibus tellus,
-                                                            lacinia blandit mi tincidunt at. Vivamus vitae interdum
-                                                            felis.
-                                                            Pellentesque congue mollis erat in imperdiet.
-                                                        </p>
+                            <div class="col-xl-6 mx-auto">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="border p-3 rounded">
+                                            <hr />
+                                            <form class="row g-3" asp-controller="Managers" asp-action="UpdateComment" method="post">
+                                                <input type="hidden" asp-for="ContributionId" />
+                                                <div class="form-group"> <!-- Thêm lớp form-group để điều chỉnh khoảng cách -->
+                                                    <label class="form-label">Comment</label>
+                                                    <input asp-for="Comment" class="form-control" />
+                                                    <span asp-validation-for="Comment" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group"> <!-- Thêm lớp form-group để điều chỉnh khoảng cách -->
+                                                    <div class="d-grid">
+                                                        <button type="submit" class="btn btn-primary">Send</button>
                                                     </div>
-                                                    <div class="comment-controls">
-                                                        <span>08-24-2014</span>
-                                                        <a href="#leave-reply">Reply</a>
-                                                    </div>
-                                                </article>
-                                            </li>
-                                        </ul><!-- /.discussion-child -->
-                                    </li><!-- /parent item -->
-                                    <li class="author-block">
-                                        <figure class="author-picture"><img src="assets/img/discussion-author-02.jpg">
-                                        </figure>
-                                        <article class="paragraph-wrapper">
-                                            <div class="inner">
-                                                <header>
-                                                    <h5>Jane Mason</h5>
-                                                </header>
-                                                <div class="rating-individual" data-score="5"></div>
-                                                <p>
-                                                    Mauris elementum et libero ac pharetra. Proin tristique dapibus
-                                                    tellus,
-                                                    lacinia blandit mi tincidunt at. Vivamus vitae interdum felis.
-                                                    Pellentesque congue mollis erat in imperdiet.
-                                                </p>
-                                            </div>
-                                            <div class="comment-controls">
-                                                <span>08-24-2014</span>
-                                                <a href="#leave-reply">Reply</a>
-                                            </div>
-                                        </article>
-                                    </li><!-- /parent item -->
-                                </ul><!-- /.discussion-list -->
-                            </section><!-- /.comments -->
+                                                </div>
 
-                            <section id="leave-reply">
-                                <header>
-                                    <h2>Leave a Reply</h2>
-                                </header>
-                                <form class="reply-form" method="post">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="input-group">
-                                                <div class="controls">
-                                                    <label for="name">Your Name</label>
-                                                    <input type="text" id="name" name="name" required="required">
-                                                </div><!-- /.controls -->
-                                            </div><!-- /.control-group -->
-                                        </div><!-- /.col-md-4 -->
-                                        <div class="col-md-6">
-                                            <div class="input-group">
-                                                <div class="controls">
-                                                    <label for="email">Your Email</label>
-                                                    <input type="email" id="email" name="email" required="required">
-                                                </div><!-- /.controls -->
-                                            </div><!-- /.control-group -->
-                                        </div><!-- /.col-md-4 -->
-                                    </div><!-- /.row -->
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="input-group">
-                                                <div class="controls">
-                                                    <label for="message">Your Message</label>
-                                                    <textarea name="message" id="message"
-                                                        required="required"></textarea>
-                                                </div><!-- /.controls -->
-                                            </div><!-- /.control-group -->
-                                        </div><!-- /.col-md-4 -->
-                                    </div><!-- /.row -->
-                                    <div class="form-actions pull-right">
-                                        <input type="submit" class="btn btn-color-primary" value="Reply">
-                                    </div><!-- /.form-actions -->
-                                </form><!-- /.reply-form -->
-                            </section>
+                                                <div class="col-12 mt-3">
+                                                    <div class="alert alert-warning" role="alert">
+                                                        The deadline to comment on this contribution is <strong>
+                                                            @ViewBag.Deadline
+                                                        </strong>
+                                                    </div>
+                                                    <input type="hidden" name="contributionId" value="">
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         </article><!-- /.course-detail -->
                     </section><!-- /.course-detail -->

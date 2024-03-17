@@ -615,7 +615,7 @@ namespace COMP1640.Controllers
 
             return View("coordinators/student_submission", contributions);
         }
-        public async Task<IActionResult> CoordinatorComment(int? id)
+         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
             var contribution = await _context.Contributions.FindAsync(id);

@@ -111,52 +111,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        @* <div class="col-xl-6 mx-auto">
-            <div class="card">
-                <div class="card-body">
-                    <div class="border p-3 rounded">
-                        <h6 class="mb-0 text-uppercase">Student Comment Form</h6>
-                        <hr />
-                        <form class="row g-3" method="post">
-                            <div class="col-6">
-                                <label class="form-label"> STUDENT NAME</label>
-                                <input type="text" class="form-control" readonly value="@ViewBag.userFullName">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">STUDENT EMAIL</label>
-                                <input type="email" class="form-control" readonly value="@ViewBag.userEmail">
-                            </div>
-                        </form>
-                        <form class="row g-3" asp-action="UpdateComment" method="post">
-                            <input type="hidden" asp-for="ContributionId" />
-                            <div class="col-12">
-                                <label class="form-label">Comment</label>
-                                <input asp-for="Comment" class="form-control" />
-                                <span asp-validation-for="Comment" class="text-danger"></span>
-                            </div>
-                            <div class="col-12">
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary">Send</button>
-                                </div>
-                            </div>
-                            <div class="col-12 mt-3">
-                                <div class="alert alert-warning" role="alert">
-                                    The deadline to comment on this contribution is <strong>
-                                        @ViewBag.Deadline
-                                    </strong>
-                                </div>
-                                <input type="hidden" name="contributionId" value="">
-                            </div>
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> *@
-
-    
+        </div> 
 
 
     </div>
