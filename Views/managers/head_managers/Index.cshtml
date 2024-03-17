@@ -28,10 +28,9 @@
                         </div>
                     </div>
                     <div id="ContributionsTotalData" data-total='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'></div>
-                      
-                        <div class="d-flex">
-                            <div id="chartColumnContributions"></div>
-                            <div id="chartPieContributions"></div>
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-6" id="chartColumnContributions"></div>
+                            <div class="col-6" id="chartPieContributions"></div>
                         </div>   
                 </div>
             </div>
@@ -65,9 +64,9 @@
                         </div>
                     </div>
                     <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))'></div>
-                        <div class="d-flex">
-                            <div id="chartPieApproved"></div>
-                            <div id="chartColumnApproved"></div>
+                        <div class="d-flex justify-content-center">
+                            <div class="col-6" id="chartColumnApproved"></div>
+                            <div class="col-6" id="chartPieApproved"></div>
                         </div>
                     </div>
                 </div>
@@ -100,9 +99,9 @@
                         </div>
                     </div>
                     <div id="ContributionsRejectedData" data-rejected= '@Html.Raw(Json.Serialize(ViewData["RejectedContribution"]))'></div>
-                        <div class="d-flex">
-                            <div id="chartPieRejected"></div>
-                            <div id="chartColumnRejected"></div>
+                        <div class="d-flex justify-content-center">
+                            <div class="col-6" id="chartColumnRejected"></div>
+                            <div class="col-6" id="chartPieRejected"></div>
                         </div>
                     </div>
                 </div>
@@ -135,9 +134,9 @@
                         </div>
                     </div>
                     <div id="ContributionsPendingData" data-pending= '@Html.Raw(Json.Serialize(ViewData["PendingContribution"]))'></div>
-                        <div class="d-flex">
-                            <div id="chartPiePending"></div>
-                            <div id="chartColumnPending"></div>
+                        <div class="d-flex justify-content-center">
+                            <div class="col-6" id="chartColumnPending"></div>
+                            <div class="col-6" id="chartPiePending"></div>
                         </div>
                     </div>
                 </div>

@@ -46,7 +46,6 @@ namespace COMP1640.Controllers
 
         public async Task<IActionResult> Index(string task, string year)
         {
-            Console.WriteLine($"Action: {task}task, Year: {year}");
             ViewData["Title"] = "Dashboard";
 
             // GET CONTRIBUTION BY FACULTY
@@ -59,6 +58,12 @@ namespace COMP1640.Controllers
             if (result is JsonResult jsonResult)
             {
                 contributionFaculty = jsonResult.Value as List<ContributionFaculty>;
+            }
+
+            //Print
+            foreach (var item in contributionFaculty)
+            {
+                System.Console.WriteLine($"Faculty: {item.Faculty}, Total: {item.Total}, Date: {item.SubmissionDate}");
             }
 
             //GET ALL YEARS
@@ -501,7 +506,8 @@ namespace COMP1640.Controllers
                 })
                 .ToListAsync();   
                 
-            //Get contribution without comment
+            
+            //GET CONTRIBUTION WITHOUT COMMENT
             /*
             SELECT 
 				YEAR(c.submissionDate) as 'Year',
@@ -526,7 +532,8 @@ namespace COMP1640.Controllers
                 })
                 .ToListAsync();   
 
-            //Get contribution without comment after 14 days
+            
+            //GET CONTRIBUTION WITHOUT COMMENT AFTER 14 DAYS
             /*
             SELECT 
 				YEAR(c.submissionDate) as 'Year',
