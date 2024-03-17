@@ -136,7 +136,8 @@ namespace COMP1640.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            var faculties = await _context.Faculties.ToListAsync();
+            var faculties = _context.Faculties.ToList();
+
             if (faculties != null && faculties.Any())
             {
                 ViewData["FacultyId"] = new SelectList(faculties, "FacultyId", "Name");
