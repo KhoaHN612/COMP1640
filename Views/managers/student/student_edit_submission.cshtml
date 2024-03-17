@@ -1,0 +1,89 @@
+﻿@model COMP1640.Models.Contribution;
+@{
+    Layout = "~/Views/Shared/_Layout_Students_Submission.cshtml";
+}
+
+<main class="page-content student">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <div class="breadcrumb-title pe-3">Forms</div>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Students" asp-action="Index"><i class="bx bx-home-alt"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Validations</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+    <div class="row">
+        <div class="col-xl-10 mx-auto pt-lg-5">
+            <h6 class="mb-0 text-uppercase">Edit submission</h6>
+            <hr />
+            <div class="card">
+                <div class="card-body">
+                    <div class="p-4 border rounded">
+                        <form asp-controller="Students" asp-action="EditSubmission" enctype='multipart/form-data' class="row g-3" method="post">
+                            <input type="hidden" name="id" value="@Model.ContributionId">
+                            <div class="col-md-4">
+                                <label asp-for='Title' for="annualMagazineId" class="form-label">Title</label>
+                                <input readonly type="text" class="form-control" id="validationDefault02"
+                                    value="@Model.Title">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for='AnnualMagazineId' class="form-label">Academic Year</label>
+                                <input readonly type="text" class="form-control" id="validationDefault02"
+                                    value="@ViewBag.academicYear">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="inputGroupFile01">Upload</label>
+                                <input type="file" name='ContributionFile' class="form-control"
+                                    required>
+                            </div>
+
+                            <div class=" col-md-6">
+                                <label class="form-label">Submission Date:</label>
+                                <input readonly type="date" class="form-control" id="submissionDate"
+                                    value="@Model.SubmissionDate">
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
+                                        onchange="validateCheckbox()" required>
+                                    <label class="form-check-label" for="invalidCheck2">Agree to terms and
+                                        conditions</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <button id="submitBtn" class="btn btn-primary" type="submit" disabled>Submit
+                                    form</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end row-->
+</main>
+<script>
+    function validateCheckbox() {
+        var checkbox = document.getElementById('invalidCheck2');
+        var submitBtn = document.getElementById('submitBtn');
+
+        if (checkbox.checked) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+    var currentDate = new Date().toISOString().slice(0, 10);
+    document.getElementById('submissionDate').value = currentDate;
+</script>

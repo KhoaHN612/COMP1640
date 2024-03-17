@@ -5,6 +5,7 @@ using COMP1640.Migrations;
 using COMP1640.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace COMP1640.Controllers
@@ -31,30 +32,56 @@ namespace COMP1640.Controllers
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
+        private async Task<string> GetUserFullName()
+        {
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            return user?.FullName; // This will return null if user is null.
+        }
 
         // GET: StudentsController
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Home Page";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             return View();
         }
-        public IActionResult SubmissionList()
+        public async Task<IActionResult> SubmissionList()
         {
             ViewData["Title"] = "Submission List";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             return View();
         }
 
         // Action for the About Us page
-        public IActionResult AboutUs()
+        public async Task<IActionResult> AboutUs()
         {
             ViewData["Title"] = "About Us";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             return View();
         }
 
         // Action for the Contact Us page
-        public IActionResult ContactUs()
+        public async Task<IActionResult> ContactUs()
         {
             ViewData["Title"] = "Contact Us";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             return View();
         }
 
@@ -111,15 +138,28 @@ namespace COMP1640.Controllers
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
+        public async Task<IActionResult> FromEditSubmission(int id)
+        {
+            ViewData["Title"] = "From Submission";
+            var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+            var academicYear = await _context.Contributions
+                .Where(c => c.ContributionId == id)
+                .Select(c => c.AnnualMagazine.AcademicYear)
+                .FirstOrDefaultAsync();
+            if (academicYear != null)
+            {
+                ViewBag.academicYear = academicYear;
+            }
+            return View("~/Views/managers/student/student_edit_submission.cshtml", contribution);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
+        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
         {
 
             string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
-            // Console.WriteLine(fileDetail.ContributionFile.FileName);
-            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
             string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
             if (fileExtension == ".docx")
             {
@@ -148,9 +188,9 @@ namespace COMP1640.Controllers
 
             maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.ContributionId = maxId + 1;
-            contribution.AnnualMagazineId = 1;
+            contribution.AnnualMagazineId = AnnualMagazineId;
 
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userManager.GetUserId(User);
             contribution.Comment = null;
             contribution.Status = "Pending";
             contribution.UserId = userId;
@@ -161,31 +201,31 @@ namespace COMP1640.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: StudentsController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
         // POST: StudentsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> EditSubmission(int id, FileDetail newContribution)
         {
-            try
+            // var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+            var currentFile = await _context.FileDetails
+                .FirstOrDefaultAsync(fd => fd.ContributionId == id);
+            if (currentFile != null)
             {
-                return RedirectToAction(nameof(Index));
+                string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
+                string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
+                System.IO.File.Delete(currentFilePath);
             }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: StudentsController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
+            string uniqueFileName = GetUniqueFileName(newContribution.ContributionFile.FileName);
+            string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+            using (var fileStream = new FileStream(newFilePath, FileMode.Create))
+            {
+                await newContribution.ContributionFile.CopyToAsync(fileStream);
+            }
+
+            currentFile.FilePath = uniqueFileName;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: StudentsController/Delete/5
@@ -217,12 +257,12 @@ namespace COMP1640.Controllers
             {
                 if (userToUpdate.ProfileImagePath != null)
                 {
-                    string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "profileImageUpload");
                     string imageFilePath = Path.Combine(uploadsFolderPath, userToUpdate.ProfileImagePath);
                     System.IO.File.Delete(imageFilePath);
                 }
                 string uniqueFileName = GetUniqueFileName(user.ProfileImageFile.FileName);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", uniqueFileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "profileImageUpload", uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await user.ProfileImageFile.CopyToAsync(fileStream);
@@ -263,6 +303,40 @@ namespace COMP1640.Controllers
                    + "_"
                    + Guid.NewGuid().ToString().Substring(0, 4)
                    + Path.GetExtension(fileName);
+        }
+
+        public async Task<IActionResult> SubmissionDetail(int id)
+        {
+            ViewData["Title"] = "Submission Detail";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
+            var contribution = await _context.Contributions.FindAsync(id);
+            return View(contribution);
+        }
+
+        public async Task<IActionResult> PostLists()
+        {
+            ViewData["Title"] = "Post Lists";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> PostDetail()
+        {
+            ViewData["Title"] = "Post Detail";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
+            return View();
         }
     }
 }

@@ -30,7 +30,7 @@
                                     <div class="my-profile">
                                         <figure class="profile-avatar">
                                             <div class="image-wrapper"><img
-                                                    src="~/uploads/@ViewBag.userProfileImagePath" alt="Profile Avatar">
+                                                    src="~/profileImageUpload/@ViewBag.userProfileImagePath" alt="Profile Avatar">
                                             </div>
                                         </figure>
                                         <article>
@@ -119,7 +119,7 @@
                                             if (item.UserId == ViewBag.userId)
                                             {
                                                 <tr class="status-not-started">
-                                                    <th class="course-title"><a href="course-detail-v1.html">@item.Title</a>
+                                                    <th class="course-title"><a asp-action="SubmissionDetail" asp-route-id="@item.ContributionId" asp-controller="Students">@item.Title</a>
                                                     </th>
                                                     <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th>
                                                     <th>@item.SubmissionDate</th>
