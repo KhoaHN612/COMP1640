@@ -4,143 +4,132 @@
 <main class="page-content">
     <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
         <div class="card overflow-hidden radius-10">
-                <div class="card-body">
-                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-                        <div class="">
-                            <p>Total Contributions</p>
-                            <h4 class="" id="totalArticles">0 article</h4>
-                        </div>              
-                        <div class="w-5">   
-                            <!-- Select year, display current year first access-->
-                            <select class="form-select" id="yearTotal" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
-                                @foreach (var item in ViewBag.Years)
+            <div class="card-body">
+                <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                    <div class="">
+                        <p>Total Contributions</p>
+                        <h4 class="" id="totalArticles">0 article</h4>
+                    </div>              
+                    <div class="w-5">   
+                        <!-- Select year, display current year first access-->
+                        <select class="form-select" id="yearTotal" aria-label="Default select example" onchange="SelectedYearContributions(this.value)">
+                            @foreach (var item in ViewBag.Years)
+                            {
+                                if (item == ViewBag.Contributions[0].Year)
                                 {
-                                    if (item == ViewBag.Contributions[0].Year)
-                                    {
-                                        <option value="@item" selected>@item</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
+                                    <option value="@item" selected>@item</option>
                                 }
-                            </select>
-                        </div>
+                                else
+                                {
+                                    <option value="@item" >@item</option>
+                                }
+                            }
+                        </select>
                     </div>
-                    <div id="ContributionsTotalData" data-total='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'></div>
-                        <div class="row d-flex justify-content-center">
-                            <div class="col-6" id="chartColumnContributions"></div>
-                            <div class="col-6" id="chartPieContributions"></div>
-                        </div>   
+                </div>
+                <div id="ContributionsTotalData" data-total='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'></div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-6" id="chartColumnContributions"></div>
+                        <div class="col-6" id="chartPieContributions"></div>
+                    </div>   
+            </div>
+        </div>
+
+        <div class="card overflow-hidden radius-10">
+            <div class="card-body">
+                <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                    <div class="">
+                        <p>Approved Contributions</p>
+                        <h4 class="" id="totalApproved">0 article</h4>
+                    </div>              
+                    <div class="w-5">   
+                        <!-- Select year, display current year first access-->
+                        <select class="form-select" id="yearApproved" aria-label="Default select example" onchange="SelectedYearApproved(this.value)">
+                            @foreach (var item in ViewBag.Years)
+                            {
+                                if (item == ViewBag.ApprovedContribution[0].Year)
+                                {
+                                    <option value="@item" selected>@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item" >@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))'></div>
+                    <div class="d-flex justify-content-center">
+                        <div class="col-6" id="chartColumnApproved"></div>
+                        <div class="col-6" id="chartPieApproved"></div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="card overflow-hidden radius-10">
+            <div class="card-body">
+                <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                    <div class="">
+                        <p>Rejected Contributions</p>
+                        <h4 class="" id="totalRejected">0 article</h4>
+                    </div>              
+                    <div class="w-5">   
+                        <!-- Select year, display current year first access-->
+                        <select class="form-select" id="yearRejected" aria-label="Default select example" onchange="SelectedYearRejected(this.value)">
+                            @foreach (var item in ViewBag.Years)
+                            {
+                                if (item == ViewBag.RejectedContribution[0].Year)
+                                {
+                                    <option value="@item" selected>@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item" >@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div id="ContributionsRejectedData" data-rejected= '@Html.Raw(Json.Serialize(ViewData["RejectedContribution"]))'></div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-6" id="chartColumnRejected"></div>
+                    <div class="col-6" id="chartPieRejected"></div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="card overflow-hidden radius-10">
+            <div class="card-body">
+                <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                    <div class="">
+                        <p>Pending Contributions</p>
+                        <h4 class="" id="totalPending">0 article</h4>
+                    </div>              
+                    <div class="w-5">   
+                        <!-- Select year, display current year first access-->
+                        <select class="form-select" id="yearPending" aria-label="Default select example" onchange="SelectedYearPending(this.value)">
+                            @foreach (var item in ViewBag.Years)
+                            {
+                                if (item == ViewBag.PendingContribution[0].Year)
+                                {
+                                    <option value="@item" selected>@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item" >@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div id="ContributionsPendingData" data-pending= '@Html.Raw(Json.Serialize(ViewData["PendingContribution"]))'></div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-6" id="chartColumnPending"></div>
+                    <div class="col-6" id="chartPiePending"></div>
+                </div>
+            </div>
+        </div>
     <!--end row-->
-
-    <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
-        <div class="card overflow-hidden radius-10">
-                <div class="card-body">
-                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-                        <div class="">
-                            <p>Approved Contributions</p>
-                            <h4 class="" id="totalApproved">0 article</h4>
-                        </div>              
-                        <div class="w-5">   
-                            <!-- Select year, display current year first access-->
-                            <select class="form-select" id="yearApproved" aria-label="Default select example" onchange="SelectedYearApproved(this.value)">
-                                @foreach (var item in ViewBag.Years)
-                                {
-                                    if (item == ViewBag.ApprovedContribution[0].Year)
-                                    {
-                                        <option value="@item" selected>@item</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))'></div>
-                        <div class="d-flex justify-content-center">
-                            <div class="col-6" id="chartColumnApproved"></div>
-                            <div class="col-6" id="chartPieApproved"></div>
-                        </div>
-                    </div>
-                </div>
-        </div>
-    </div>
-
-    <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
-        <div class="card overflow-hidden radius-10">
-                <div class="card-body">
-                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-                        <div class="">
-                            <p>Rejected Contributions</p>
-                            <h4 class="" id="totalRejected">0 article</h4>
-                        </div>              
-                        <div class="w-5">   
-                            <!-- Select year, display current year first access-->
-                            <select class="form-select" id="yearRejected" aria-label="Default select example" onchange="SelectedYearRejected(this.value)">
-                                @foreach (var item in ViewBag.Years)
-                                {
-                                    if (item == ViewBag.RejectedContribution[0].Year)
-                                    {
-                                        <option value="@item" selected>@item</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div id="ContributionsRejectedData" data-rejected= '@Html.Raw(Json.Serialize(ViewData["RejectedContribution"]))'></div>
-                        <div class="d-flex justify-content-center">
-                            <div class="col-6" id="chartColumnRejected"></div>
-                            <div class="col-6" id="chartPieRejected"></div>
-                        </div>
-                    </div>
-                </div>
-        </div>
-    </div>
-
-    <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
-        <div class="card overflow-hidden radius-10">
-                <div class="card-body">
-                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-                        <div class="">
-                            <p>Pending Contributions</p>
-                            <h4 class="" id="totalPending">0 article</h4>
-                        </div>              
-                        <div class="w-5">   
-                            <!-- Select year, display current year first access-->
-                            <select class="form-select" id="yearPending" aria-label="Default select example" onchange="SelectedYearPending(this.value)">
-                                @foreach (var item in ViewBag.Years)
-                                {
-                                    if (item == ViewBag.PendingContribution[0].Year)
-                                    {
-                                        <option value="@item" selected>@item</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div id="ContributionsPendingData" data-pending= '@Html.Raw(Json.Serialize(ViewData["PendingContribution"]))'></div>
-                        <div class="d-flex justify-content-center">
-                            <div class="col-6" id="chartColumnPending"></div>
-                            <div class="col-6" id="chartPiePending"></div>
-                        </div>
-                    </div>
-                </div>
-        </div>
-    </div>
 </main>
 <!--end page main-->

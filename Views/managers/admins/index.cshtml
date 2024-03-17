@@ -7,35 +7,34 @@
 <main class="page-content">
     <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
         <div class="card overflow-hidden radius-10">
-                <div class="card-body">
-                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-                        <div class="">
-                            <p>Total Contributions</p>
-                            <h4 class="" id="totalArticles">0 article</h4>
+            <div class="card-body">
+                <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                    <div class="">
+                        <p>Total Contributions</p>
+                        <h4 class="" id="totalArticles">0 article</h4>
+                    </div>
+                    <div class="card-body">
+                            <div id="chart5"></div>
+                            @foreach (var item in ViewBag.ContributionYear)
+                            {
+                                <div class="contribution-item" data-month="@item.Month" data-total="@item.TotalByMonth"></div>
+                            }
                         </div>
-                        <div class="card-body">
-                                <div id="chart5"></div>
-                                @foreach (var item in ViewBag.ContributionYear)
+                    <div class="w-5">   
+                        <!-- Select year, display current year first access-->
+                        <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
+                            @foreach (var item in ViewBag.Years)
+                            {
+                                if (item == ViewBag.ContributionYear[0].Year)
                                 {
-                                    <div class="contribution-item" data-month="@item.Month" data-total="@item.TotalByMonth"></div>
+                                    <option value="@item" selected>@item</option>
                                 }
-                            </div>
-                        <div class="w-5">   
-                            <!-- Select year, display current year first access-->
-                            <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
-                                @foreach (var item in ViewBag.Years)
+                                else
                                 {
-                                    if (item == ViewBag.ContributionYear[0].Year)
-                                    {
-                                        <option value="@item" selected>@item</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
+                                    <option value="@item" >@item</option>
                                 }
-                            </select>
-                        </div>
+                            }
+                        </select>
                     </div>
                 </div>
             </div>

@@ -951,6 +951,7 @@ namespace COMP1640.Controllers
             return View("profile_managers");
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status)
@@ -981,43 +982,43 @@ namespace COMP1640.Controllers
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
-       [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> UpdateComment(Contribution contribution)
-{
-    
-    var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
-    if (existingContribution != null)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateComment(Contribution contribution)
     {
-        // Tìm user và contribution tương ứng
-        var user = await _context.Users.FindAsync(existingContribution.UserId);
-        var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
-
-        // Tạo một đối tượng Comment mới
-        var newComment = new Comment
+        
+        var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+        if (existingContribution != null)
         {
-            UserId = user.Id,
-            ContributionId = contribution.ContributionId,
-            CommentField = contribution.Comment, // Sử dụng comment từ contribution được gửi lên
-            CommentDate = DateTime.Now // Đặt ngày bình luận là ngày hiện tại
-        };
+            // Tìm user và contribution tương ứng
+            var user = await _context.Users.FindAsync(existingContribution.UserId);
+            var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
 
-        // Thêm Comment mới vào cơ sở dữ liệu
-        _context.Comments.Add(newComment);
-        await _context.SaveChangesAsync();
+            // Tạo một đối tượng Comment mới
+            var newComment = new Comment
+            {
+                UserId = user.Id,
+                ContributionId = contribution.ContributionId,
+                CommentField = contribution.Comment, // Sử dụng comment từ contribution được gửi lên
+                CommentDate = DateTime.Now // Đặt ngày bình luận là ngày hiện tại
+            };
 
-        // Lấy danh sách comment cho contribution này
-        var comments = await _context.Comments
-            .Where(c => c.ContributionId == contribution.ContributionId)
-            .ToListAsync();
+            // Thêm Comment mới vào cơ sở dữ liệu
+            _context.Comments.Add(newComment);
+            await _context.SaveChangesAsync();
 
-        ViewBag.Comments = comments;
+            // Lấy danh sách comment cho contribution này
+            var comments = await _context.Comments
+                .Where(c => c.ContributionId == contribution.ContributionId)
+                .ToListAsync();
 
-        return RedirectToAction("StudentSubmissionCoordinators");
+            ViewBag.Comments = comments;
+
+            return RedirectToAction("StudentSubmissionCoordinators");
+        }
+
+        return RedirectToAction("StudentSubmissionCoordinators", "Managers");
     }
-
-    return RedirectToAction("StudentSubmissionCoordinators", "Managers");
-}
 
 
 
