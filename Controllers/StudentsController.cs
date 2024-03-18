@@ -239,10 +239,10 @@ namespace COMP1640.Controllers
                     var coordinatorEmails = coordinators.Select(u => u.Email).ToArray();
                     var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
 
-                    string body =  "Title: New Contribution\n" +
+                    string body = "Title: New Contribution\n" +
                     "Dear sir/madam, \n" +
                     "There are new contribution(s) for the annual magazine.\n" +
-                    "- Name Contribution: "+  contribution.Title + "\n" +
+                    "- Name Contribution: " + contribution.Title + "\n" +
                     "- Annual Magazine name:" + annualMagazine.Title + "\n" +
                     "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
                     "Sincerely, \n" +
@@ -251,7 +251,7 @@ namespace COMP1640.Controllers
                     await _emailSender.SendEmailAsync(message);
                 }
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MyAccount));
         }
 
         // POST: StudentsController/Edit/5
@@ -400,7 +400,7 @@ namespace COMP1640.Controllers
             ViewBag.userProfileImagePath = userProfileImagePath;
             ViewBag.Comments = comments;
             return View(contribution);
-            
+
         }
 
         public async Task<IActionResult> PostLists()

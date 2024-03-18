@@ -58,9 +58,11 @@
                                 @* <li>
                                     <a asp-controller="Students" asp-action="ContactUs">Contact Us</a>
                                 </li> *@
-                                <li>
+                                @if(User.Identity.IsAuthenticated){
+                                    <li>
                                     <a asp-controller="Students" asp-action="MyAccount">My Account</a>
                                 </li>
+                                }                               
                                 <li>
                                     <a asp-controller="Students" asp-action="PostLists">Post List</a>
                                 </li>
@@ -76,7 +78,7 @@
                                     <li class="nav-item">
                                         @* <a href="@Url.Page("/Account/Logout", new { area = "Identity", returnUrl = Url.Action("Index", "Home", new { area = "" }) })" class="nav-link">Logout</a> *@
                                         @* <a href="@Url.Page("/Account/Logout", new { area = "Identity", returnUrl = Url.Page("/", new { area = "" }) })" type="submit" class="nav-link text-dark">Logout</a> *@
-                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post" style="padding-left: 2vw;">
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post" style="padding-left: 2vw;">
                                             <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
                                         </form>
                                     </li>
