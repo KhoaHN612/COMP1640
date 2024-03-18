@@ -424,5 +424,33 @@ namespace COMP1640.Controllers
             }
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateComment(Contribution contribution)
+        {
+            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+            if (existingContribution != null)
+            {
+                var user = await _context.Users.FindAsync(existingContribution.UserId);
+                var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
+                var newComment = new Comment
+                {
+                    UserId = user.Id,
+                    ContributionId = contribution.ContributionId,
+                    CommentField = contribution.Comment, 
+                    CommentDate = DateTime.Now 
+                };
+                _context.Comments.Add(newComment);
+                await _context.SaveChangesAsync();
+                var comments = await _context.Comments
+                    .Where(c => c.ContributionId == contribution.ContributionId)
+                    .ToListAsync();
+                ViewBag.Comments = comments;
+                return RedirectToAction("SubmissionDetail", "Students", new { id = contribution.ContributionId });
+            }
+            return View(contribution);
+        }
+
     }
 }
