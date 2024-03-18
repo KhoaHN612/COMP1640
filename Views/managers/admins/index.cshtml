@@ -5,163 +5,164 @@
 }
 
 <main class="page-content">
-    <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
-        <div class="card overflow-hidden radius-10">
-                <div class="card-body">
-                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-                        <div class="">
-                            <p>Total Contributions</p>
-                            <h4 class="" id="totalArticles">0 article</h4>
-                        </div>
-                        <div class="card-body">
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
+            <div class="col">
+                <div class="card overflow-hidden radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                            <div>
+                                <p>Total Contributions</p>
+                                <h4 class="" id="totalArticles">0 article</h4>
+                            </div>
+                            <div class="w-50">
                                 <div id="chart5"></div>
                                 @foreach (var item in ViewBag.ContributionYear)
                                 {
                                     <div class="contribution-item" data-month="@item.Month" data-total="@item.TotalByMonth"></div>
                                 }
                             </div>
-                        <div class="w-5">   
-                            <!-- Select year, display current year first access-->
-                            <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
-                                @foreach (var item in ViewBag.Years)
-                                {
-                                    if (item == ViewBag.ContributionYear[0].Year)
+                            <div class="w-50">
+                                <!-- Select year, display current year first access-->
+                                <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
+                                    @foreach (var item in ViewBag.Years)
                                     {
-                                        <option value="@item" selected>@item</option>
+                                        if (item == ViewBag.ContributionYear[0].Year)
+                                        {
+                                            <option value="@item" selected>@item</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item" >@item</option>
+                                        }
                                     }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
-                                }
-                            </select>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!--end row-->
+        <!--end row-->
 
-    <div class="row">      
-    <div class="col-12 col-lg-6 col-xl-4 d-flex">
-            <div class="card radius-10 w-100">
-                <div class="card-body">
-                    @foreach (var item in ViewBag.RoleStatistics)
-                    {
-                        <div class="card radius-10 border shadow-none mb-3">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="">
-                                        <p class="mb-1">@item.Role Accounts</p>
-                                        <h4 class="mb-0 text-primary">@item.Total</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        @foreach (var item in ViewBag.RoleStatistics)
+                        {
+                            <div class="card radius-10 border shadow-none mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-1">@item.Role Accounts</p>
+                                            <h4 class="mb-0 text-primary">@item.Total</h4>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        }
                     </div>
-                    }                    
                 </div>
             </div>
-        </div> 
-        <div class="col-6 col-lg-6 col-xl-8 d-flex">
-            <div class="card radius-10 w-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <h6 class="mb-0">Contributions by Faculty</h6>
-                        <div class="fs-5 ms-auto dropdown">
-                            <select class="form-select" id="year" aria-label="Default select example" onchange="GetContributionByYear(this.value)">
-                                @foreach (var item in ViewBag.Years)
-                                {
-                                    if (item == ViewBag.ContributionFaculty[0].SubmissionDate.Year)
+            <div class="col-md-6">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Contributions by Faculty</h6>
+                            <div class="dropdown ms-auto">
+                                <select class="form-select" id="year" aria-label="Default select example" onchange="GetContributionByYear(this.value)">
+                                    @foreach (var item in ViewBag.Years)
                                     {
-                                        <option value="@item" selected>@item</option>
+                                        if (item == ViewBag.ContributionFaculty[0].SubmissionDate.Year)
+                                        {
+                                            <option value="@item" selected>@item</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item" >@item</option>
+                                        }
                                     }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row m-2 align-items-center justify-content-center my-3">
-                        <div class="col-6 col-lg-6 col-xl-8 align-items-center">
-                            <div class="by-device-container">
-                                <div class="piechart-legend" id="piechart">
-                                    <h2 class="mb-1" id="percent">0%</h2>
-                                    <h6 class="mb-0" id="falcuty">No Faculty</h6>
-                                </div>
-                                <canvas id="chart6"></canvas>
+                                </select>
                             </div>
-                        </div> 
-                        <div id="contributionFaculty"
-                                data-contributionfaculty='@Html.Raw(Json.Serialize(ViewData["ContributionFaculty"]))'>
-                        </div>                                           
+                        </div>
+                        <div class="row m-2 align-items-center justify-content-center my-3">
+                            <div class="col-6 col-lg-6 col-xl-8 align-items-center">
+                                <div class="by-device-container">
+                                    <div class="piechart-legend" id="piechart">
+                                        <h2 class="mb-1" id="percent">0%</h2>
+                                        <h6 class="mb-0" id="falcuty">No Faculty</h6>
+                                    </div>
+                                    <canvas id="chart6"></canvas>
+                                </div>
+                            </div> 
+                            <div id="contributionFaculty"
+                                    data-contributionfaculty='@Html.Raw(Json.Serialize(ViewData["ContributionFaculty"]))'>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div><!--end row-->
+        <!--end row-->
 
-
-    <div class="row">
-        <div class="d-flex">
-            <div class="card radius-10 w-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="">
-                            <h6>Quantity Of Contributors</h6>
-                            <h4 class="" id="totalContributors">0 article</h4>
-                        </div>
-                        
-                        <div class="fs-5 ms-auto dropdown">
-                            <select class="form-select" id="yearUser" aria-label="Default select example" onchange="SelectedYearUser(this.value)">
-                                @foreach (var item in ViewBag.Years)
-                                {
-                                    if (item == ViewBag.ContributionUser[0].Year)
+        <div class="row">
+            <div class="col">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h6>Quantity Of Contributors</h6>
+                                <h4 class="" id="totalContributors">0 article</h4>
+                            </div>
+                            <div class="dropdown ms-auto">
+                                <select class="form-select" id="yearUser" aria-label="Default select example" onchange="SelectedYearUser(this.value)">
+                                    @foreach (var item in ViewBag.Years)
                                     {
-                                        <option value="@item" selected>@item</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item" >@item</option>
-                                    }
-                                }
-                            </select>
+                                        if (item == ViewBag.ContributionUser[0].Year)
+                                        {
+                                            <option value="@item" selected>@item</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item" >@item</option>
+                                        }
+                                    }   
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="table-responsive mt-2">
-                        <table class="table align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Student Name</th>
-                                    <th>Faculty</th>
-                                    <th>Total contributions</th>
-                                    <th>Accepted</th>
-                                    <th>Rejected</th>
-                                    <th>Pending</th>
-                                </tr>
-                            </thead>
-                            <tbody id="qtyContribution">
+                        <div class="table-responsive mt-2">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Faculty</th>
+                                        <th>Total contributions</th>
+                                        <th>Accepted</th>
+                                        <th>Rejected</th>
+                                        <th>Pending</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="qtyContribution">
                                     @foreach (var item in ViewBag.ContributionUser)
                                     {
-                                        
                                         <tr>
                                             <td>@item.FullName</td>
                                             <td>@item.Faculty</td>
                                             <td class="totalContributionCell">@item.TotalContribution</td>
                                             <td>@item.TotalAccept</td>
                                             <td>@item.TotalReject</td>
-                                            <td>@item.TotalPending</td>                            
+                                            <td>@item.TotalPending</td>
                                         </tr>
                                     }
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!--end row-->
     </div>
-    <!--end row-->
 </main>
 <!--end page main-->

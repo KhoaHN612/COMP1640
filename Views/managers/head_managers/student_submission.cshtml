@@ -21,7 +21,7 @@
     <hr />
     <div class="row">
         <div class="col d-flex justify-content-end">
-            <button type="button" class="btn btn-info px-5" onclick="location.href='@Url.Action("DownloadAllApproved", "Managers")'">
+            <button type="button" class="btn btn-info px-5" onclick="ConfirmDownLoadAll()">
                 <i class="bi bi-cloud-arrow-down-fill"></i> Download All
             </button>
         </div>
@@ -84,4 +84,20 @@
     </div>
 </main>
 <!--end page main-->
+<script>
+function ConfirmDownLoadAll() {
+    Swal.fire({
+        title: 'Are you sure to download all contributions?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0d6efd',
+        cancelButtonColor: '#9C9C9C',
+        confirmButtonText: 'Download'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href='@Url.Action("DownloadAllApproved", "Managers")'
+        }
+    })
+}
+</script>
 
