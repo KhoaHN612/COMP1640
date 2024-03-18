@@ -1,4 +1,5 @@
 ﻿@model List<COMP1640.Models.Contribution>
+@inject Microsoft.AspNetCore.Identity.UserManager<COMP1640.Areas.Identity.Data.COMP1640User> _userManager
 @{
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
 }
@@ -34,7 +35,7 @@
                         <tr>
                             <th>No</th>
                             <th>Contribution ID</th>
-                            <th>User ID</th>
+                            <th>Full Name</th>
                             <th>Annual Magazine</th>
                             <th>Title</th>
                             <th>Submission Date</th>
@@ -50,7 +51,12 @@
                             <tr>
                                 <td>@index</td>
                                 <td>@contribution.ContributionId</td>
-                                <td>@contribution.UserId</td>
+                                @{
+                                    string userId = contribution.UserId;
+                                    var user = await _userManager.FindByIdAsync(userId);
+                                    string fullName = user != null ? user.FullName : "Unknown";
+                                }
+                                <td>@fullName</td>
                                 <td>@contribution.AnnualMagazine.Title</td>
                                 <td>@contribution.Title</td>
                                 <td>@contribution.SubmissionDate.ToString("dd/MM/yyyy")</td>
@@ -71,7 +77,7 @@
                         <tr>
                             <th>No</th>
                             <th>Contribution ID</th>
-                            <th>User ID</th>
+                            <th>Full Name</th>
                             <th>Annual Magazine</th>
                             <th>Title</th>
                             <th>Submission Date</th>

@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<COMP1640.Models.Contribution>
+@inject Microsoft.AspNetCore.Identity.UserManager<COMP1640.Areas.Identity.Data.COMP1640User> _userManager
 
 @{
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
@@ -28,7 +29,7 @@
                         <tr>
                             <th>No</th>
                             <th>Contribution ID</th>
-                            <th>User ID</th>
+                            <th>Full Name</th>
                             <th>Title</th>
                             <th>Submission Date</th>
                             <th>Status</th>
@@ -44,7 +45,12 @@
                             <tr>
                                 <td>@index</td>
                                 <td>@contributions.ContributionId</td>
-                                <td>@contributions.UserId</td>
+                                @{
+                                    string userId = contributions.UserId;
+                                    var user = await _userManager.FindByIdAsync(userId);
+                                    string fullName = user != null ? user.FullName : "Unknown";
+                                }
+                                <td>@fullName</td>
                                 <td>@contributions.Title</td>
                                 <td>@contributions.SubmissionDate.ToString("dd/MM/yyyy")</td>
                                 <td>
@@ -63,7 +69,9 @@
                                 </td>
                                 <td>
                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                        <a href="@Url.Action("DownloadContributionFiles", "Managers", new { id = contributions.ContributionId })" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download">
+                                        <a href="@Url.Action("DownloadContributionFiles", "Managers", new { id = contributions.ContributionId })"
+                                            class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                            title="Download">
                                             <i class="lni lni-download"></i>
                                         </a>
 
@@ -75,7 +83,7 @@
 
 
                                         <form asp-controller="Managers" asp-action="updatestatus" method="post">
-                                            <input type="hidden" name="id" value="@contributions.ContributionId" />                                          
+                                            <input type="hidden" name="id" value="@contributions.ContributionId" />
                                             <input type="hidden" name="status" value="Rejected" />
                                             <button type="submit" class="btn btn-danger">Reject</button>
                                         </form>
@@ -95,7 +103,7 @@
                         <tr>
                             <th>No</th>
                             <th>Contribution ID</th>
-                            <th>User ID</th>
+                            <th>Full Name</th>
                             <th>Title</th>
                             <th>Submission Date</th>
                             <th>Status</th>
