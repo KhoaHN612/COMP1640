@@ -366,6 +366,13 @@ namespace COMP1640.Controllers
         [HttpPost]
         public IActionResult UpdateAnnualMagazine(AnnualMagazine annualMagazine)
         {
+            Console.WriteLine("============UpdateMagazine============");
+            //print annualMagazine
+            foreach (var prop in annualMagazine.GetType().GetProperties())
+            {
+                Console.WriteLine("{0} = {1}", prop.Name, prop.GetValue(annualMagazine, null));
+            }
+
             var existingAnnualMagazine = _context.AnnualMagazines.Find(annualMagazine.AnnualMagazineId);
             if (existingAnnualMagazine == null)
             {

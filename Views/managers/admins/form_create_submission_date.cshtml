@@ -31,7 +31,7 @@
                 <div class="card-body">
                     <div class="border p-4 rounded">
                         <!-- Start of form -->
-                        <form action = "@Url.Action(Model.AnnualMagazineId == 0 ? "CreateAnnualMagazine" : "UpdateAnnualMagazine", "Managers")" method="post">
+                        <form action="@Url.Action(Model.AnnualMagazineId == 0 ? "CreateAnnualMagazine" : "UpdateAnnualMagazine", "Managers")" method="post">
                             <div class="card-title d-flex align-items-center">
                                 <h5 class="mb-0">@ViewData["Title"] Date</h5>
                             </div>
@@ -78,6 +78,22 @@
                                             name="finalClosureDate" placeholder="Choose Date Time" value="@Model.FinalClosureDate?.ToString("yyyy-MM-dd")">
                                 </div>
                             </div>
+                            @* radio button to change status. @Mode.IsStatus == Active or Disable *@
+                            <div class="row mb-3">
+                                <label for="inputChooseDate2" class="col-sm-3 col-form-label">
+                                    Status
+                                </label>
+                                <div class="col-sm-9">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" id="active" name="isActive" value="True" @(Model.IsActive ? "checked" : "")>
+                                        <label class="form-check-label" for="active">Active</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" id="disable" name="isActive" value="False" @(!Model.IsActive ? "checked" : "")>
+                                        <label class="form-check-label" for="disable">Disable</label>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Submit Button -->
                             <div class="row">
                                 <label class="col-sm-3 col-form-label"></label>
@@ -95,4 +111,3 @@
 
     <!--end row-->
 </main>
-<!--end page main-->

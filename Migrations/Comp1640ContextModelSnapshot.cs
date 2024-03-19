@@ -123,6 +123,10 @@ namespace COMP1640.Migrations
                         .HasColumnType("date")
                         .HasColumnName("finalClosureDate");
 
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("isActive");
+
                     b.Property<DateOnly?>("SubmissionClosureDate")
                         .HasColumnType("date")
                         .HasColumnName("submissionClosureDate");
