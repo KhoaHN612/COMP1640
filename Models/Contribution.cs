@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -29,6 +29,9 @@ public partial class Contribution
     [Column("comment")]
     public string? Comment { get; set; }
 
+    [Column("isPublished")]
+    public bool IsPublished { get; set; }
+
     [Column("status")]
     [StringLength(10)]
     public string Status { get; set; } = null!;
@@ -36,9 +39,6 @@ public partial class Contribution
     [ForeignKey("AnnualMagazineId")]
     [InverseProperty("Contributions")]
     public virtual AnnualMagazine AnnualMagazine { get; set; } = null!;
-
-    [InverseProperty("Contribution")]
-    public virtual ICollection<FileDetail> FileDetails { get; set; } = new List<FileDetail>();
 
     [InverseProperty("Contribution")]
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();

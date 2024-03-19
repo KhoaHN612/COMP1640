@@ -5,6 +5,7 @@ using COMP1640.Migrations;
 using COMP1640.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 
@@ -138,7 +139,9 @@ namespace COMP1640.Controllers
         public IActionResult FromCreateSubmission()
         {
             ViewData["Title"] = "From Submission";
-            var annualMagazines = _context.AnnualMagazines.ToList();
+            var annualMagazines = _context.AnnualMagazines
+                             .Where(m => m.IsActive == true)
+                             .ToList();
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
@@ -153,55 +156,139 @@ namespace COMP1640.Controllers
             if (academicYear != null)
             {
                 ViewBag.academicYear = academicYear;
-            }
+            }   
             return View("~/Views/managers/student/student_edit_submission.cshtml", contribution);
         }
 
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
+        // {
+
+        //     string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
+        //     string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+        //     string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
+        //     if (fileExtension == ".docx")
+        //     {
+        //         using (var fileStream = new FileStream(filePath, FileMode.Create))
+        //         {
+        //             await fileDetail.ContributionFile.CopyToAsync(fileStream);
+        //         }
+        //         fileDetail.FilePath = uniqueFileName;
+        //         fileDetail.Type = "Document";
+        //     }
+        //     else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".webp")
+        //     {
+        //         using (var fileStream = new FileStream(filePath, FileMode.Create))
+        //         {
+        //             await fileDetail.ContributionFile.CopyToAsync(fileStream);
+        //         }
+        //         fileDetail.FilePath = uniqueFileName;
+        //         fileDetail.Type = "Image";
+        //     }
+        //     int maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
+        //     fileDetail.FileId = maxId + 1;
+
+        //     maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
+        //     contribution.ContributionId = maxId + 1;
+        //     contribution.AnnualMagazineId = AnnualMagazineId;
+
+        //     var userId = _userManager.GetUserId(User);
+        //     contribution.Comment = null;
+        //     contribution.Status = "Pending";
+        //     contribution.UserId = userId;
+        //     fileDetail.ContributionId = contribution.ContributionId;
+        //     _context.Add(contribution);
+        //     _context.Add(fileDetail);
+        //     var result = await _context.SaveChangesAsync();
+        //     if (result > 0)
+        //     {
+        //         var currentUser = await _userManager.GetUserAsync(User);
+
+        //         if (currentUser == null)
+        //         {
+        //             return NotFound("User not found.");
+        //         }
+
+        //         // Get the Faculty ID of the current user
+        //         var facultyId = currentUser.FacultyId;
+
+        //         // Get the role ID for "Coordinator"
+        //         var coordinatorRole = (await _roleManager.FindByNameAsync("Coordinator"));
+
+        //         if (facultyId != null && coordinatorRole != null)
+        //         {
+        //             // // Retrieve users with the same Faculty and "Coordinator" role
+        //             // var coordinators = await _userManager.Users
+        //             //     .Include(u => u.Faculty) // Eager load the Faculty navigation property
+        //             //     .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
+        //             //     .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result) // Check if user has the "Coordinator" role
+        //             //     .ToListAsync();
+
+        //             var sameFacultyUsers = await _userManager.Users
+        //                 .Include(u => u.Faculty) // Eager load the Faculty navigation property
+        //                 .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
+        //                 .ToListAsync();
+
+        //             // Filter users who have the "Coordinator" role
+        //             var coordinators = sameFacultyUsers
+        //                 .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result)
+        //                 .ToList();
+
+        //             var coordinatorEmails = coordinators.Select(u => u.Email).ToArray();
+        //             var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
+
+        //             string body = "Title: New Contribution\n" +
+        //             "Dear sir/madam, \n" +
+        //             "There are new contribution(s) for the annual magazine.\n" +
+        //             "- Name Contribution: " + contribution.Title + "\n" +
+        //             "- Annual Magazine name:" + annualMagazine.Title + "\n" +
+        //             "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
+        //             "Sincerely, \n" +
+        //             "Developer team";
+        //             var message = new Message(coordinatorEmails, "New Contribution", body);
+        //             await _emailSender.SendEmailAsync(message);
+        //         }
+        //     }
+        //     return RedirectToAction(nameof(MyAccount));
+        // }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
+        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetails)
         {
-
-            string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
-            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
-            string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
-            if (fileExtension == ".docx")
+            var currentContributionId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
+            contribution.ContributionId = currentContributionId + 1;
+            int maxId = 0;
+            maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
+            foreach (var file in fileDetails.ContributionFile)
             {
+                fileDetails.FileId = maxId + 1;
+                maxId++;
+                string uniqueFileName = GetUniqueFileName(file.FileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+                string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
+                    await file.CopyToAsync(fileStream);
                 }
-                fileDetail.FilePath = uniqueFileName;
-                fileDetail.Type = "Document";
+                fileDetails.FilePath = uniqueFileName;
+                fileDetails.Type = "Document";
+                fileDetails.ContributionId = contribution.ContributionId;
+                _context.Add(fileDetails);
+                await _context.SaveChangesAsync();
             }
-            else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".webp")
-            {
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await fileDetail.ContributionFile.CopyToAsync(fileStream);
-                }
-                fileDetail.FilePath = uniqueFileName;
-                fileDetail.Type = "Image";
-            }
-            else
-            {
-                return View("Error");
-            }
-            int maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
-            fileDetail.FileId = maxId + 1;
-
             maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-            contribution.ContributionId = maxId + 1;
+
             contribution.AnnualMagazineId = AnnualMagazineId;
 
             var userId = _userManager.GetUserId(User);
             contribution.Comment = null;
             contribution.Status = "Pending";
             contribution.UserId = userId;
-            fileDetail.ContributionId = contribution.ContributionId;
             _context.Add(contribution);
-            _context.Add(fileDetail);
             var result = await _context.SaveChangesAsync();
+
             if (result > 0)
             {
                 var currentUser = await _userManager.GetUserAsync(User);
@@ -255,31 +342,31 @@ namespace COMP1640.Controllers
         }
 
         // POST: StudentsController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditSubmission(int id, FileDetail newContribution)
-        {
-            // var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
-            var currentFile = await _context.FileDetails
-                .FirstOrDefaultAsync(fd => fd.ContributionId == id);
-            if (currentFile != null)
-            {
-                string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
-                string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
-                System.IO.File.Delete(currentFilePath);
-            }
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public async Task<ActionResult> EditSubmission(int id, FileDetail newContribution)
+        // {
+        //     // var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
+        //     var currentFile = await _context.FileDetails
+        //         .FirstOrDefaultAsync(fd => fd.ContributionId == id);
+        //     if (currentFile != null)
+        //     {
+        //         string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
+        //         string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
+        //         System.IO.File.Delete(currentFilePath);
+        //     }
 
-            string uniqueFileName = GetUniqueFileName(newContribution.ContributionFile.FileName);
-            string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
-            using (var fileStream = new FileStream(newFilePath, FileMode.Create))
-            {
-                await newContribution.ContributionFile.CopyToAsync(fileStream);
-            }
+        //     string uniqueFileName = GetUniqueFileName(newContribution.ContributionFile.FileName);
+        //     string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+        //     using (var fileStream = new FileStream(newFilePath, FileMode.Create))
+        //     {
+        //         await newContribution.ContributionFile.CopyToAsync(fileStream);
+        //     }
 
-            currentFile.FilePath = uniqueFileName;
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        //     currentFile.FilePath = uniqueFileName;
+        //     await _context.SaveChangesAsync();
+        //     return RedirectToAction(nameof(Index));
+        // }
 
         // POST: StudentsController/Delete/5
         [HttpPost]
@@ -424,5 +511,33 @@ namespace COMP1640.Controllers
             }
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateComment(Contribution contribution)
+        {
+            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+            if (existingContribution != null)
+            {
+                var user = await _context.Users.FindAsync(existingContribution.UserId);
+                var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
+                var newComment = new Comment
+                {
+                    UserId = user.Id,
+                    ContributionId = contribution.ContributionId,
+                    CommentField = contribution.Comment, 
+                    CommentDate = DateTime.Now 
+                };
+                _context.Comments.Add(newComment);
+                await _context.SaveChangesAsync();
+                var comments = await _context.Comments
+                    .Where(c => c.ContributionId == contribution.ContributionId)
+                    .ToListAsync();
+                ViewBag.Comments = comments;
+                return RedirectToAction("SubmissionDetail", "Students", new { id = contribution.ContributionId });
+            }
+            return View(contribution);
+        }
+
     }
 }

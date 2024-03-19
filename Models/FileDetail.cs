@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace COMP1640.Models;
 
-[Index("ContributionId", Name = "IX_FileDetails_contributionId")]
 public partial class FileDetail
 {
     [Key]
@@ -14,7 +13,7 @@ public partial class FileDetail
     public int FileId { get; set; }
 
     [Column("contributionId")]
-    public int ContributionId { get; set; }
+    public int? ContributionId { get; set; }
 
     [Column("type")]
     [StringLength(10)]
@@ -23,10 +22,6 @@ public partial class FileDetail
     [Column("filePath")]
     public string FilePath { get; set; } = null!;
 
-    [ForeignKey("ContributionId")]
-    [InverseProperty("FileDetails")]
-    public virtual Contribution Contribution { get; set; } = null!;
-
     [NotMapped]
-    public IFormFile ContributionFile { get; set; }
+    public List<IFormFile>? ContributionFile { get; set; }
 }

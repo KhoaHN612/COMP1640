@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP1640.Migrations
 {
     [DbContext(typeof(Comp1640Context))]
-    [Migration("20240317102937_finalAdd3")]
-    partial class finalAdd3
+    [Migration("20240318185148_AllowNull")]
+    partial class AllowNull
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -254,7 +254,7 @@ namespace COMP1640.Migrations
                         .HasColumnType("int")
                         .HasColumnName("fileId");
 
-                    b.Property<int>("ContributionId")
+                    b.Property<int?>("ContributionId")
                         .HasColumnType("int")
                         .HasColumnName("contributionId");
 
@@ -458,7 +458,6 @@ namespace COMP1640.Migrations
                     b.HasOne("COMP1640.Models.Contribution", "Contribution")
                         .WithMany("FileDetails")
                         .HasForeignKey("ContributionId")
-                        .IsRequired()
                         .HasConstraintName("FK__FileDetai__contr__66603565");
 
                     b.Navigation("Contribution");

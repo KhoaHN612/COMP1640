@@ -4,6 +4,7 @@ using COMP1640.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP1640.Migrations
 {
     [DbContext(typeof(Comp1640Context))]
-    partial class Comp1640ContextModelSnapshot : ModelSnapshot
+    [Migration("20240319032214_PublishField")]
+    partial class PublishField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,10 +126,6 @@ namespace COMP1640.Migrations
                         .HasColumnType("date")
                         .HasColumnName("finalClosureDate");
 
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("isActive");
-
                     b.Property<DateOnly?>("SubmissionClosureDate")
                         .HasColumnType("date")
                         .HasColumnName("submissionClosureDate");
@@ -193,10 +192,6 @@ namespace COMP1640.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("comment");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit")
-                        .HasColumnName("isPublished");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -259,7 +254,7 @@ namespace COMP1640.Migrations
                         .HasColumnType("int")
                         .HasColumnName("fileId");
 
-                    b.Property<int?>("ContributionId")
+                    b.Property<int>("ContributionId")
                         .HasColumnType("int")
                         .HasColumnName("contributionId");
 
@@ -277,69 +272,9 @@ namespace COMP1640.Migrations
                     b.HasKey("FileId")
                         .HasName("PK__FileDeta__C2C6FFDCE73A7F89");
 
+                    b.HasIndex(new[] { "ContributionId" }, "IX_FileDetails_contributionId");
+
                     b.ToTable("FileDetails");
-                });
-
-            modelBuilder.Entity("COMP1640.Models.Post", b =>
-                {
-                    b.Property<int>("PostId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("PostId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostId"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PostedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("COMP1640.Models.PostComment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PostComments");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -518,34 +453,15 @@ namespace COMP1640.Migrations
                     b.Navigation("AnnualMagazine");
                 });
 
-            modelBuilder.Entity("COMP1640.Models.Post", b =>
+            modelBuilder.Entity("COMP1640.Models.FileDetail", b =>
                 {
-                    b.HasOne("COMP1640.Areas.Identity.Data.COMP1640User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("COMP1640.Models.Contribution", "Contribution")
+                        .WithMany("FileDetails")
+                        .HasForeignKey("ContributionId")
+                        .IsRequired()
+                        .HasConstraintName("FK__FileDetai__contr__66603565");
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("COMP1640.Models.PostComment", b =>
-                {
-                    b.HasOne("COMP1640.Models.Post", "Post")
-                        .WithMany("PostComments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("COMP1640.Areas.Identity.Data.COMP1640User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-
-                    b.Navigation("User");
+                    b.Navigation("Contribution");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -607,16 +523,13 @@ namespace COMP1640.Migrations
             modelBuilder.Entity("COMP1640.Models.Contribution", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("FileDetails");
                 });
 
             modelBuilder.Entity("COMP1640.Models.Faculty", b =>
                 {
                     b.Navigation("COMP1640User");
-                });
-
-            modelBuilder.Entity("COMP1640.Models.Post", b =>
-                {
-                    b.Navigation("PostComments");
                 });
 #pragma warning restore 612, 618
         }

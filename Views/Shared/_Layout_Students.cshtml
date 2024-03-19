@@ -67,6 +67,10 @@
                                     <a asp-controller="Post" asp-action="PostList">Post List</a>
                                 </li>
                                 <li>
+                                    <a asp-controller="Managers" asp-action="ShowPublish">Publish</a>
+                                </li>
+
+                                <li>
                                     <a asp-controller="Managers" asp-action="Index">Admin</a>
                                 </li>
                                 @if (SignInManager.IsSignedIn(User))

@@ -107,10 +107,6 @@ public partial class Comp1640Context : IdentityDbContext<COMP1640User>
             entity.HasKey(e => e.FileId).HasName("PK__FileDeta__C2C6FFDCE73A7F89");
 
             entity.Property(e => e.FileId).ValueGeneratedNever();
-
-            entity.HasOne(d => d.Contribution).WithMany(p => p.FileDetails)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__FileDetai__contr__66603565");
         });
 
         OnModelCreatingPartial(modelBuilder);
