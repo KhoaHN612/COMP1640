@@ -29,6 +29,9 @@ public partial class Contribution
     [Column("comment")]
     public string? Comment { get; set; }
 
+    [Column("isPublished")]
+    public bool IsPublished { get; set; }
+
     [Column("status")]
     [StringLength(10)]
     public string Status { get; set; } = null!;

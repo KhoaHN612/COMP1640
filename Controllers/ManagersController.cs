@@ -486,17 +486,17 @@ namespace COMP1640.Controllers
             List<TotalContribution> TotalContributionsPending = await GetTotalContributions(currentDate.Year, "TotalContributionsPending");
 
             //GET ALL CONTRIBUTIONS
-            List<ContributionWithoutComment> contributions =  await _context.Contributions
+            List<ContributionWithoutComment> contributions = await _context.Contributions
                 .Where(c => c.SubmissionDate.Year == DateTime.Now.Year)
-                .GroupBy(c => new { Date = c.SubmissionDate.Date})
+                .GroupBy(c => new { Date = c.SubmissionDate.Date })
                 .Select(g => new ContributionWithoutComment
                 {
                     Date = g.Key.Date,
                     Quantity = g.Count()
                 })
-                .ToListAsync();   
-                
-            
+                .ToListAsync();
+
+
             //GET CONTRIBUTION WITHOUT COMMENT
             /*
             SELECT 
@@ -515,15 +515,15 @@ namespace COMP1640.Controllers
     
             List<ContributionWithoutComment> contributionWithoutComments =  await _context.Contributions
                 .Where(c => c.SubmissionDate.Year == DateTime.Now.Year && c.Comment == null)
-                .GroupBy(c => new { Date = c.SubmissionDate.Date})
+                .GroupBy(c => new { Date = c.SubmissionDate.Date })
                 .Select(g => new ContributionWithoutComment
                 {
                     Date = g.Key.Date,
                     Quantity = g.Count()
                 })
-                .ToListAsync();   
+                .ToListAsync();
 
-            
+
             //GET CONTRIBUTION WITHOUT COMMENT AFTER 14 DAYS
             /*
             SELECT 
@@ -544,7 +544,7 @@ namespace COMP1640.Controllers
                 .Where(c => c.SubmissionDate.Year == DateTime.Now.Year
                             && c.Comment == null
                             && EF.Functions.DateDiffDay(c.SubmissionDate, DateTime.Now.Date) > 14)
-                .GroupBy(c => new { Date = c.SubmissionDate.Date})
+                .GroupBy(c => new { Date = c.SubmissionDate.Date })
                 .Select(g => new ContributionWithoutComment
                 {
                     Date = g.Key.Date,
@@ -622,7 +622,7 @@ namespace COMP1640.Controllers
 
             return View("coordinators/student_submission", contributions);
         }
-         public async Task<IActionResult> CoordinatorComment(int? id)
+        public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
             var contribution = await _context.Contributions.FindAsync(id);
@@ -716,9 +716,9 @@ namespace COMP1640.Controllers
                 .ToListAsync();
 
             //GET CONTRIBUTIONS BY YEAR
-            int selectedYearAll = DateTime.Now.Year; 
-            int selectedYearApproved = DateTime.Now.Year; 
-            int selectedYearRejected = DateTime.Now.Year; 
+            int selectedYearAll = DateTime.Now.Year;
+            int selectedYearApproved = DateTime.Now.Year;
+            int selectedYearRejected = DateTime.Now.Year;
             int selectedYearPending = DateTime.Now.Year;
 
             if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { selectedYearAll = Convert.ToInt32(year); }
@@ -770,7 +770,8 @@ namespace COMP1640.Controllers
             */
             List<ContributionDate> contributions = new List<ContributionDate>();
 
-            if(status == "All"){
+            if (status == "All")
+            {
                 contributions = await _context.Users
                 .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
                 .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
@@ -786,7 +787,9 @@ namespace COMP1640.Controllers
                 .OrderBy(c => c.Year)
                 .ThenBy(c => c.Month)
                 .ToListAsync();
-            }else{
+            }
+            else
+            {
                 contributions = await _context.Users
                 .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
                 .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
@@ -941,7 +944,7 @@ namespace COMP1640.Controllers
             return View("profile_managers");
         }
 
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status)
@@ -980,24 +983,22 @@ namespace COMP1640.Controllers
             var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
             if (existingContribution != null)
             {
-                // Tìm user và contribution tương ứng
+                
                 var user = await _context.Users.FindAsync(existingContribution.UserId);
                 var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
 
-                // Tạo một đối tượng Comment mới
+                
                 var newComment = new Comment
                 {
                     UserId = user.Id,
                     ContributionId = contribution.ContributionId,
-                    CommentField = contribution.Comment, // Sử dụng comment từ contribution được gửi lên
-                    CommentDate = DateTime.Now // Đặt ngày bình luận là ngày hiện tại
+                    CommentField = contribution.Comment, 
+                    CommentDate = DateTime.Now 
                 };
 
-                // Thêm Comment mới vào cơ sở dữ liệu
                 _context.Comments.Add(newComment);
                 await _context.SaveChangesAsync();
 
-                // Lấy danh sách comment cho contribution này
                 var comments = await _context.Comments
                     .Where(c => c.ContributionId == contribution.ContributionId)
                     .ToListAsync();
@@ -1009,11 +1010,34 @@ namespace COMP1640.Controllers
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
+        [HttpPost]
+        public async Task<IActionResult> Publish(int id, bool isPublished)
+        {
+            var contribution = await _context.Contributions.FindAsync(id);
+            if (contribution == null)
+            {
+                return NotFound();
+            }
 
-
-
-
-
-
+            try
+            {
+                contribution.IsPublished = true; 
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index)); 
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError("", "Fail");
+                return View();
+            }
+        }
+        public async Task<IActionResult> ShowPublish()
+        {
+             ViewData["Title"] = "Publish Contributions";
+            var publishedContributions = await _context.Contributions
+                .Where(c => c.IsPublished) 
+                .ToListAsync();
+            return View("coordinators/publishContribution", publishedContributions);
+        }
     }
 }
