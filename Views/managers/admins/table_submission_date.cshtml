@@ -37,6 +37,7 @@
                             <th>Title</th>
                             <th>SubmissionClosureDate</th>
                             <th>FinalClosureDate</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -52,6 +53,9 @@
                                 <td>@annualMagazine.Title</td>
                                 <td>@annualMagazine.SubmissionClosureDate</td>
                                 <td>@annualMagazine.FinalClosureDate</td>
+                                <td>
+                                    <span  class="annualStatus">@annualMagazine.IsActive</span>
+                                </td>
                                 <td>
                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
                                         <a href="@Url.Action("FormCreateSubmissionDate", "Managers", new { id = annualMagazine.AnnualMagazineId })" 
@@ -85,6 +89,18 @@
 </main>
 <!--end page main-->
 <script>
+    // get class AnnualStatus.If text is Disable, add class="badge bg-light-warning text-warning w-100", else add class="badge bg-light-success text-success w-100"
+    var annualStatus = document.getElementsByClassName("annualStatus");
+    for (var i = 0; i < annualStatus.length; i++) {
+        if (annualStatus[i].innerText == "False") {
+            annualStatus[i].classList.add("badge", "bg-light-warning", "text-warning", "w-100");
+            annualStatus[i].textContent = "Disable";
+        } else {
+            annualStatus[i].classList.add("badge", "bg-light-success", "text-success", "w-100");
+            annualStatus[i].textContent = "Active";
+        }
+    }
+
     function confirmDelete(title, id) {
         //SweeetAlert confirm
         Swal.fire({

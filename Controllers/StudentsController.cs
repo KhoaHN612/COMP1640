@@ -138,7 +138,9 @@ namespace COMP1640.Controllers
         public IActionResult FromCreateSubmission()
         {
             ViewData["Title"] = "From Submission";
-            var annualMagazines = _context.AnnualMagazines.ToList();
+            var annualMagazines = _context.AnnualMagazines
+                             .Where(m => m.IsActive == true)
+                             .ToList();
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
@@ -153,7 +155,7 @@ namespace COMP1640.Controllers
             if (academicYear != null)
             {
                 ViewBag.academicYear = academicYear;
-            }
+            }   
             return View("~/Views/managers/student/student_edit_submission.cshtml", contribution);
         }
 

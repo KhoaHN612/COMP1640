@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP1640.Migrations
 {
     [DbContext(typeof(Comp1640Context))]
-    [Migration("20240317102937_finalAdd3")]
-    partial class finalAdd3
+    [Migration("20240319161756_AnnualMagazine add status")]
+    partial class AnnualMagazineaddstatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,6 +125,10 @@ namespace COMP1640.Migrations
                     b.Property<DateOnly?>("FinalClosureDate")
                         .HasColumnType("date")
                         .HasColumnName("finalClosureDate");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("isActive");
 
                     b.Property<DateOnly?>("SubmissionClosureDate")
                         .HasColumnType("date")
