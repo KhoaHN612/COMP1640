@@ -17,15 +17,18 @@ namespace COMP1640.Controllers
     {
         private readonly UserManager<COMP1640User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+
+        private readonly IEmailSenderCustom _emailSender;
         private readonly Comp1640Context _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         public ManagersController(Comp1640Context context, IWebHostEnvironment webHostEnvironment,
-         UserManager<COMP1640User> UserManager, RoleManager<IdentityRole> roleManager)
+         UserManager<COMP1640User> UserManager, RoleManager<IdentityRole> roleManager, IEmailSenderCustom EmailSender)
         {
             _roleManager = roleManager;
             _userManager = UserManager;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
+            _emailSender = EmailSender;
         }
         //================================ ADMIN ================================//
         public async Task<IActionResult> CreateRole()
@@ -41,6 +44,13 @@ namespace COMP1640.Controllers
                     roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }
+            return RedirectToAction("TableUser");
+        }
+
+        public IActionResult TestEmail()
+        {
+            var message = new Message(new string[] { "comp1640k@gmail.com" }, "Test async email", "This is the content from our async email.");
+            _emailSender.SendEmail(message);
             return RedirectToAction("TableUser");
         }
 
@@ -60,12 +70,6 @@ namespace COMP1640.Controllers
                 contributionFaculty = jsonResult.Value as List<ContributionFaculty>;
             }
 
-            //Print
-            foreach (var item in contributionFaculty)
-            {
-                System.Console.WriteLine($"Faculty: {item.Faculty}, Total: {item.Total}, Date: {item.SubmissionDate}");
-            }
-
             //GET ALL YEARS
             List<int> years = await _context.Contributions
                 .Select(c => c.SubmissionDate.Year)
@@ -74,7 +78,7 @@ namespace COMP1640.Controllers
 
 
             //GET CONTRIBUTIONS BY YEAR
-            List<ContributionDate> ContributionDate = new List<ContributionDate>();
+            List<ContributionDate> ContributionByYear = new List<ContributionDate>();
             int selectedYear = DateTime.Now.Year;
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
@@ -82,7 +86,7 @@ namespace COMP1640.Controllers
 
             if (yearResult is JsonResult jsonYearResult)
             {
-                ContributionDate = jsonYearResult.Value as List<ContributionDate>;
+                ContributionByYear = jsonYearResult.Value as List<ContributionDate>;
             }
 
 
@@ -110,7 +114,7 @@ namespace COMP1640.Controllers
 
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
-            ViewData["ContributionYear"] = ContributionDate;
+            ViewData["ContributionByYear"] = ContributionByYear;
             ViewData["ContributionUser"] = ContributionUser;
             ViewData["RoleStatistics"] = roleStatistics;
 
@@ -458,20 +462,20 @@ namespace COMP1640.Controllers
                 }
             }
 
-            return RedirectToAction("FormCreateUser");
-            // // If ModelState is invalid, return to the create user form with errors
-            // ViewData["Title"] = "Create User page";
-            // ViewBag.Roles = _roleManager.Roles.ToList();
-            // var faculties = _context.Faculties.ToList();
-            // if (faculties != null && faculties.Any())
-            // {
-            //     ViewBag.FacultyId = new SelectList(faculties, "FacultyId", "Name");
-            // }
-            // else
-            // {
-            //     ViewBag.FacultyId = new SelectList(new List<Faculty>(), "FacultyId", "Name");
-            // }
-            // return View("admins/form_create_user", model);
+            // return RedirectToAction("FormCreateUser");
+            // If ModelState is invalid, return to the create user form with errors
+            ViewData["Title"] = "Create User page";
+            ViewBag.Roles = _roleManager.Roles.ToList();
+            var faculties = _context.Faculties.ToList();
+            if (faculties != null && faculties.Any())
+            {
+                ViewBag.FacultyId = new SelectList(faculties, "FacultyId", "Name");
+            }
+            else
+            {
+                ViewBag.FacultyId = new SelectList(new List<Faculty>(), "FacultyId", "Name");
+            }
+            return View("admins/form_create_user", model);
         }
 
         public async Task<IActionResult> IndexCooridinators(string task, string year)
@@ -632,7 +636,7 @@ namespace COMP1640.Controllers
 
             return View("coordinators/student_submission", contributions);
         }
-        public async Task<IActionResult> CoordinatorComment(int? id)
+         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
             var contribution = await _context.Contributions.FindAsync(id);
@@ -951,6 +955,7 @@ namespace COMP1640.Controllers
             return View("profile_managers");
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status)
@@ -981,43 +986,43 @@ namespace COMP1640.Controllers
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
-       [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> UpdateComment(Contribution contribution)
-{
-    
-    var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
-    if (existingContribution != null)
-    {
-        // Tìm user và contribution tương ứng
-        var user = await _context.Users.FindAsync(existingContribution.UserId);
-        var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
-
-        // Tạo một đối tượng Comment mới
-        var newComment = new Comment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateComment(Contribution contribution)
         {
-            UserId = user.Id,
-            ContributionId = contribution.ContributionId,
-            CommentField = contribution.Comment, // Sử dụng comment từ contribution được gửi lên
-            CommentDate = DateTime.Now // Đặt ngày bình luận là ngày hiện tại
-        };
 
-        // Thêm Comment mới vào cơ sở dữ liệu
-        _context.Comments.Add(newComment);
-        await _context.SaveChangesAsync();
+            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+            if (existingContribution != null)
+            {
+                // Tìm user và contribution tương ứng
+                var user = await _context.Users.FindAsync(existingContribution.UserId);
+                var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
 
-        // Lấy danh sách comment cho contribution này
-        var comments = await _context.Comments
-            .Where(c => c.ContributionId == contribution.ContributionId)
-            .ToListAsync();
+                // Tạo một đối tượng Comment mới
+                var newComment = new Comment
+                {
+                    UserId = user.Id,
+                    ContributionId = contribution.ContributionId,
+                    CommentField = contribution.Comment, // Sử dụng comment từ contribution được gửi lên
+                    CommentDate = DateTime.Now // Đặt ngày bình luận là ngày hiện tại
+                };
 
-        ViewBag.Comments = comments;
+                // Thêm Comment mới vào cơ sở dữ liệu
+                _context.Comments.Add(newComment);
+                await _context.SaveChangesAsync();
 
-        return RedirectToAction("StudentSubmissionCoordinators");
-    }
+                // Lấy danh sách comment cho contribution này
+                var comments = await _context.Comments
+                    .Where(c => c.ContributionId == contribution.ContributionId)
+                    .ToListAsync();
 
-    return RedirectToAction("StudentSubmissionCoordinators", "Managers");
-}
+                ViewBag.Comments = comments;
+
+                return RedirectToAction("StudentSubmissionCoordinators");
+            }
+
+            return RedirectToAction("StudentSubmissionCoordinators", "Managers");
+        }
 
 
 

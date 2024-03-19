@@ -14,12 +14,12 @@
             <div class="col-md-12">
                 <section id="my-account">
                     <ul class="nav nav-tabs" id="tabs">
-                        <li class="active"><a href="#tab-profile" data-toggle="tab">Profile</a></li>
-                        <li><a href="#tab-my-courses" data-toggle="tab">My Submissions</a></li>
+                        <li class="active"><a href="#tab-profile" data-toggle="tab">My Submissions</a></li>
+                        <li><a href="#tab-my-courses" data-toggle="tab">Profile</a></li>
                         <li><a href="#tab-change-password" data-toggle="tab">Change Password</a></li>
                     </ul><!-- /#my-profile-tabs -->
                     <div class="tab-content my-account-tab-content">
-                        <div class="tab-pane active" id="tab-profile">
+                        <div class="tab-pane" id="tab-my-courses">
                             <form asp-action="UpdateProfile" id="profile-form" enctype="multipart/form-data">
                                 <input type="hidden" id="userId" name="id" value="@ViewBag.userId">
                                 <!-- Thêm form tag với method POST và enctype cho file upload -->
@@ -97,7 +97,8 @@
                                 </section>
                             </form>
                         </div><!-- /tab-pane -->
-                        <div class="tab-pane" id="tab-my-courses">
+
+                        <div class="tab-pane active" id="tab-profile">
                             <section id="course-list">
                                 <header>
                                     <h3>My Submissions</h3>

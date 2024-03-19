@@ -26,7 +26,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="p-4 border rounded">
-                        <form asp-controller="Students" asp-action="EditSubmission" enctype='multipart/form-data' class="row g-3" method="post">
+                        <form asp-controller="Students" asp-action="EditSubmission" enctype='multipart/form-data'
+                            class="row g-3" method="post">
                             <input type="hidden" name="id" value="@Model.ContributionId">
                             <div class="col-md-4">
                                 <label asp-for='Title' for="annualMagazineId" class="form-label">Title</label>
@@ -42,8 +43,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label" for="inputGroupFile01">Upload</label>
-                                <input type="file" name='ContributionFile' class="form-control"
-                                    required>
+                                <input type="file" name='ContributionFile' class="form-control" required>
                             </div>
 
                             <div class=" col-md-6">

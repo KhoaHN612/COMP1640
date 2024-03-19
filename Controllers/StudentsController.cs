@@ -16,14 +16,16 @@ namespace COMP1640.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<StudentsController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
         private readonly UserManager<COMP1640User> _userManager;
-
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailSenderCustom _emailSender;
         public StudentsController(Comp1640Context context,
             IWebHostEnvironment webHostEnvironment,
             ILogger<StudentsController> logger,
             IHttpContextAccessor httpContextAccessor,
-            UserManager<COMP1640User> userManager
+            UserManager<COMP1640User> userManager,
+            RoleManager<IdentityRole> RoleManager,
+            IEmailSenderCustom EmailSender
            )
         {
             _logger = logger;
@@ -31,6 +33,8 @@ namespace COMP1640.Controllers
             _webHostEnvironment = webHostEnvironment;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
+            _roleManager = RoleManager;
+            _emailSender = EmailSender;
         }
         private async Task<string> GetUserFullName()
         {
@@ -198,7 +202,56 @@ namespace COMP1640.Controllers
             _context.Add(contribution);
             _context.Add(fileDetail);
             var result = await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (result > 0)
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+
+                if (currentUser == null)
+                {
+                    return NotFound("User not found.");
+                }
+
+                // Get the Faculty ID of the current user
+                var facultyId = currentUser.FacultyId;
+
+                // Get the role ID for "Coordinator"
+                var coordinatorRole = (await _roleManager.FindByNameAsync("Coordinator"));
+
+                if (facultyId != null && coordinatorRole != null)
+                {
+                    // // Retrieve users with the same Faculty and "Coordinator" role
+                    // var coordinators = await _userManager.Users
+                    //     .Include(u => u.Faculty) // Eager load the Faculty navigation property
+                    //     .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
+                    //     .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result) // Check if user has the "Coordinator" role
+                    //     .ToListAsync();
+
+                    var sameFacultyUsers = await _userManager.Users
+                        .Include(u => u.Faculty) // Eager load the Faculty navigation property
+                        .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
+                        .ToListAsync();
+
+                    // Filter users who have the "Coordinator" role
+                    var coordinators = sameFacultyUsers
+                        .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result)
+                        .ToList();
+
+                    var coordinatorEmails = coordinators.Select(u => u.Email).ToArray();
+                    var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
+
+                    string body = "Title: New Contribution\n" +
+                    "Dear sir/madam, \n" +
+                    "There are new contribution(s) for the annual magazine.\n" +
+                    "- Name Contribution: " + contribution.Title + "\n" +
+                    "- Annual Magazine name:" + annualMagazine.Title + "\n" +
+                    "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
+                    "Sincerely, \n" +
+                    "Developer team";
+                    var message = new Message(coordinatorEmails, "New Contribution", body);
+                    await _emailSender.SendEmailAsync(message);
+                }
+            }
+            return RedirectToAction(nameof(MyAccount));
         }
 
         // POST: StudentsController/Edit/5
@@ -314,7 +367,40 @@ namespace COMP1640.Controllers
                 ViewBag.userFullName = userFullName;
             }
             var contribution = await _context.Contributions.FindAsync(id);
+            var comments = await _context.Comments
+                                .Where(c => c.ContributionId == id)
+                                .ToListAsync();
+
+            var contributions = _context.Contributions.ToList();
+            var userId = _userManager.GetUserId(User);
+            var anotherUserId = userId;
+            var user = await _userManager.FindByIdAsync(userId);
+            var userAddress = user.Address;
+            var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == user.FacultyId);
+            var userFaculty = facultyName != null ? facultyName.Name : null;
+            var userEmail = user.Email;
+            var userProfileImagePath = user.ProfileImagePath;
+            if (contribution != null)
+            {
+                var submissionDate = contribution.SubmissionDate;
+                var deadline = submissionDate.AddDays(14);
+                if (deadline >= submissionDate)
+                {
+                    ViewBag.Deadline = deadline;
+                }
+            }
+            ViewBag.userEmail = userEmail;
+            ViewBag.contributions = contributions;
+            ViewBag.userFaculty = userFaculty;
+            ViewBag.userId = anotherUserId;
+            ViewBag.contributionUserId = contribution.UserId;
+            ViewBag.contributionsTile = contribution.Title;
+            ViewBag.userFullName = userFullName;
+            ViewBag.userAddress = userAddress;
+            ViewBag.userProfileImagePath = userProfileImagePath;
+            ViewBag.Comments = comments;
             return View(contribution);
+
         }
 
         public async Task<IActionResult> PostLists()
@@ -338,5 +424,33 @@ namespace COMP1640.Controllers
             }
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateComment(Contribution contribution)
+        {
+            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+            if (existingContribution != null)
+            {
+                var user = await _context.Users.FindAsync(existingContribution.UserId);
+                var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
+                var newComment = new Comment
+                {
+                    UserId = user.Id,
+                    ContributionId = contribution.ContributionId,
+                    CommentField = contribution.Comment, 
+                    CommentDate = DateTime.Now 
+                };
+                _context.Comments.Add(newComment);
+                await _context.SaveChangesAsync();
+                var comments = await _context.Comments
+                    .Where(c => c.ContributionId == contribution.ContributionId)
+                    .ToListAsync();
+                ViewBag.Comments = comments;
+                return RedirectToAction("SubmissionDetail", "Students", new { id = contribution.ContributionId });
+            }
+            return View(contribution);
+        }
+
     }
 }

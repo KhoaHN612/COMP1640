@@ -15,9 +15,9 @@
                                 <p>Total Contributions</p>
                                 <h4 class="" id="totalArticles">0 article</h4>
                             </div>
-                            <div class="w-50">
+                            <div class="w-5">
                                 <div id="chart5"></div>
-                                @foreach (var item in ViewBag.ContributionYear)
+                                 @foreach (var item in ViewBag.ContributionByYear)
                                 {
                                     <div class="contribution-item" data-month="@item.Month" data-total="@item.TotalByMonth"></div>
                                 }
@@ -27,7 +27,7 @@
                                 <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
                                     @foreach (var item in ViewBag.Years)
                                     {
-                                        if (item == ViewBag.ContributionYear[0].Year)
+                                        if (item == ViewBag.ContributionByYear[0].Year)
                                         {
                                             <option value="@item" selected>@item</option>
                                         }
@@ -87,14 +87,12 @@
                             </div>
                         </div>
                         <div class="row m-2 align-items-center justify-content-center my-3">
-                            <div class="col-6 col-lg-6 col-xl-8 align-items-center">
-                                <div class="by-device-container">
-                                    <div class="piechart-legend" id="piechart">
-                                        <h2 class="mb-1" id="percent">0%</h2>
-                                        <h6 class="mb-0" id="falcuty">No Faculty</h6>
-                                    </div>
-                                    <canvas id="chart6"></canvas>
+                            <div class="by-device-container">
+                                <div class="piechart-legend" id="piechart">
+                                    <h2 class="mb-1" id="percent">0%</h2>
+                                    <h6 class="mb-0" id="falcuty">No Faculty</h6>
                                 </div>
+                                <canvas id="chart6"></canvas>
                             </div> 
                             <div id="contributionFaculty"
                                     data-contributionfaculty='@Html.Raw(Json.Serialize(ViewData["ContributionFaculty"]))'>

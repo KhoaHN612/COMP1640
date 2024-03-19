@@ -658,7 +658,9 @@ function GetContributionByFaculty() {
 					document.getElementById('percent').innerText = lstPercent[index] + '%';
 				}
 			  }
-			}
+			},
+			with: 500,
+			height: 500
 	  });
 
 		// Display chart 
