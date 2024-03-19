@@ -59,9 +59,9 @@
                                         data-bs-toggle="tooltip" 
                                         data-bs-placement="bottom" 
                                         title="Edit"><i class="bi bi-pencil-fill"></i></a>
-                                        <a href="#" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" onclick="confirmDelete(@annualMagazine.AnnualMagazineId)">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </a>
+                                        <a href="#" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" onclick="confirmDelete('@annualMagazine.Title', @annualMagazine.AnnualMagazineId)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -85,19 +85,30 @@
 </main>
 <!--end page main-->
 <script>
-    function confirmDelete(id) {
-        if (confirm('Are you sure you want to delete this item?')) {
-            fetch('@Url.Action("DeleteAnnualMagazine", "Managers")/' + id, {
+    function confirmDelete(title, id) {
+        //SweeetAlert confirm
+        Swal.fire({
+            title: 'Are you sure \"' + title + '\" ?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#9C9C9C',
+            confirmButtonText: 'Delete'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('@Url.Action("DeleteAnnualMagazine", "Managers")/' + id, {
                 method: 'DELETE'
-            }).then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    console.error('Failed to delete item.');
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-            });
-        }
+                }).then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        console.error('Failed to delete item.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
     }
 </script>

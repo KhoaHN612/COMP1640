@@ -628,35 +628,10 @@ function GetContributionByFaculty() {
 			lstPercent.push(((arrDataChart6[1][i] / sum) * 100).toFixed(2));
 		}
 
-		// Create the chart
-		// var chart = new Chart(document.getElementById('chart6'), {
-		// 	type: 'doughnut',
-		// 	data: {
-		// 		labels: arrDataChart6[0],
-		// 		datasets: [{
-		// 			backgroundColor: backgroundColors,
-		// 			data: arrDataChart6[1]
-		// 		}]
-		// 	},
-		// 	options: {
-		// 		maintainAspectRatio: false,
-		// 		cutoutPercentage: 85,
-		// 		responsive: true,
-		// 		legend: {
-		// 			display: true,
-		// 			position: 'right',
-		// 		}
-		// 		// onHover: function(event, elements) {
-		// 		// 	if (elements.length > 0) {
-		// 		// 		var index = elements[0]._index; // Lấy chỉ mục của phần tử được nhấp
-		// 		// 		var label = this.data.labels[index]; // Lấy nhãn tương ứng với chỉ mục
-		// 		// 		//check index in lstLabels after that display percent at this index
-		// 		// 		document.getElementById('falcuty').innerText = arrDataChart6[0][index];
-		// 		// 		document.getElementById('percent').innerText = lstPercent[index] + '%';
-		// 		// 	}
-		// 		// }
-		// 	}
-		// });
+		//Lấy phần tử đầu tiên hiển thị phần trăm và tên faculty
+		document.getElementById('falcuty').innerText = arrDataChart6[0][0];
+		document.getElementById('percent').innerText = lstPercent[0] + '%';
+
 		var chart = new Chart(document.getElementById('chart6'), {
 			type: 'doughnut',
 			data: {
@@ -674,9 +649,19 @@ function GetContributionByFaculty() {
 			  legend: {
 				display: true,
 				position: 'right'
+			  },
+			  onHover: function (event, chartElement) {
+				if (chartElement.length > 0) {
+					var index = chartElement[0]._index; // Lấy chỉ mục của phần tử được nhấp
+					//check index in lstLabels after that display percent at this index
+					document.getElementById('falcuty').innerText = arrDataChart6[0][index];
+					document.getElementById('percent').innerText = lstPercent[index] + '%';
+				}
 			  }
-			}
-		  });
+			},
+			with: 500,
+			height: 500
+	  });
 
 		// Display chart 
 		chart.render();
