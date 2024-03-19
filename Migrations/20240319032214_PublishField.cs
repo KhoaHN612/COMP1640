@@ -5,7 +5,7 @@
 namespace COMP1640.Migrations
 {
     /// <inheritdoc />
-    public partial class finalAdd3 : Migration
+    public partial class PublishField : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

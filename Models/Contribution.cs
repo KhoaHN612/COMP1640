@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -28,6 +28,9 @@ public partial class Contribution
 
     [Column("comment")]
     public string? Comment { get; set; }
+
+    [Column("isPublished")]
+    public bool IsPublished { get; set; }
 
     [Column("status")]
     [StringLength(10)]

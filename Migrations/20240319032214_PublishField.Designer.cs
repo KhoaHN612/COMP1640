@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP1640.Migrations
 {
     [DbContext(typeof(Comp1640Context))]
-    [Migration("20240317102937_finalAdd3")]
-    partial class finalAdd3
+    [Migration("20240319032214_PublishField")]
+    partial class PublishField
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -139,7 +139,9 @@ namespace COMP1640.Controllers
         public IActionResult FromCreateSubmission()
         {
             ViewData["Title"] = "From Submission";
-            var annualMagazines = _context.AnnualMagazines.ToList();
+            var annualMagazines = _context.AnnualMagazines
+                             .Where(m => m.IsActive == true)
+                             .ToList();
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
@@ -154,7 +156,7 @@ namespace COMP1640.Controllers
             if (academicYear != null)
             {
                 ViewBag.academicYear = academicYear;
-            }
+            }   
             return View("~/Views/managers/student/student_edit_submission.cshtml", contribution);
         }
 
@@ -509,5 +511,33 @@ namespace COMP1640.Controllers
             }
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateComment(Contribution contribution)
+        {
+            var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
+            if (existingContribution != null)
+            {
+                var user = await _context.Users.FindAsync(existingContribution.UserId);
+                var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
+                var newComment = new Comment
+                {
+                    UserId = user.Id,
+                    ContributionId = contribution.ContributionId,
+                    CommentField = contribution.Comment, 
+                    CommentDate = DateTime.Now 
+                };
+                _context.Comments.Add(newComment);
+                await _context.SaveChangesAsync();
+                var comments = await _context.Comments
+                    .Where(c => c.ContributionId == contribution.ContributionId)
+                    .ToListAsync();
+                ViewBag.Comments = comments;
+                return RedirectToAction("SubmissionDetail", "Students", new { id = contribution.ContributionId });
+            }
+            return View(contribution);
+        }
+
     }
 }
