@@ -15,6 +15,4 @@ $(function() {
         table.buttons().container()
             .appendTo( '#example2_wrapper .col-md-6:eq(0)' );
     } );
-
-
 });

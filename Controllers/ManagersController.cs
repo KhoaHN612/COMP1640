@@ -70,12 +70,6 @@ namespace COMP1640.Controllers
                 contributionFaculty = jsonResult.Value as List<ContributionFaculty>;
             }
 
-            //Print
-            foreach (var item in contributionFaculty)
-            {
-                System.Console.WriteLine($"Faculty: {item.Faculty}, Total: {item.Total}, Date: {item.SubmissionDate}");
-            }
-
             //GET ALL YEARS
             List<int> years = await _context.Contributions
                 .Select(c => c.SubmissionDate.Year)
@@ -84,7 +78,7 @@ namespace COMP1640.Controllers
 
 
             //GET CONTRIBUTIONS BY YEAR
-            List<ContributionDate> ContributionDate = new List<ContributionDate>();
+            List<ContributionDate> ContributionByYear = new List<ContributionDate>();
             int selectedYear = DateTime.Now.Year;
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
@@ -92,7 +86,7 @@ namespace COMP1640.Controllers
 
             if (yearResult is JsonResult jsonYearResult)
             {
-                ContributionDate = jsonYearResult.Value as List<ContributionDate>;
+                ContributionByYear = jsonYearResult.Value as List<ContributionDate>;
             }
 
 
@@ -120,7 +114,7 @@ namespace COMP1640.Controllers
 
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
-            ViewData["ContributionYear"] = ContributionDate;
+            ViewData["ContributionByYear"] = ContributionByYear;
             ViewData["ContributionUser"] = ContributionUser;
             ViewData["RoleStatistics"] = roleStatistics;
 

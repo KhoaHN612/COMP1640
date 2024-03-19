@@ -831,13 +831,13 @@ a {
 
 .by-device-container {
     position: relative;
-    height: 260px;
+    height: 260px;	
 }
 
 .piechart-legend {
 	position: absolute;
-    top: 50%;
-    left: 34%;
+    top: 53%;
+    left: 30%;
 	transform: translate(-50%, -50%);
 	text-align: center;
 }

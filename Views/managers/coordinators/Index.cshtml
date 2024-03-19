@@ -24,40 +24,42 @@
                             </select>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-5 justify-content-center mt-3 p-2 radius-10 border">
-                        <div class="text-center">
-                            <h3 class="mb-2 text-primary" id="totalContributions">0 article</h3>
-                            <p class="mb-0">Total contribution</p>
-                        </div>                        
-                        <div id="totalContributionData"
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary" id="totalContributions">0 article</h3>
+                                <p class="mb-0">Total contribution</p>
+                            </div>
+                            <div id="totalContributionData"
                                 data-totalcontribution='@Html.Raw(Json.Serialize(ViewData["TotalContribution"]))'>
+                            </div>
                         </div>
-                        
-                        <div class="border-end sepration"></div>
-                        <div class="text-center">
-                            <h3 class="mb-2 text-primary-2" id="totalAccepted">0 article</h3>
-                            <p class="mb-0">Contribution Accepted</p>
-                        </div>                        
-                        <div id="totalAcceptedData"
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary-2" id="totalAccepted">0 article</h3>
+                                <p class="mb-0">Contribution Accepted</p>
+                            </div>
+                            <div id="totalAcceptedData"
                                 data-totalaccepted='@Html.Raw(Json.Serialize(ViewData["TotalContributionsAccepted"]))'>
+                            </div>
                         </div>
-                        
-                        <div class="border-end sepration"></div>
-                        <div class="text-center">
-                            <h3 class="mb-2 text-primary-2" id="totalRejected">0 article</h3>
-                            <p class="mb-0">Contribution Rejected</p>
-                        </div>                     
-                        <div id="totalRejectedData"
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary-2" id="totalRejected">0 article</h3>
+                                <p class="mb-0">Contribution Rejected</p>
+                            </div>
+                            <div id="totalRejectedData"
                                 data-totalrejected='@Html.Raw(Json.Serialize(ViewData["TotalContributionsRejected"]))'>
+                            </div>
                         </div>
-                        
-                        <div class="border-end sepration"></div>
-                        <div class="text-center">
-                            <h3 class="mb-2 text-primary-2" id="totalPending">0 article</h3>
-                            <p class="mb-0">Contribution Pending</p>
-                        </div>                        
-                        <div id="totalPendingData"
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary-2" id="totalPending">0 article</h3>
+                                <p class="mb-0">Contribution Pending</p>
+                            </div>
+                            <div id="totalPendingData"
                                 data-totalpending='@Html.Raw(Json.Serialize(ViewData["TotalContributionsPending"]))'>
+                            </div>
                         </div>
                     </div>
                 </div>
