@@ -1,0 +1,95 @@
+@model COMP1640.Models.Post
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+</head>
+<body>
+
+<main class="page-content">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <div class="breadcrumb-title pe-3">Forms</div>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCooridinators"><i
+                                class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active"><a asp-controller="Managers"
+                            asp-action="TablePost">List post</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">From @ViewData["Title"]</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-9 mx-auto">
+            <h6 class="mb-0 text-uppercase">@ViewData["Title"] Form</h6>
+            <hr />
+            <div class="card">
+                <div class="card-body">
+                    <div class="border p-4 rounded">
+                        <!-- Start of form -->
+                        <form asp-action="Edit" asp-controller="Post" method="Post">
+                            <div class="card-title d-flex align-items-center">
+                                <h5 class="mb-0">>@ViewData["Title"] Registration</h5>
+                            </div>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <hr />
+
+                            <input asp-for="PostId" type="hidden"/>
+
+                            <!-- Name Input -->
+                            <div class="row mb-3">
+                                <label asp-for="Title" class="col-sm-3 col-form-label">
+                                    Post title
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" asp-for="Title" placeholder="Enter title">
+                                </div>
+                            </div>
+                            <!-- Content Input -->
+                            <div class="row mb-3">
+                                <label asp-for="Content"
+                                        class="col-sm-3 col-form-label">Content</label>
+                                <div class="col-sm-9">
+                                    <textarea class="form-control" asp-for="Content"
+                                            rows="3" placeholder="Content"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="PostedAt"
+                                        class="col-sm-3 col-form-label">Content</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="PostedAt" class="form-control" type ="datetime-local" readonly/>
+                                </div>
+                            </div>
+
+                            <input asp-for="UserId" type="hidden"/>
+
+                            <!-- Submit Button -->
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-9">
+                                    <input type="submit" value="Update" class="btn btn-primary px-5" />
+                                </div>
+                            </div>
+                        </form>
+                        <!-- End of form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+</body>
+</html>

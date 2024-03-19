@@ -1,0 +1,77 @@
+@model IEnumerable<COMP1640.Models.Post>
+
+@{
+    Layout = "~/Views/Shared/_Layout_Students.cshtml";
+}
+
+<style>
+    .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
+        height: 10px !important;
+    }
+
+    .vertical-center {
+        bottom: 0;
+        margin: auto;
+        top: 5vw;
+        position: absolute;
+    }
+</style>
+@* <!-- Breadcrumb -->
+<div class="container">
+<ol class="breadcrumb">
+<li><a href="#">Home</a></li>
+<li><a href="#">Library</a></li>
+<li class="active">Data</li>
+</ol>
+</div> *@
+<!-- end Breadcrumb -->
+
+<!-- Page Content -->
+<div id="page-content">
+    <div class="container">
+        <div class="row">
+            <!--MAIN Content-->
+            <div class="col-md-12">
+                <div id="page-main">
+                    <section class="events" id="events">
+                        <header>
+                            <h1>Post List</h1>
+                        </header>
+                        <div class="section-content">
+                            @foreach (var item in Model)
+                            {
+                                <article class="event">
+                                    <figure class="date">
+                                        <div class="month">jan</div>
+                                        <div class="day">18</div>
+                                    </figure>
+                                    <aside>
+                                        <header>
+                                            <a href="event-detail.html">@item.Title</a>
+                                        </header>
+                                        <div class="additional-info"><span class="fa fa-map-marker"></span>@item.User.FullName</div>
+                                        <div class="description">
+                                            <p>@item.Content
+                                            </p>
+                                        </div>
+                                        <a asp-action="PostDetail" asp-controller="Post" asp-route-id="@item.PostId" class="btn btn-framed btn-color-grey btn-small">View Details</a>
+                                    </aside>
+                                </article>
+
+                                <!-- /article -->
+                            }
+                        </div><!-- /.section-content -->
+                    </section><!-- /.events -->
+                    <div class="center">
+                        <ul class="pagination">
+                            <li class="active"><a href="#">1</a></li>
+                            <li><a href="#">2</a></li>
+                            <li><a href="#">3</a></li>
+                        </ul>
+                    </div>
+                </div><!-- /#page-main -->
+            </div><!-- /.col-md-8 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</div>
+<!-- end Page Content -->
