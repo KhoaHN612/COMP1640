@@ -768,7 +768,7 @@ function ContributionAnalysisChart() {
 			chart: {
 			height: 350,
 			type: 'line',
-			stacked: false,
+			stacked: true,
 		  },
 		  stroke: {
 			width: [0, 2, 5],
@@ -776,7 +776,7 @@ function ContributionAnalysisChart() {
 		  },
 		  plotOptions: {
 			bar: {
-			  columnWidth: '50%'
+			  columnWidth: '70%'
 			}
 		  },
 		  
@@ -800,7 +800,7 @@ function ContributionAnalysisChart() {
 		  },
 		  yaxis: {
 			title: {
-			  text: 'Points',
+			  text: 'Articles',
 			},
 			min: 0
 		  },
@@ -810,7 +810,7 @@ function ContributionAnalysisChart() {
 			y: {
 			  formatter: function (y) {
 				if (typeof y !== "undefined") {
-				  return y.toFixed(0) + " points";
+				  return y.toFixed(0) + " aricles";
 				}
 				return y;
 		  

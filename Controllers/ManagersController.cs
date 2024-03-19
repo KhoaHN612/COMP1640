@@ -59,16 +59,10 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "Dashboard";
 
             // GET CONTRIBUTION BY FACULTY
-            List<ContributionFaculty> contributionFaculty = new List<ContributionFaculty>();
             DateTime currentDate = DateTime.Now;
 
             if (task == "ContributionFaculty" && !string.IsNullOrEmpty(year)) { currentDate = new DateTime(Convert.ToInt32(year), 1, 1); }
-            var result = await GetContributionByFaculty(currentDate);
-
-            if (result is JsonResult jsonResult)
-            {
-                contributionFaculty = jsonResult.Value as List<ContributionFaculty>;
-            }
+            List<ContributionFaculty> contributionFaculty = await GetContributionByFaculty(currentDate);
 
             //GET ALL YEARS
             List<int> years = await _context.Contributions
@@ -78,38 +72,22 @@ namespace COMP1640.Controllers
 
 
             //GET CONTRIBUTIONS BY YEAR
-            List<ContributionDate> ContributionByYear = new List<ContributionDate>();
             int selectedYear = DateTime.Now.Year;
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
-            var yearResult = await GetContributionByYear(selectedYear);
-
-            if (yearResult is JsonResult jsonYearResult)
-            {
-                ContributionByYear = jsonYearResult.Value as List<ContributionDate>;
-            }
+            List<ContributionDate> ContributionByYear = await GetContributionByYear(selectedYear);
 
 
             //GET CONTRIBUTIONS BY USER
-            List<ContributionUser> ContributionUser = new List<ContributionUser>();
             int selectedYearUser = DateTime.Now.Year;
 
             if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
-            var userResult = await GetContributionByUser(selectedYearUser);
-
-            if (userResult is JsonResult jsonUserResult)
-            {
-                ContributionUser = jsonUserResult.Value as List<ContributionUser>;
-            }
-
+            List<ContributionUser> ContributionUser = await GetContributionByUser(selectedYearUser);
 
             //GET ROLE STATISTICS
-            List<RoleStatistics> roleStatistics = new List<RoleStatistics>();
-            var roleResult = await GetRoleStatistics();
-
-            if (roleResult is JsonResult jsonRoleResult)
-            {
-                roleStatistics = jsonRoleResult.Value as List<RoleStatistics>;
+            List<RoleStatistics> roleStatistics = await GetRoleStatistics();
+            foreach(var i in roleStatistics){
+                Console.WriteLine(i.Role + " - " + i.Total);
             }
 
             ViewData["ContributionFaculty"] = contributionFaculty;
@@ -122,7 +100,7 @@ namespace COMP1640.Controllers
         }
 
         //ContributionFaculty
-        public async Task<IActionResult> GetContributionByFaculty(DateTime date)
+        public async Task<List<ContributionFaculty>> GetContributionByFaculty(DateTime date)
         {
 
             /*SELECT COUNT(a.Id) AS 'Total', 
@@ -147,11 +125,11 @@ namespace COMP1640.Controllers
                 })
                 .ToListAsync();
 
-            return Json(contributions);
+            return contributions;
         }
 
         // ContributionYear
-        public async Task<IActionResult> GetContributionByYear(int year)
+        public async Task<List<ContributionDate>> GetContributionByYear(int year)
         {
             /*
             SELECT
@@ -181,11 +159,11 @@ namespace COMP1640.Controllers
                 .ThenBy(c => c.Month)
                 .ToListAsync();
 
-            return Json(contributions);
+            return contributions;
         }
 
         // Quantity of contributions by user
-        public async Task<IActionResult> GetContributionByUser(int year)
+        public async Task<List<ContributionUser>> GetContributionByUser(int year)
         {
             /*
             SELECT 
@@ -226,11 +204,11 @@ namespace COMP1640.Controllers
                 })
                 .ToListAsync();
 
-            return Json(contributions);
+            return contributions;
         }
 
         //Thống kê mỗi role có bao nhiêu người
-        public async Task<IActionResult> GetRoleStatistics()
+        public async Task<List<RoleStatistics>> GetRoleStatistics()
         {
             /*
             SELECT 
@@ -257,7 +235,7 @@ namespace COMP1640.Controllers
                 })
                 .ToListAsync();
 
-            return Json(roleStatistics);
+            return roleStatistics;
         }
 
         public IActionResult TableFaculty()
@@ -534,6 +512,7 @@ namespace COMP1640.Controllers
                 YEAR(c.submissionDate), c.submissionDate;
             */
 
+    
             List<ContributionWithoutComment> contributionWithoutComments =  await _context.Contributions
                 .Where(c => c.SubmissionDate.Year == DateTime.Now.Year && c.Comment == null)
                 .GroupBy(c => new { Date = c.SubmissionDate.Date})

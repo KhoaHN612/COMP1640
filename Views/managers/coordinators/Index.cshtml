@@ -6,7 +6,7 @@
         <div class="card radius-10 w-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
-                        <h6 class="mb-0">Contribution</h6>
+                        <h5 class="mb-0">Contribution</h5>
                         <!-- Select year, display current year first access-->
                         <div class="w-5"> 
                             <select class="form-select" id="yearCoordinator" aria-label="Default select example" onchange="SelectedYearInCoordinators(this.value)">
@@ -24,7 +24,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col-md-3 mb-3">
                             <div class="text-center p-3 border radius-10">
                                 <h3 class="mb-2 text-primary" id="totalContributions">0 article</h3>
@@ -70,7 +70,7 @@
         <div class="card radius-10 w-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <h6 class="mb-0">Contribution without Comment</h6>
+                        <h5 class="mb-0">Contribution without Comment in @ViewBag.Contributions[0].Date.Year</h5>
                     </div>                    
                      <div id="totalContributionsData"
                             data-totalcontributions='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'>

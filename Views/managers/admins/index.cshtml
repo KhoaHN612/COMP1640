@@ -15,14 +15,14 @@
                                 <p>Total Contributions</p>
                                 <h4 class="" id="totalArticles">0 article</h4>
                             </div>
-                            <div class="w-5">
+                            <div class="w-50">
                                 <div id="chart5"></div>
                                  @foreach (var item in ViewBag.ContributionByYear)
                                 {
                                     <div class="contribution-item" data-month="@item.Month" data-total="@item.TotalByMonth"></div>
                                 }
                             </div>
-                            <div class="w-50">
+                            <div class="w-5">
                                 <!-- Select year, display current year first access-->
                                 <select class="form-select" id="year" aria-label="Default select example" onchange="SelectedYear(this.value)">
                                     @foreach (var item in ViewBag.Years)
