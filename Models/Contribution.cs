@@ -38,9 +38,6 @@ public partial class Contribution
     public virtual AnnualMagazine AnnualMagazine { get; set; } = null!;
 
     [InverseProperty("Contribution")]
-    public virtual ICollection<FileDetail> FileDetails { get; set; } = new List<FileDetail>();
-
-    [InverseProperty("Contribution")]
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }
 

@@ -4,6 +4,7 @@ using COMP1640.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP1640.Migrations
 {
     [DbContext(typeof(Comp1640Context))]
-    partial class Comp1640ContextModelSnapshot : ModelSnapshot
+    [Migration("20240318185148_AllowNull")]
+    partial class AllowNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -269,6 +272,8 @@ namespace COMP1640.Migrations
                     b.HasKey("FileId")
                         .HasName("PK__FileDeta__C2C6FFDCE73A7F89");
 
+                    b.HasIndex(new[] { "ContributionId" }, "IX_FileDetails_contributionId");
+
                     b.ToTable("FileDetails");
                 });
 
@@ -448,6 +453,16 @@ namespace COMP1640.Migrations
                     b.Navigation("AnnualMagazine");
                 });
 
+            modelBuilder.Entity("COMP1640.Models.FileDetail", b =>
+                {
+                    b.HasOne("COMP1640.Models.Contribution", "Contribution")
+                        .WithMany("FileDetails")
+                        .HasForeignKey("ContributionId")
+                        .HasConstraintName("FK__FileDetai__contr__66603565");
+
+                    b.Navigation("Contribution");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -507,6 +522,8 @@ namespace COMP1640.Migrations
             modelBuilder.Entity("COMP1640.Models.Contribution", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("FileDetails");
                 });
 
             modelBuilder.Entity("COMP1640.Models.Faculty", b =>
