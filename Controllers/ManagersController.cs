@@ -1035,13 +1035,5 @@ namespace COMP1640.Controllers
                 return View();
             }
         }
-        public async Task<IActionResult> ShowPublish()
-        {
-             ViewData["Title"] = "Publish Contributions";
-            var publishedContributions = await _context.Contributions
-                .Where(c => c.IsPublished) 
-                .ToListAsync();
-            return View("coordinators/publishContribution", publishedContributions);
-        }
     }
 }
