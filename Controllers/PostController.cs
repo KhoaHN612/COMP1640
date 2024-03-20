@@ -21,12 +21,23 @@ namespace COMP1640.Controllers
             _context = context;
             _userManager = UserManager;
         }
-
+        private async Task<string> GetUserFullName()
+        {
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            return user?.FullName; // This will return null if user is null.
+        }
         // GET: Post
         public async Task<IActionResult> Index()
         {
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             var comp1640Context = _context.Posts.Include(p => p.User);
             return View(await comp1640Context.ToListAsync());
+            
         }
 
         // GET: Post/Details/5
@@ -36,7 +47,11 @@ namespace COMP1640.Controllers
             {
                 return NotFound();
             }
-
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             var post = await _context.Posts
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.PostId == id);
@@ -50,6 +65,11 @@ namespace COMP1640.Controllers
 
         public async Task<IActionResult> PostList()
         {
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             var comp1640Context = _context.Posts.Include(p => p.User);
             return View(await comp1640Context.ToListAsync());
         }
@@ -60,7 +80,11 @@ namespace COMP1640.Controllers
             {
                 return NotFound();
             }
-
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             var post = await _context.Posts
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.PostId == id);

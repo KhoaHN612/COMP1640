@@ -138,8 +138,8 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "From Submission";
             var annualMagazines = _context.AnnualMagazines
-                             .Where(m => m.IsActive == true)
-                             .ToList();
+                            .Where(m => m.IsActive == true)
+                            .ToList();
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
