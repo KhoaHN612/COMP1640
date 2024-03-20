@@ -602,10 +602,8 @@ namespace COMP1640.Controllers
             return contributions;
         }
 
-
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
-
             ViewData["Title"] = "List Submission";
 
             var currentUser = await _userManager.GetUserAsync(User);
@@ -616,12 +614,18 @@ namespace COMP1640.Controllers
             }
             var currentFacultyId = currentUser.FacultyId;
 
-            var usersInSameFaculty = _context.Users.Where(u => u.FacultyId == currentFacultyId);
+            var userIdsInSameFaculty = await _context.Users
+                .Where(u => u.FacultyId == currentFacultyId)
+                .Select(u => u.Id)
+                .ToListAsync();
 
-            var contributions = _context.Contributions.Where(c => usersInSameFaculty.Any(u => u.Id == c.UserId));
+            var contributions = await _context.Contributions
+                .Where(c => userIdsInSameFaculty.Contains(c.UserId))
+                .ToListAsync();
 
             return View("coordinators/student_submission", contributions);
         }
+
         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
