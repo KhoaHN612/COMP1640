@@ -54,7 +54,6 @@ function GetTotalContributionsData() {
 		var optionsPie = {
 			series: dataTotalPie[1],
 			chart: {
-				width: 500,
 				type: 'pie',
 			},
 			labels: dataTotalPie[0],
@@ -62,7 +61,7 @@ function GetTotalContributionsData() {
 				breakpoint: 480,
 				options: {
 					chart: {
-						width: 800
+						width: '100%'
 					},
 					legend: {
 						position: 'bottom'
@@ -206,7 +205,6 @@ function GetApprovedContributionData() {
 		var optionsPie = {
 			series: dataApprovedPie[1],
 			chart: {
-				width: 500,
 				type: 'pie',
 			},
 			labels: dataApprovedPie[0],
@@ -214,7 +212,7 @@ function GetApprovedContributionData() {
 				breakpoint: 480,
 				options: {
 					chart: {
-						width: 1000
+						width: '100%'
 					},
 					legend: {
 						position: 'bottom'
@@ -354,8 +352,6 @@ function GetRejectedContributionData() {
 		var optionsPie = {
 			series: dataRejectedPie[1],
 			chart: {
-				width
-				: 500,
 				type: 'pie',
 			},	
 			labels: dataRejectedPie[0],
@@ -363,7 +359,7 @@ function GetRejectedContributionData() {
 				breakpoint: 480,
 				options: {
 					chart: {
-						height: 800
+						height: '100%'
 					},
 					legend: {
 						position: 'bottom'
@@ -378,7 +374,7 @@ function GetRejectedContributionData() {
 			data: dataRejectedColumn[1]
 		}],
 			chart: {
-			height: 350,
+			height: 450,
 			type: 'bar',
 		},
 		plotOptions: {
@@ -503,7 +499,6 @@ function GetPendingContributionData() {
 		var optionsPie = {
 			series: dataPendingPie[1],
 			chart: {
-				width: 500,
 				type: 'pie',
 			},
 			labels: dataPendingPie[0],
@@ -511,7 +506,7 @@ function GetPendingContributionData() {
 				breakpoint: 480,
 				options: {
 					chart: {
-						width: 800
+						width: '100%'
 					},
 					legend: {
 						position: 'bottom'
