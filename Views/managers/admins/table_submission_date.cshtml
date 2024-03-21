@@ -47,7 +47,7 @@
                         }
                         @foreach (var annualMagazine in Model)
                         {
-                            <tr>
+                            <tr id="@annualMagazine.AnnualMagazineId">
                                 <td>@index</td>
                                 <td>@annualMagazine.AcademicYear</td>
                                 <td>@annualMagazine.Title</td>
@@ -105,19 +105,28 @@
         //SweeetAlert confirm
         Swal.fire({
             title: 'Are you sure \"' + title + '\" ?',
-            text: "You won't be able to revert this!",
+            text: "Note: Related Contributions will be deleted.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#0d6efd',
             cancelButtonColor: '#9C9C9C',
             confirmButtonText: 'Delete'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        }).then((result) => {         
+            if (result.isConfirmed) {                   
+                var trElement = document.getElementById(id).remove();
+                
                 fetch('@Url.Action("DeleteAnnualMagazine", "Managers")/' + id, {
                 method: 'DELETE'
                 }).then(response => {
-                    if (response.ok) {
-                        location.reload();
+                    if (response.ok) {;
+                        
+                        Swal.fire({
+                            position: "top-center",
+                            icon: "success",
+                            title: "Deleted successfully!",
+                            showConfirmButton: false,
+                            timer: 1500
+                            });
                     } else {
                         console.error('Failed to delete item.');
                     }
