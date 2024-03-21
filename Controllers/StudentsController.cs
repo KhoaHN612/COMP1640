@@ -58,12 +58,10 @@ namespace COMP1640.Controllers
         public async Task<IActionResult> SubmissionList()
         {
             ViewData["Title"] = "Submission List";
-            var userFullName = await GetUserFullName();
-            if (userFullName != null)
-            {
-                ViewBag.userFullName = userFullName;
-            }
-            return View();
+            var publishedContributions = await _context.Contributions
+                .Where(c => c.IsPublished) 
+                .ToListAsync();
+            return View("submissionList", publishedContributions);
         }
 
         // Action for the About Us page
@@ -140,8 +138,8 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "From Submission";
             var annualMagazines = _context.AnnualMagazines
-                             .Where(m => m.IsActive == true)
-                             .ToList();
+                            .Where(m => m.IsActive == true)
+                            .ToList();
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }

@@ -791,47 +791,50 @@ namespace COMP1640.Controllers
         }
         //DOWNLOAD ALL FILES
 
-        // [HttpGet]
-        // public async Task<IActionResult> DownloadAllApproved()
-        // {
-        //     var contributions = await _context.Contributions
-        //         .Where(c => c.Status == "Approved")
-        //         .Include(c => c.FileDetails)
-        //         .ToListAsync();
+        [HttpGet]
+        public async Task<IActionResult> DownloadAllApproved()
+        {
+            var approvedContributions = await _context.Contributions
+                .Where(c => c.Status == "Approved")
+                .ToListAsync();
 
-        //     var memoryStream = new MemoryStream();
-        //     try
-        //     {
-        //         using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, leaveOpen: true))
-        //         {
-        //             foreach (var contribution in contributions)
-        //             {
-        //                 foreach (var fileDetail in contribution.FileDetails)
-        //                 {
-        //                     var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", fileDetail.FilePath);
+            var memoryStream = new MemoryStream();
+            try
+            {
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, leaveOpen: true))
+                {
+                    foreach (var contribution in approvedContributions)
+                    {
+                        var fileDetails = await _context.FileDetails
+                            .Where(fd => fd.ContributionId == contribution.ContributionId)
+                            .ToListAsync();
 
-        //                     if (System.IO.File.Exists(filePath))
-        //                     {
-        //                         var entry = archive.CreateEntry(Path.GetFileName(filePath));
+                        foreach (var fileDetail in fileDetails)
+                        {
+                            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", fileDetail.FilePath);
 
-        //                         using (var entryStream = entry.Open())
-        //                         using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-        //                         {
-        //                             await fileStream.CopyToAsync(entryStream);
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //         memoryStream.Position = 0;
-        //         return File(memoryStream, "application/zip", "ApprovedFiles.zip");
-        //     }
-        //     catch
-        //     {
-        //         memoryStream.Close();
-        //         throw;
-        //     }
-        // }
+                            if (System.IO.File.Exists(filePath))
+                            {
+                                var entry = archive.CreateEntry(Path.GetFileName(filePath));
+
+                                using (var entryStream = entry.Open())
+                                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                                {
+                                    await fileStream.CopyToAsync(entryStream);
+                                }
+                            }
+                        }
+                    }
+                }
+                memoryStream.Position = 0;
+                return File(memoryStream, "application/zip", "ApprovedFiles.zip");
+            }
+            catch
+            {
+                memoryStream.Close();
+                throw;
+            }
+        }
         //================================ PROFILES ================================//
         public async Task<IActionResult> ShowProfileAsync()
         {
@@ -932,14 +935,6 @@ namespace COMP1640.Controllers
                 ModelState.AddModelError("", "Fail");
                 return View();
             }
-        }
-        public async Task<IActionResult> ShowPublish()
-        {
-             ViewData["Title"] = "Publish Contributions";
-            var publishedContributions = await _context.Contributions
-                .Where(c => c.IsPublished) 
-                .ToListAsync();
-            return View("coordinators/publishContribution", publishedContributions);
         }
     }
 }

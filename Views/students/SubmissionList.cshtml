@@ -1,5 +1,5 @@
-﻿
-
+﻿@model IEnumerable<COMP1640.Models.Contribution>
+@inject Microsoft.AspNetCore.Identity.UserManager<COMP1640.Areas.Identity.Data.COMP1640User> _userManager
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 10px !important;
@@ -21,10 +21,14 @@
             <div class="col-md-12">
                 <div id="page-main">
                     <section class="course-listing" id="courses">
-                        <header><h1>Submissions</h1></header>
+                        <header>
+                            <h1>Submissions</h1>
+                        </header>
                         <section id="course-search">
                             <div class="search-box">
-                                <header><span class="fa fa-search"></span><h2>Find your submission</h2></header>
+                                <header><span class="fa fa-search"></span>
+                                    <h2>Find your submission</h2>
+                                </header>
                                 <form id="course-search-form" role="form" class="form-inline">
                                     <div class="form-row">
                                         <div class="form-group">
@@ -47,7 +51,8 @@
                                         </div><!-- /.form-group -->
                                         <div class="form-group">
                                             <label for="full-text">Name Course</label>
-                                            <input name="full-text" id="full-text" placeholder="Enter Keyword" type="text">
+                                            <input name="full-text" id="full-text" placeholder="Enter Keyword"
+                                                type="text">
                                         </div><!-- /.form-group -->
                                     </div>
                                     <button type="submit" class="btn pull-right">Search</button>
@@ -59,67 +64,67 @@
                                 <table class="table table-hover course-list-table tablesorter">
                                     <thead>
                                         <tr>
-                                            <th>Course Name</th>
-                                            <th>Course Type</th>
-                                            <th class="starts">Starts</th>
-                                            <th class="length">Length</th>
+                                            <th>No</th>
+                                            <th>Contributions ID</th>
+                                            <th>Full Name</th>
+                                            <th>Title</th>
+                                            <th>Submission Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">Introduction to modo 701</a></th>
-                                            <th class="course-category"><a href="#">Graphic Design and 3D</a></th>
-                                            <th>01-03-2014</th>
-                                            <th>3 months</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">Become self marketer</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>03-03-2014</th>
-                                            <th>2 lessons</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">How to find long term customers</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>06-03-2014</th>
-                                            <th>1 month</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">Neuroscience and the future</a></th>
-                                            <th class="course-category"><a href="#">Science</a></th>
-                                            <th>21-03-2014</th>
-                                            <th>3 weeks</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">History in complex view</a></th>
-                                            <th class="course-category"><a href="#">History and Psychology</a></th>
-                                            <th>06-04-2014</th>
-                                            <th>1 lesson</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">Become self marketer</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>03-03-2014</th>
-                                            <th>2 lessons</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">How to find long term customers</a></th>
-                                            <th class="course-category"><a href="#">Marketing</a></th>
-                                            <th>06-03-2014</th>
-                                            <th>1 month</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">Neuroscience and the future</a></th>
-                                            <th class="course-category"><a href="#">Science</a></th>
-                                            <th>21-03-2014</th>
-                                            <th>3 weeks</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="course-title"><a href="course-detail-v1.html">History in complex view</a></th>
-                                            <th class="course-category"><a href="#">History and Psychology</a></th>
-                                            <th>06-04-2014</th>
-                                            <th>1 lesson</th>
-                                        </tr>
+                                        @{
+                                            int index = 1;
+                                        }
+                                        @foreach (var publishedContributions in Model)
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@publishedContributions.ContributionId</td>
+                                                @{
+                                                    if (publishedContributions != null)
+                                                    {
+                                                        string userId = publishedContributions.UserId;
+                                                        var user = await _userManager.FindByIdAsync(userId);
+                                                        string fullName = user != null ? user.FullName : "Unknown";
+                                                        <td>@fullName</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>Unknown</td>
+                                                    }
+                                                }
+                                                <td>@publishedContributions.Title</td>
+                                                <td>@publishedContributions.SubmissionDate.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    @if (publishedContributions.Status == "Pending")
+                                                    {
+                                                        <span class="badge bg-light-warning text-warning w-100">Pending</span>
+                                                    }
+                                                    else if (publishedContributions.Status == "Rejected")
+                                                    {
+                                                        <span class="badge bg-light-danger text-danger w-100">Rejected</span>
+                                                    }
+                                                    else if (publishedContributions.Status == "Approved")
+                                                    {
+                                                        <span class="badge bg-light-success text-success w-100">Approved</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                                        <button
+                                                            onclick="window.location.href='@Url.Action("DownloadContributionFiles", "Managers", new { id = publishedContributions.ContributionId })'"
+                                                            class="btn btn-sm btn-danger" data-bs-toggle="tooltip"
+                                                            data-bs-placement="bottom" title="Download">
+                                                            Download
+                                                        </button>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                            index++;
+                                        }
                                     </tbody>
                                 </table>
                             </div>

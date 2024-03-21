@@ -11,7 +11,7 @@ namespace COMP1640.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK__FileDetai__contr__6754599E",
+                name: "FK__FileDetai__contr__44FF419A",
                 table: "FileDetails");
 
             migrationBuilder.DropIndex(
@@ -28,7 +28,7 @@ namespace COMP1640.Migrations
                 column: "contributionId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK__FileDetai__contr__6754599E",
+                name: "FK__FileDetai__contr__44FF419A",
                 table: "FileDetails",
                 column: "contributionId",
                 principalTable: "Contributions",

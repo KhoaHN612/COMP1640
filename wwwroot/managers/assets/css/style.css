@@ -837,9 +837,14 @@ a {
 .piechart-legend {
 	position: absolute;
     top: 53%;
-    left: 30%;
+    left: 45%;
 	transform: translate(-50%, -50%);
 	text-align: center;
+}
+@media (max-aspect-ratio: 16/9) {
+    .piechart-legend {
+        left: 38%;
+    }
 }
 
 .chart-container1 {
@@ -1821,9 +1826,9 @@ a {
 }
 
 
-@media screen and (max-width:520px) {
-	.chat-footer-menu,
-	.chat-top-header-menu {
-		display: none
-	}
+#chartColumnContributions, #chartPieContributions {
+    min-width: 300px; 
+    max-width: 100%;
+    height: auto; 
+    margin: auto;
 }
