@@ -9,6 +9,7 @@ using COMP1640.Models.MultiModels;
 using Microsoft.AspNetCore.Identity;
 using COMP1640.Areas.Identity.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace COMP1640.Controllers
@@ -30,6 +31,7 @@ namespace COMP1640.Controllers
             _emailSender = EmailSender;
         }
 
+        [Authorize]
         public async Task<IActionResult> Index(string task, string year)
         {
             ViewData["Title"] = "Dashboard";

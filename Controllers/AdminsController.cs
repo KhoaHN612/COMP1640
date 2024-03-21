@@ -133,6 +133,23 @@ namespace COMP1640
                         await _userManager.AddToRoleAsync(user, selectedRole.Name);
                     }
 
+
+                    // var coordinatorEmails = coordinators.Select(u => u.Email).ToArray();
+                    // var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
+
+                    // string body = "Title: New Contribution\n" +
+                    // "Dear sir/madam, \n" +
+                    // "There are new contribution(s) for the annual magazine.\n" +
+                    // "- Name Contribution: " + contribution.Title + "\n" +
+                    // "- Annual Magazine name:" + annualMagazine.Title + "\n" +
+                    // "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
+                    // "Sincerely, \n" +
+                    // "Developer team";
+                    // var message = new Message(coordinatorEmails, "New Contribution", body);
+                    // await _emailSender.SendEmailAsync(message);
+
+
+
                     // Redirect to a success page or return a success message
                     return RedirectToAction("TableUser");
                 }
