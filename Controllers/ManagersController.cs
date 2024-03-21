@@ -270,17 +270,18 @@ namespace COMP1640.Controllers
             return View("admins/form_create_faculty", faculty);
         }
 
-        [HttpDelete]
-        public IActionResult DeleteFaculty(int id)
-        {
-            var facultyToDelete = _context.Faculties.Find(id);
-            if (facultyToDelete != null)
-            {
-                _context.Faculties.Remove(facultyToDelete);
-                _context.SaveChanges();
-            }
-            return RedirectToAction("TableFaculty");
-        }
+        // [HttpDelete]
+        // public IActionResult DeleteFaculty(int id)
+        // {
+        //     var facultyToDelete = _context.Faculties.Find(id);
+        //     if (facultyToDelete != null)
+        //     {
+        //         _context.Faculties.Remove(facultyToDelete);
+        //         _context.SaveChanges();
+        //     }
+            
+        //     return RedirectToAction("TableFaculty");
+        // }
 
         public IActionResult TableSubmissionDate()
         {
@@ -350,10 +351,17 @@ namespace COMP1640.Controllers
             var annualManazineToDelete = _context.AnnualMagazines.Find(id);
             if (annualManazineToDelete != null)
             {
+                var contributions = _context.Contributions.Where(c => c.AnnualMagazineId == id);
+                foreach (var c in contributions)
+                {
+                    _context.Contributions.Remove(c);
+                }
                 _context.AnnualMagazines.Remove(annualManazineToDelete);
+
                 _context.SaveChanges();
             }
-            return RedirectToAction("TableSubmissionDate"); // Chuyển hướng sau khi xóa
+            
+            return Ok();
         }
 
         public async Task<IActionResult> IndexCooridinators(string task, string year)
