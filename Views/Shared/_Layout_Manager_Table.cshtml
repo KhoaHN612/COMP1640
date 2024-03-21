@@ -1,5 +1,21 @@
 ﻿@using COMP1640.Models;
+@using Microsoft.AspNetCore.Identity
+@using COMP1640.Areas.Identity.Data
 @inject Comp1640Context context
+@inject SignInManager<COMP1640User> SignInManager
+@inject UserManager<COMP1640User> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+
+@{
+    var CurUser = await UserManager.GetUserAsync(User);
+    var Roles = await UserManager.GetRolesAsync(CurUser);
+
+    var avatarImg = File.Exists($"/profileImageUpload/{CurUser.ProfileImagePath}")
+                    ? $"/profileImageUpload/{CurUser.ProfileImagePath}"
+                    : "/profileImageUpload/DefaultUser.png";
+}
+
+
 <!doctype html>
 <html lang="en">
 
@@ -53,19 +69,22 @@
                             <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
                                 data-bs-toggle="dropdown">
                                 <div class="user-setting d-flex align-items-center">
-                                    <img src="~/managers/assets/images/avatars/avatar-1.png" class="user-img" alt="">
+                                    <img src="@avatarImg" class="user-img" alt="">
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
                                     <a class="dropdown-item" href="#">
                                         <div class="d-flex align-items-center">
-                                            <img src="~/managers/assets/images/avatars/avatar-1.png" alt=""
+                                            <img src="@avatarImg" alt=""
                                                 class="rounded-circle" width="54" height="54">
                                             <div class="ms-3">
-                                                <h6 class="mb-0 dropdown-user-name">Jhon Deo</h6>
-                                                <small class="mb-0 dropdown-user-designation text-secondary">HR
-                                                    Manager</small>
+                                                <h6 class="mb-0 dropdown-user-name">@CurUser.FullName</h6>
+                                                @foreach (var role in Roles)
+                                                {
+                                                    <small class="mb-0 dropdown-user-designation text-secondary">@role</small>
+                                                }
+                                                
                                             </div>
                                         </div>
                                     </a>

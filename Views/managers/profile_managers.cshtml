@@ -1,4 +1,4 @@
-﻿
+﻿@model COMP1640.Areas.Identity.Data.COMP1640User
 @{
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
 }
@@ -40,11 +40,14 @@
                                 <div class="row g-3">
                                     <div class="col-6">
                                         <label class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" name="fullName" value="">
+                                        <input type="text" class="form-control" name="fullName" value="@Model.FullName"
+                                            disabled>
                                     </div>
                                     <div class="col-6">
-                                        <label class="form-label">Email address</label>
-                                        <input type="email" class="form-control" name="email" value=""> <!-- Changed type to email for validation -->
+                                        <label class="form-label">Faculty</label>
+                                        <input type="text" class="form-control" name="faculty"
+                                            value="@ViewBag.facultyName" disabled>
+                                        <!-- Changed type to email for validation -->
                                     </div>
                                 </div>
                             </div>
@@ -56,19 +59,26 @@
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label class="form-label">Address</label>
-                                        <input type="text" class="form-control" name="address" value="47-A, city name, United States">
+                                        <label class="form-label">Date Of Birth</label>
+                                        <input disabled type="datetime" class="form-control" name="dateOfBirth"
+                                            value="@Model.DayOfBirth">
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">About Me</label>
-                                        <textarea class="form-control" name="aboutMe" rows="4" placeholder="Describe yourself..."></textarea>
+                                        <label class="form-label">Address</label>
+                                        <input disabled type="text" class="form-control" name="address"
+                                            value="@Model.Address">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Phone Number</label>
+                                        <input disabled type="text" class="form-control" name="phoneNumber"
+                                            value="@Model.PhoneNumber">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="text-start">
-                            <button type="submit" class="btn btn-primary px-4">Save Changes</button>
-                        </div>
+                        @* <div class="text-start">
+                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                        </div> *@
                     </form>
                 </div>
             </div>
@@ -77,21 +87,35 @@
             <div class="card shadow-sm border-0 overflow-hidden">
                 <div class="card-body">
                     <div class="profile-avatar text-center">
-                        <img src="assets/images/avatars/avatar-1.png" class="rounded-circle shadow" width="120" height="120"
-                             alt="">
+
+                        @{
+                            var avatarImg = File.Exists($"/profileImageUpload/{Model.ProfileImagePath}")
+                            ? $"/profileImageUpload/{Model.ProfileImagePath}"
+                            : "/profileImageUpload/DefaultUser.png";
+                        }
+
+                        <img src="@avatarImg" alt="" class="rounded-circle shadow" width="120" height="120">
+
+                        @* <img src="assets/images/avatars/avatar-1.png" class="rounded-circle shadow" width="120"
+                        height="120" alt=""> *@
                     </div>
                     <div class="text-center mt-4">
-                        <h4 class="mb-1">Jhon Deo</h4>
-                        <p class="mb-0 text-secondary">Sydney, Australia</p>
+                        <h4 class="mb-1">@Model.FullName</h4>
+                        <p class="mb-0 text-secondary">
+                            @foreach (var role in ViewBag.roles)
+                            {
+                            <p>@role </p>
+                            }
+                        </p>
                         <div class="mt-4"></div>
                     </div>
                     <hr>
-                    <div class="text-start">
-                        <h5 class="">About</h5>
-                        <p class="mb-0">
-                            It is a long established fact that a reader will be distracted by the readable content
-                            of a page when looking at its layout. The point of using Lorem.
-                    </div>
+                    @* <div class="text-start">
+                    <h5 class="">About</h5>
+                    <p class="mb-0">
+                    It is a long established fact that a reader will be distracted by the readable content
+                    of a page when looking at its layout. The point of using Lorem.
+                    </div> *@
                 </div>
             </div>
         </div>

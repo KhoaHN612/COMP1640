@@ -17,7 +17,6 @@ namespace COMP1640.Controllers
     {
         private readonly UserManager<COMP1640User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-
         private readonly IEmailSenderCustom _emailSender;
         private readonly Comp1640Context _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -29,29 +28,6 @@ namespace COMP1640.Controllers
             _context = context;
             _webHostEnvironment = webHostEnvironment;
             _emailSender = EmailSender;
-        }
-        //================================ ADMIN ================================//
-        public async Task<IActionResult> CreateRole()
-        {
-            string[] roleNames = { "Guest", "Manager", "Coordinator", "Student", "Admin" };
-            IdentityResult roleResult;
-            foreach (var roleName in roleNames)
-            {
-                var roleExist = await _roleManager.RoleExistsAsync(roleName);
-                if (!roleExist)
-                {
-                    //create the roles and seed them to the database: Question 1
-                    roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
-                }
-            }
-            return RedirectToAction("TableUser");
-        }
-
-        public IActionResult TestEmail()
-        {
-            var message = new Message(new string[] { "comp1640k@gmail.com" }, "Test async email", "This is the content from our async email.");
-            _emailSender.SendEmail(message);
-            return RedirectToAction("TableUser");
         }
 
         public async Task<IActionResult> Index(string task, string year)
@@ -376,91 +352,6 @@ namespace COMP1640.Controllers
                 _context.SaveChanges();
             }
             return RedirectToAction("TableSubmissionDate"); // Chuyển hướng sau khi xóa
-        }
-
-        public IActionResult TableUser()
-        {
-            ViewData["Title"] = "User Table page";
-            var users = _userManager.Users.ToList();
-            ViewBag.Context = _context;
-            return View("admins/table_user", users);
-        }
-        public IActionResult FormCreateUser()
-        {
-            ViewData["Title"] = "Create User page";
-            ViewBag.Roles = _roleManager.Roles.ToList();
-            var faculties = _context.Faculties.ToList();
-            if (faculties != null && faculties.Any())
-            {
-                ViewBag.FacultyId = new SelectList(faculties, "FacultyId", "Name");
-            }
-            else
-            {
-                ViewBag.FacultyId = new SelectList(new List<Faculty>(), "FacultyId", "Name");
-            }
-            return View("admins/form_create_user");
-        }
-        //================================ COORDINATORS ================================//
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FormCreateUser(COMP1640User model, string Role)
-        {
-            if (ModelState.IsValid)
-            {
-                // Create a new IdentityUser instance
-                var user = new COMP1640User
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    FullName = model.FullName,
-                    ProfileImagePath = model.ProfileImagePath,
-                    PhoneNumber = model.PhoneNumber,
-                    DayOfBirth = model.DayOfBirth,
-                    Address = model.Address,
-                    FacultyId = model.FacultyId,
-                };
-
-                // Create the user in the database
-                var result = await _userManager.CreateAsync(user);
-
-                if (result.Succeeded)
-                {
-                    // Find the role by its ID
-                    var selectedRole = await _roleManager.FindByIdAsync(Role);
-
-                    if (selectedRole != null)
-                    {
-                        // Assign the user to the selected role
-                        await _userManager.AddToRoleAsync(user, selectedRole.Name);
-                    }
-
-                    // Redirect to a success page or return a success message
-                    return RedirectToAction("TableUser");
-                }
-                else
-                {
-                    // If creation of user fails, add errors to model state
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-            }
-
-            // return RedirectToAction("FormCreateUser");
-            // If ModelState is invalid, return to the create user form with errors
-            ViewData["Title"] = "Create User page";
-            ViewBag.Roles = _roleManager.Roles.ToList();
-            var faculties = _context.Faculties.ToList();
-            if (faculties != null && faculties.Any())
-            {
-                ViewBag.FacultyId = new SelectList(faculties, "FacultyId", "Name");
-            }
-            else
-            {
-                ViewBag.FacultyId = new SelectList(new List<Faculty>(), "FacultyId", "Name");
-            }
-            return View("admins/form_create_user", model);
         }
 
         public async Task<IActionResult> IndexCooridinators(string task, string year)
@@ -942,10 +833,17 @@ namespace COMP1640.Controllers
         //     }
         // }
         //================================ PROFILES ================================//
-        public IActionResult ShowProfile()
+        public async Task<IActionResult> ShowProfileAsync()
         {
             ViewData["Title"] = "Profiles";
-            return View("profile_managers");
+            var curUser = await _userManager.GetUserAsync(User);
+            if (curUser == null){
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+            ViewBag.roles = await _userManager.GetRolesAsync(curUser);
+            var faculty = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == curUser.FacultyId);
+            ViewBag.facultyName = faculty.Name;
+            return View("profile_managers",curUser);
         }
 
 
