@@ -96,6 +96,8 @@ namespace COMP1640.Controllers
             {
                 return NotFound();
             }
+            var imagePath = post.ImagePath;
+            ViewBag.imagePath = imagePath;
 
             return View(post);
         }
@@ -128,7 +130,7 @@ namespace COMP1640.Controllers
                 await _context.SaveChangesAsync();
             }
             ViewData["UserId"] = _userManager.GetUserId(User);
-            return View(post);
+            return RedirectToAction("Index");
         }
 
         // GET: Post/Edit/5
