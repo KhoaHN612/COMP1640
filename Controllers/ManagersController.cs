@@ -64,7 +64,8 @@ namespace COMP1640.Controllers
 
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
-            foreach(var i in roleStatistics){
+            foreach (var i in roleStatistics)
+            {
                 Console.WriteLine(i.Role + " - " + i.Total);
             }
 
@@ -279,7 +280,7 @@ namespace COMP1640.Controllers
         //         _context.Faculties.Remove(facultyToDelete);
         //         _context.SaveChanges();
         //     }
-            
+
         //     return RedirectToAction("TableFaculty");
         // }
 
@@ -360,7 +361,7 @@ namespace COMP1640.Controllers
 
                 _context.SaveChanges();
             }
-            
+
             return Ok();
         }
 
@@ -506,7 +507,7 @@ namespace COMP1640.Controllers
             return contributions;
         }
 
-        [Authorize(Roles="Coordinator")]
+        [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
             ViewData["Title"] = "List Submission";
@@ -532,7 +533,7 @@ namespace COMP1640.Controllers
         }
 
 
-        [Authorize(Roles="Coordinator, Student")]
+        [Authorize(Roles = "Coordinator, Student")]
         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
@@ -856,16 +857,17 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "Profiles";
             var curUser = await _userManager.GetUserAsync(User);
-            if (curUser == null){
+            if (curUser == null)
+            {
                 return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
             ViewBag.roles = await _userManager.GetRolesAsync(curUser);
             var faculty = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == curUser.FacultyId);
             ViewBag.facultyName = faculty.Name;
-            return View("profile_managers",curUser);
+            return View("profile_managers", curUser);
         }
 
-        [Authorize(Roles="Coordinator")]
+        [Authorize(Roles = "Coordinator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status)
@@ -896,27 +898,27 @@ namespace COMP1640.Controllers
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
+
         
-        [Authorize(Roles="Coordinator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateComment(Contribution contribution)
+        public async Task<IActionResult> UpdateComment(Contribution contribution, string userId)
         {
 
             var existingContribution = await _context.Contributions.FindAsync(contribution.ContributionId);
             if (existingContribution != null)
             {
-                
+
                 var user = await _context.Users.FindAsync(existingContribution.UserId);
                 var annualMagazine = await _context.AnnualMagazines.FindAsync(existingContribution.AnnualMagazineId);
 
-                
+
                 var newComment = new Comment
                 {
                     UserId = user.Id,
                     ContributionId = contribution.ContributionId,
-                    CommentField = contribution.Comment, 
-                    CommentDate = DateTime.Now 
+                    CommentField = contribution.Comment,
+                    CommentDate = DateTime.Now
                 };
 
                 _context.Comments.Add(newComment);
@@ -927,14 +929,22 @@ namespace COMP1640.Controllers
                     .ToListAsync();
 
                 ViewBag.Comments = comments;
+                var userComment = _userManager.FindByIdAsync(userId);
+                ViewBag.userFullName = await GetUserFullName();
 
                 return RedirectToAction("StudentSubmissionCoordinators");
             }
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
-        
-        [Authorize(Roles="Coordinator")]
+        private async Task<string> GetUserFullName()
+        {
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            return user?.FullName; // This will return null if user is null.
+        }
+
+        [Authorize(Roles = "Coordinator")]
         [HttpPost]
         public async Task<IActionResult> Publish(int id, bool isPublished)
         {
@@ -946,9 +956,9 @@ namespace COMP1640.Controllers
 
             try
             {
-                contribution.IsPublished = true; 
+                contribution.IsPublished = true;
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException)
             {

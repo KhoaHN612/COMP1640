@@ -24,52 +24,16 @@
                         <header>
                             <h1>Submissions</h1>
                         </header>
-                        <section id="course-search">
-                            <div class="search-box">
-                                <header><span class="fa fa-search"></span>
-                                    <h2>Find your submission</h2>
-                                </header>
-                                <form id="course-search-form" role="form" class="form-inline">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="course-year">Course Year</label>
-                                            <select name="course-type" id="course-year">
-                                                <option value="">Year</option>
-                                                <option value="2">2015 - 2016</option>
-                                                <option value="3">2016 - 2017</option>
-                                                <option value="4">2017 - 2018</option>
-                                            </select>
-                                        </div><!-- /.form-group -->
-                                        <div class="form-group">
-                                            <label for="course-department">Department</label>
-                                            <select name="course-type" id="course-department">
-                                                <option value="">Department</option>
-                                                <option value="2">Department 1</option>
-                                                <option value="3">Department 2</option>
-                                                <option value="4">Department 3</option>
-                                            </select>
-                                        </div><!-- /.form-group -->
-                                        <div class="form-group">
-                                            <label for="full-text">Name Course</label>
-                                            <input name="full-text" id="full-text" placeholder="Enter Keyword"
-                                                type="text">
-                                        </div><!-- /.form-group -->
-                                    </div>
-                                    <button type="submit" class="btn pull-right">Search</button>
-                                </form><!-- /#<!-- /.form-group -->
-                            </div><!-- /.course-search-box -->
-                        </section><!-- /#course-search -->
+                        
                         <section id="course-list">
                             <div class="table-responsive">
                                 <table class="table table-hover course-list-table tablesorter">
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Contributions ID</th>
                                             <th>Full Name</th>
                                             <th>Title</th>
                                             <th>Submission Date</th>
-                                            <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -81,7 +45,6 @@
                                         {
                                             <tr>
                                                 <td>@index</td>
-                                                <td>@publishedContributions.ContributionId</td>
                                                 @{
                                                     if (publishedContributions != null)
                                                     {
@@ -97,20 +60,6 @@
                                                 }
                                                 <td>@publishedContributions.Title</td>
                                                 <td>@publishedContributions.SubmissionDate.ToString("dd/MM/yyyy")</td>
-                                                <td>
-                                                    @if (publishedContributions.Status == "Pending")
-                                                    {
-                                                        <span class="badge bg-light-warning text-warning w-100">Pending</span>
-                                                    }
-                                                    else if (publishedContributions.Status == "Rejected")
-                                                    {
-                                                        <span class="badge bg-light-danger text-danger w-100">Rejected</span>
-                                                    }
-                                                    else if (publishedContributions.Status == "Approved")
-                                                    {
-                                                        <span class="badge bg-light-success text-success w-100">Approved</span>
-                                                    }
-                                                </td>
                                                 <td>
                                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
                                                         <button
