@@ -3,132 +3,143 @@
 <!DOCTYPE html>
 
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Create</title>
 </head>
+
 <body>
 
-<main class="page-content">
-    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-        <div class="breadcrumb-title pe-3">Forms</div>
-        <div class="ps-3">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCooridinators"><i
-                                class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active"><a asp-controller="Managers"
-                            asp-action="TablePost">List post</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">From @ViewData["Title"]</li>
-                </ol>
-            </nav>
+    <main class="page-content">
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">Forms</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCooridinators"><i
+                                    class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item active"><a asp-controller="Managers" asp-action="TablePost">List
+                                post</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">From @ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-xl-9 mx-auto">
-            <h6 class="mb-0 text-uppercase">@ViewData["Title"] Form</h6>
-            <hr />
-            <div class="card">
-                <div class="card-body">
-                    <div class="border p-4 rounded">
-                        <!-- Start of form -->
-                        <form asp-action="Create" method="post">
-                            <div class="card-title d-flex align-items-center">
-                                <h5 class="mb-0">@ViewData["Title"] Registration</h5>
-                            </div>
-                            <hr />
-                            <!-- Name Input -->
-                            <div class="row mb-3">
-                                <label asp-for="Title" class="col-sm-3 col-form-label">
-                                    Post title
-                                </label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" asp-for="Title" placeholder="Enter title" value="">
-                                </div>
-                            </div>
-                            <!-- Content Input -->
-                            <div class="row mb-3">
-                                <label asp-for="Content"
-                                        class="col-sm-3 col-form-label">Content</label>
-                                <div class="col-sm-9">
-                                    <textarea class="form-control" asp-for="Content"
-                                            rows="3" placeholder="Content"></textarea>
-                                </div>
-                            </div>
+        <div class="row">
+            <div class="col-xl-9 mx-auto">
+                <h6 class="mb-0 text-uppercase">@ViewData["Title"] Form</h6>
+                <hr />
+                <div class="card">
+                    <div class="card-body">
+                        <div class="border p-4 rounded">
+                            <!-- Start of form -->
+                            <form asp-action="Create" method="post" enctype="multipart/form-data">
 
-                            <div class="row mb-3">
-                                <label asp-for="PostedAt"
-                                        class="col-sm-3 col-form-label">Content</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="PostedAt" class="form-control" type ="datetime-local" readonly/>
+                                <div class="card-title d-flex align-items-center">
+                                    <h5 class="mb-0">@ViewData["Title"] Registration</h5>
                                 </div>
-                            </div>
-
-                            <input asp-for="UserId" type="hidden" value="@ViewBag.UserId" />
-
-                            <!-- Submit Button -->
-                            <div class="row">
-                                <label class="col-sm-3 col-form-label"></label>
-                                <div class="col-sm-9">
-                                    <input type="submit" value="Create" class="btn btn-primary px-5" />
+                                <hr />
+                                <!-- Name Input -->
+                                <div class="row mb-3">
+                                    <label asp-for="Title" class="col-sm-3 col-form-label">
+                                        Post title
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" asp-for="Title"
+                                            placeholder="Enter title" value="">
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-                        <!-- End of form -->
+                                <!-- Content Input -->
+                                <div class="row mb-3">
+                                    <label asp-for="Content" class="col-sm-3 col-form-label">Content</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control" asp-for="Content" rows="3"
+                                            placeholder="Content"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label">Image File</label>
+                                    <div class="col-sm-9">
+                                        <input type="file" class="form-control" name="imageFile" />
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label asp-for="PostedAt" class="col-sm-3 col-form-label">Date Created</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="PostedAt" class="form-control" type="datetime-local" readonly />
+                                    </div>
+                                </div>
+
+
+                                <input asp-for="UserId" type="hidden" value="@ViewBag.UserId" />
+
+                                <!-- Submit Button -->
+                                <div class="row">
+                                    <label class="col-sm-3 col-form-label"></label>
+                                    <div class="col-sm-9">
+                                        <input type="submit" value="Create" class="btn btn-primary px-5" />
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- End of form -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-@* <h4>Post</h4>
-<hr />
-<div class="row">
+    @* <h4>Post</h4>
+    <hr />
+    <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PostedAt" class="control-label"></label>
-                <input asp-for="PostedAt" class="form-control" />
-                <span asp-validation-for="PostedAt" class="text-danger"></span>
-            </div>
-            <input asp-for="UserId" type="hidden" value="@ViewBag.UserId" />
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+    <form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+    <label asp-for="Title" class="control-label"></label>
+    <input asp-for="Title" class="form-control" />
+    <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-</div>
+    <div class="form-group">
+    <label asp-for="Content" class="control-label"></label>
+    <input asp-for="Content" class="form-control" />
+    <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+    <label asp-for="PostedAt" class="control-label"></label>
+    <input asp-for="PostedAt" class="form-control" />
+    <span asp-validation-for="PostedAt" class="text-danger"></span>
+    </div>
+    <input asp-for="UserId" type="hidden" value="@ViewBag.UserId" />
+    <div class="form-group">
+    <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+    </form>
+    </div>
+    </div>
 
-<div>
+    <div>
     <a asp-action="Index">Back to List</a>
-</div> *@
+    </div> *@
 
-<script>
-  // Get current local date and time
-  var now = new Date();
-  
-  // Convert local time to UTC
-  var utcDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-  
-  // Format the date to be used in input field
-  var formattedDate = utcDate.toISOString().slice(0,16);
-  
-  // Fill input field with the formatted date
-  document.getElementById('PostedAt').value = formattedDate;
-</script>
+    <script>
+        // Get current local date and time
+        var now = new Date();
+
+        // Convert local time to UTC
+        var utcDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+
+        // Format the date to be used in input field
+        var formattedDate = utcDate.toISOString().slice(0, 16);
+
+        // Fill input field with the formatted date
+        document.getElementById('PostedAt').value = formattedDate;
+    </script>
 
 </body>
-</html> 
+
+</html>
