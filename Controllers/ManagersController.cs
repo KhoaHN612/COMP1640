@@ -617,6 +617,7 @@ namespace COMP1640.Controllers
 
         // }
         //================================ MANAGERS ================================//
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> IndexManagers(string task, string year)
         {
             ViewData["Title"] = "Dashboard Managers";
@@ -759,7 +760,7 @@ namespace COMP1640.Controllers
         //     return Json(students);
         // }
 
-
+        [Authorize(Roles = "Manager")]
         public IActionResult StudentSubmissionManagers()
         {
             List<Contribution> contributions = _context.Contributions
@@ -770,6 +771,7 @@ namespace COMP1640.Controllers
             return View("head_managers/student_submission", contributions);
         }
         // DOWNLOAD EACH FILES
+        [Authorize(Roles = "Manager, Coordinator")]
         [HttpGet]
         public async Task<IActionResult> DownloadContributionFiles(int id)
         {
@@ -807,7 +809,6 @@ namespace COMP1640.Controllers
             return File(memoryStream.ToArray(), "application/zip", zipFileName);
         }
         //DOWNLOAD ALL FILES
-
         [HttpGet]
         public async Task<IActionResult> DownloadAllApproved()
         {
