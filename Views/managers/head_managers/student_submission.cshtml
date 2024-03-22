@@ -34,7 +34,6 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Contribution ID</th>
                             <th>Full Name</th>
                             <th>Annual Magazine</th>
                             <th>Title</th>
@@ -50,7 +49,6 @@
                         {
                             <tr>
                                 <td>@index</td>
-                                <td>@contribution.ContributionId</td>
                                 @{
                                     string userId = contribution.UserId;
                                     var user = await _userManager.FindByIdAsync(userId);
@@ -61,14 +59,27 @@
                                 <td>@contribution.Title</td>
                                 <td>@contribution.SubmissionDate.ToString("dd/MM/yyyy")</td>
                                 <td>
-                                    <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                        @* <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                            title="Views"><i class="bi bi-eye-fill"></i></a> *@
-                                        <a href="@Url.Action("DownloadContributionFiles", "Managers", new { id = contribution.ContributionId })" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download">
+                                    <div class="d-flex align-items-center gap-3 fs-6">
+                                        <a href="@Url.Action("DownloadContributionFiles", "Managers", new { id = contribution.ContributionId })"
+                                            class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                            title="Download">
                                             <i class="lni lni-download"></i>
                                         </a>
+
+                                        <a asp-controller="Managers" asp-action="CoordinatorComment" class="text-warning"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment"
+                                            asp-route-id="@contribution.ContributionId">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+
+                                        <form asp-controller="Managers" asp-action="publish" method="post">
+                                            <input type="hidden" name="id" value="@contribution.ContributionId" />
+                                            <input type="hidden" name="isPublished" value="True" />
+                                            <button type="submit" class="btn btn-primary">Publish</button>
+                                        </form>
                                     </div>
                                 </td>
+
                             </tr>
                             index++;
                         }
@@ -76,7 +87,6 @@
                     <tfoot>
                         <tr>
                             <th>No</th>
-                            <th>Contribution ID</th>
                             <th>Full Name</th>
                             <th>Annual Magazine</th>
                             <th>Title</th>
@@ -91,19 +101,18 @@
 </main>
 <!--end page main-->
 <script>
-function ConfirmDownLoadAll() {
-    Swal.fire({
-        title: 'Are you sure to download all contributions?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#0d6efd',
-        cancelButtonColor: '#9C9C9C',
-        confirmButtonText: 'Download'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href='@Url.Action("DownloadAllApproved", "Managers")'
-        }
-    })
-}
+    function ConfirmDownLoadAll() {
+        Swal.fire({
+            title: 'Are you sure to download all contributions?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#9C9C9C',
+            confirmButtonText: 'Download'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '@Url.Action("DownloadAllApproved", "Managers")'
+            }
+        })
+    }
 </script>
-
