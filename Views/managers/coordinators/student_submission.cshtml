@@ -51,7 +51,8 @@
                                     string fullName = user != null ? user.FullName : "Unknown";
                                 }
                                 <td>@fullName</td>
-                                <td>@contributions.Title</td>
+                                <td class="text-ellipsis">@contributions.Title</td>
+
                                 <td>@contributions.SubmissionDate.ToString("dd/MM/yyyy")</td>
                                 <td>
                                     @if (contributions.Status == "Pending")
@@ -94,10 +95,10 @@
                                             <button type="submit" class="btn btn-success">Approved</button>
                                         </form>
                                         @* <form asp-controller="Managers" asp-action="publish" method="post">
-                                            <input type="hidden" name="id" value="@contributions.ContributionId" />
-                                            <input type="hidden" name="isPublished" value="True" />
-                                            <button type="submit" class="btn btn-primary">Publish</button>
-                                        </form> *@
+                                    <input type="hidden" name="id" value="@contributions.ContributionId" />
+                                    <input type="hidden" name="isPublished" value="True" />
+                                    <button type="submit" class="btn btn-primary">Publish</button>
+                                    </form> *@
                                     </div>
                                 </td>
                             </tr>
@@ -120,4 +121,12 @@
         </div>
     </div>
 </main>
+<style>
+    .text-ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 150px;
+    }
+</style>
 <!--end page main-->
