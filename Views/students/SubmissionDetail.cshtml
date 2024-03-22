@@ -1,4 +1,7 @@
 @model COMP1640.Models.Contribution
+@using Microsoft.AspNetCore.Identity
+@using COMP1640.Areas.Identity.Data
+@inject UserManager<COMP1640User> UserManager
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 10px !important;
@@ -109,8 +112,8 @@
                                                     {
                                                         <div class="card mb-3 comment-card">
                                                             <div class="card-body">
-                                                                @* <h6 class="card-title" style="color: red; font-weight:
-                                        bold;">@comment.User.FullName</h6> *@
+                                                                <h6 class="card-title" style="color: red; font-weight:
+                                        bold;">@ViewBag.userFullName</h6>
                                                                 <p class="card-text comment-content">@comment.CommentField</p>
                                                                 <p class="card-text"><small class="text-muted">Comment Date:
                                                                         @comment.CommentDate</small></p>
@@ -154,7 +157,7 @@
                                                     </div>
                                                     <input type="hidden" name="contributionId" value="">
                                                 </div>
-
+                                                <input type="hidden" id="userId" name="id" value="@UserManager.GetUserId(User)">
                                             </form>
                                         </div>
                                     </div>
