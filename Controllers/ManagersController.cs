@@ -366,7 +366,7 @@ namespace COMP1640.Controllers
         }
 
         [Authorize(Roles="Coordinator")]
-        public async Task<IActionResult> IndexCooridinators(string task, string year)
+        public async Task<IActionResult> IndexCoordinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
             List<TotalContribution> TotalContribution = new List<TotalContribution>();
