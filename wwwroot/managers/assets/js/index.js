@@ -763,7 +763,7 @@ function ContributionAnalysisChart() {
 			chart: {
 			height: 350,
 			type: 'line',
-			stacked: true,
+			stacked: false,
 		  },
 		  stroke: {
 			width: [0, 2, 5],
