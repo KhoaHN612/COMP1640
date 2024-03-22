@@ -365,56 +365,63 @@ namespace COMP1640.Controllers
         public async Task<IActionResult> IndexCooridinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
-            Console.WriteLine($"Action: {task}task, Year: {year}");
+            List<TotalContribution> TotalContribution = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsAccepted = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsRejected = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsPending = new List<TotalContribution>();
+            List<ContributionWithoutComment> contributions = new List<ContributionWithoutComment>();
+            List<ContributionWithoutComment> contributionWithoutComments = new List<ContributionWithoutComment>();
+            List<ContributionWithoutComment> contributionWithoutCommentsAfter14Days = new List<ContributionWithoutComment>();
 
             //Total Contributions
             DateTime currentDate = DateTime.Now;
             if (task == "TotalContribution" && !string.IsNullOrEmpty(year))
             {
                 currentDate = new DateTime(Convert.ToInt32(year), 1, 1);
+            }            
+                //get current faculty of current user
+            var currentUser = await _userManager.GetUserAsync(User);
+                //get faculty id of current user
+            if (currentUser == null || currentUser.FacultyId == null)
+            {
+                return null;
             }
-            List<TotalContribution> TotalContribution = await GetTotalContributions(currentDate.Year, "TotalContributions");
+            else
+            { 
+                
+             int currentFacultyId = currentUser.FacultyId ?? 0;;
+                    
+            TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
 
             //Total Contributions Accepted
-            List<TotalContribution> TotalContributionsAccepted = await GetTotalContributions(currentDate.Year, "TotalContributionsAccepted");
+            TotalContributionsAccepted = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsAccepted");
 
             //Total Contributions Rejected
-            List<TotalContribution> TotalContributionsRejected = await GetTotalContributions(currentDate.Year, "TotalContributionsRejected");
+            TotalContributionsRejected = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsRejected");
 
             //Total Contributions Pending
-            List<TotalContribution> TotalContributionsPending = await GetTotalContributions(currentDate.Year, "TotalContributionsPending");
-
+            TotalContributionsPending = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPending");
+                    
+                                  
             //GET ALL CONTRIBUTIONS
-            List<ContributionWithoutComment> contributions = await _context.Contributions
-                .Where(c => c.SubmissionDate.Year == DateTime.Now.Year)
-                .GroupBy(c => new { Date = c.SubmissionDate.Date })
+            contributions = await _context.Contributions
+                .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
+                .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year && c.User.FacultyId == currentFacultyId)
+                .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
                 .Select(g => new ContributionWithoutComment
                 {
                     Date = g.Key.Date,
                     Quantity = g.Count()
                 })
                 .ToListAsync();
-
-
-            //GET CONTRIBUTION WITHOUT COMMENT
-            /*
-            SELECT 
-				YEAR(c.submissionDate) as 'Year',
-                c.submissionDate AS 'Date',
-                COUNT(*) AS Quantity
-            FROM 
-                Contributions c
-            WHERE 
-                YEAR(c.submissionDate) = YEAR(GETDATE()) 
-                AND c.Comment IS NULL 
-            GROUP BY 
-                YEAR(c.submissionDate), c.submissionDate;
-            */
-
     
-            List<ContributionWithoutComment> contributionWithoutComments =  await _context.Contributions
-                .Where(c => c.SubmissionDate.Year == DateTime.Now.Year && c.Comment == null)
-                .GroupBy(c => new { Date = c.SubmissionDate.Date })
+            contributionWithoutComments =  await _context.Contributions
+                .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
+                .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year 
+                            && c.Contribution.Comment == null 
+                            && c.Contribution.Status == "Approved"
+                            && c.User.FacultyId == currentFacultyId)
+                .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
                 .Select(g => new ContributionWithoutComment
                 {
                     Date = g.Key.Date,
@@ -423,33 +430,22 @@ namespace COMP1640.Controllers
                 .ToListAsync();
 
 
-            //GET CONTRIBUTION WITHOUT COMMENT AFTER 14 DAYS
-            /*
-            SELECT 
-				YEAR(c.submissionDate) as 'Year',
-                c.submissionDate AS 'Date',
-                COUNT(*) AS Quantity
-            FROM 
-                Contributions c
-            WHERE 
-                YEAR(c.submissionDate) = YEAR(GETDATE()) 
-                AND c.Comment IS NULL 
-                AND DATEDIFF(day, c.submissionDate, GETDATE()) > 14
-            GROUP BY 
-                YEAR(c.submissionDate), c.submissionDate;
-            */
-
-            List<ContributionWithoutComment> contributionWithoutCommentsAfter14Days = await _context.Contributions
-                .Where(c => c.SubmissionDate.Year == DateTime.Now.Year
-                            && c.Comment == null
-                            && EF.Functions.DateDiffDay(c.SubmissionDate, DateTime.Now.Date) > 14)
-                .GroupBy(c => new { Date = c.SubmissionDate.Date })
+            contributionWithoutCommentsAfter14Days = await _context.Contributions
+                .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
+                .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year
+                            && c.Contribution.Comment == null
+                            && c.Contribution.Status == "Approved"
+                            && EF.Functions.DateDiffDay(c.Contribution.SubmissionDate, DateTime.Now.Date) > 14
+                            && c.User.FacultyId == currentFacultyId)
+                .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
                 .Select(g => new ContributionWithoutComment
                 {
                     Date = g.Key.Date,
                     Quantity = g.Count()
                 })
                 .ToListAsync();
+                }
+
 
             //GET ALL YEARS
             List<int> years = await _context.Contributions
@@ -469,34 +465,40 @@ namespace COMP1640.Controllers
             return View("coordinators/index");
         }
 
-        public async Task<List<TotalContribution>> GetTotalContributions(int year, string action)
+        public async Task<List<TotalContribution>> GetTotalContributions(int facultyID, int year, string action)
         {
-            IQueryable<Contribution> query = _context.Contributions.Where(c => c.SubmissionDate.Year == year);
+
+
+            var query = from c in _context.Contributions
+            join u in _context.Users on c.UserId equals u.Id
+            where c.SubmissionDate.Year == year
+            select new { Contribution = c, User = u };
 
             switch (action)
             {
                 case "TotalContributionsAccepted":
-                    query = query.Where(c => c.Status == "Approved");
+                    query = query.Where(c => c.Contribution.Status == "Approved");
                     break;
                 case "TotalContributionsRejected":
-                    query = query.Where(c => c.Status == "Rejected");
+                    query = query.Where(c => c.Contribution.Status == "Rejected");
                     break;
                 case "TotalContributionsPending":
-                    query = query.Where(c => c.Status == "Pending");
+                    query = query.Where(c => c.Contribution.Status == "Pending");
                     break;
             }
 
-            List<TotalContribution> contributions = await query
-                .GroupBy(c => new { c.SubmissionDate.Year, c.SubmissionDate.Month })
-                .Select(g => new TotalContribution
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Total = g.Count()
-                })
-                .OrderBy(c => c.Year)
-                .ThenBy(c => c.Month)
-                .ToListAsync();
+            List<TotalContribution> contributions =  await query
+            .Where(uc => uc.User.FacultyId == facultyID)
+            .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
+            .Select(g => new TotalContribution
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                Total = g.Count()
+            })
+            .OrderBy(c => c.Year)
+            .ThenBy(c => c.Month)
+            .ToListAsync();
 
             return contributions;
         }
@@ -508,7 +510,7 @@ namespace COMP1640.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
 
             if (currentUser == null || currentUser.FacultyId == null)
-            {
+            {   
                 return NotFound();
             }
             var currentFacultyId = currentUser.FacultyId;

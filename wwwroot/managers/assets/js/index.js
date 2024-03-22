@@ -752,11 +752,11 @@ function ContributionAnalysisChart() {
 			type: 'column',
 			data: arrData1
 		  }, {
-			name: 'Contribution Without Comments',
+			name: 'Approved contributions don\'t have comment',
 			type: 'area',
 			data: arrData2
 		  }, {
-			name: 'Contributions After 14 Days Without Comments',
+			name: 'Approved contributions don\'t have comment after 14 days',
 			type: 'line',
 			data: arrData3
 		  }],
