@@ -33,7 +33,7 @@ namespace COMP1640.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<COMP1640User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly Comp1640Context _context;
 
         public RegisterModel(
@@ -41,6 +41,7 @@ namespace COMP1640.Areas.Identity.Pages.Account
             IUserStore<COMP1640User> userStore,
             SignInManager<COMP1640User> signInManager,
             ILogger<RegisterModel> logger,
+            RoleManager<IdentityRole> RoleManager,
             IEmailSender emailSender,
             Comp1640Context context)
         {
@@ -49,6 +50,7 @@ namespace COMP1640.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
+            _roleManager = RoleManager;
             _emailSender = emailSender;
             _context = context;
         }
@@ -172,6 +174,12 @@ namespace COMP1640.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password." + Input.Password);
+                    var studentRole = await _roleManager.FindByNameAsync("Student");
+                    if (studentRole != null)
+                    {
+                        // Assign the user to the selected role
+                        await _userManager.AddToRoleAsync(user, studentRole.Name);
+                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

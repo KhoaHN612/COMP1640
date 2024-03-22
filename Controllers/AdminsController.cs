@@ -133,20 +133,20 @@ namespace COMP1640
                         await _userManager.AddToRoleAsync(user, selectedRole.Name);
                     }
 
+                    string body = "Title: Account Created\n" +
+                    "Dear sir/madam, \n" +
+                    "Your new account on University Comp 1640 system has been created.\n" +
+                    "- Full Name:" + user.FullName + "\n" +
+                    "- Email:" + user.Email + "\n" +
+                    "- Password: " + Password + "\n\n" +
+                    "Sincerely, \n" +
+                    "Developer team";
 
-                    // var coordinatorEmails = coordinators.Select(u => u.Email).ToArray();
-                    // var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
+                    List<string> emails = new List<string>();
+                    emails.Add(user.Email);
 
-                    // string body = "Title: New Contribution\n" +
-                    // "Dear sir/madam, \n" +
-                    // "There are new contribution(s) for the annual magazine.\n" +
-                    // "- Name Contribution: " + contribution.Title + "\n" +
-                    // "- Annual Magazine name:" + annualMagazine.Title + "\n" +
-                    // "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
-                    // "Sincerely, \n" +
-                    // "Developer team";
-                    // var message = new Message(coordinatorEmails, "New Contribution", body);
-                    // await _emailSender.SendEmailAsync(message);
+                    var message = new Message(emails, "Account Created", body);
+                    await _emailSender.SendEmailAsync(message);
 
 
 

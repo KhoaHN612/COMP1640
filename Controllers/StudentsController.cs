@@ -3,6 +3,7 @@ using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Migrations;
 using COMP1640.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.Language;
@@ -55,6 +56,7 @@ namespace COMP1640.Controllers
             }
             return View();
         }
+        [Authorize(Roles="Student")]
         public async Task<IActionResult> SubmissionList()
         {
             ViewData["Title"] = "Submission List";
@@ -89,6 +91,7 @@ namespace COMP1640.Controllers
         }
 
         // Action for the My Account page
+        [Authorize(Roles="Student, Guest")]
         public async Task<IActionResult> MyAccount()
         {
             ViewData["Title"] = "My Account";
@@ -127,13 +130,14 @@ namespace COMP1640.Controllers
             return View();
         }
 
-        // Action for the Login/Register page
-        public IActionResult LoginRegister()
-        {
-            ViewData["Title"] = "Login Or Register";
-            return View();
-        }
+        // // Action for the Login/Register page
+        // public IActionResult LoginRegister()
+        // {
+        //     ViewData["Title"] = "Login Or Register";
+        //     return View();
+        // }
 
+        [Authorize(Roles="Student")]
         public IActionResult FromCreateSubmission()
         {
             ViewData["Title"] = "From Submission";
@@ -143,6 +147,8 @@ namespace COMP1640.Controllers
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
+
+        [Authorize(Roles="Student")]
         public async Task<IActionResult> FromEditSubmission(int id)
         {
             ViewData["Title"] = "From Submission";
@@ -251,6 +257,7 @@ namespace COMP1640.Controllers
         //     return RedirectToAction(nameof(MyAccount));
         // }
 
+        [Authorize(Roles="Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetails)
@@ -366,6 +373,7 @@ namespace COMP1640.Controllers
         //     return RedirectToAction(nameof(Index));
         // }
 
+        [Authorize(Roles="Student")]
         // POST: StudentsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -381,6 +389,7 @@ namespace COMP1640.Controllers
             }
         }
 
+        [Authorize(Roles="Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
@@ -416,6 +425,7 @@ namespace COMP1640.Controllers
             return RedirectToAction(nameof(MyAccount));
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdatePassword(string id, string inputOldPassword, string newPassword)
@@ -443,6 +453,7 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
+        [Authorize(Roles="Student")]
         public async Task<IActionResult> SubmissionDetail(int id)
         {
             ViewData["Title"] = "Submission Detail";
@@ -488,6 +499,7 @@ namespace COMP1640.Controllers
 
         }
 
+        [Authorize(Roles="Student")]
         public async Task<IActionResult> PostLists()
         {
             ViewData["Title"] = "Post Lists";
@@ -499,6 +511,7 @@ namespace COMP1640.Controllers
             return View();
         }
 
+        [Authorize(Roles="Student")]
         public async Task<IActionResult> PostDetail()
         {
             ViewData["Title"] = "Post Detail";
