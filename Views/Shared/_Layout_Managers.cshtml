@@ -104,12 +104,15 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="authentication-signup-with-header-footer.html">
+                                    <a class="dropdown-item" href="#" id="logoutLink">
                                         <div class="d-flex align-items-center">
                                             <div class=""><i class="bi bi-lock-fill"></i></div>
                                             <div class="ms-3"><span>Logout</span></div>
                                         </div>
                                     </a>
+                                    <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post" style="display: none;">
+                                        <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                                    </form>
                                 </li>
                             </ul>
                         </li>
@@ -297,6 +300,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         new PerfectScrollbar(".best-product")
+    </script>
+    <script>
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent the default anchor behavior
+            document.getElementById('logoutForm').submit(); // Submit the hidden form
+        });
     </script>
     <script type="text/javascript">
         $(document).ready(function () {
