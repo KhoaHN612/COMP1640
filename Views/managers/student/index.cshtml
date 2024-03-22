@@ -1,0 +1,103 @@
+﻿<!--start content-->
+<main class="page-content">
+    <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-4">
+        <div class="card radius-10 w-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Contribution in @ViewBag.TotalContribution[0].Year</h5>
+                        <!-- Select year, display current year first access-->
+                        <div class="w-5"> 
+                            <select class="form-select" id="yearStudent" aria-label="Default select example" onchange="SelectedContributionsYearByStudent(this.value)">
+                                @foreach (var item in ViewBag.Years)
+                                {
+                                    if (item == ViewBag.TotalContribution[0].Year)
+                                    {
+                                        <option value="@item" selected>@item</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item" >@item</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary" id="totalContributions">0 article</h3>
+                                <p class="mb-0">Total contribution</p>
+                            </div>
+                            <div id="totalContributionData"
+                                data-totalcontribution='@Html.Raw(Json.Serialize(ViewData["TotalContribution"]))'>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary-2" id="totalAccepted">0 article</h3>
+                                <p class="mb-0">Contribution Puslished</p>
+                            </div>
+                            <div id="totalAcceptedData"
+                                data-totalaccepted='@Html.Raw(Json.Serialize(ViewData["TotalContributionsAccepted"]))'>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary-2" id="totalRejected">0 article</h3>
+                                <p class="mb-0">Contribution Rejected</p>
+                            </div>
+                            <div id="totalRejectedData"
+                                data-totalrejected='@Html.Raw(Json.Serialize(ViewData["TotalContributionsRejected"]))'>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary-2" id="totalPending">0 article</h3>
+                                <p class="mb-0">Contribution Pending</p>
+                            </div>
+                            <div id="totalPendingData"
+                                data-totalpending='@Html.Raw(Json.Serialize(ViewData["TotalContributionsPending"]))'>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div><!--end row-->
+
+    <div class="row">
+        <div class="card radius-10 w-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Contribution without Comment in @ViewBag.Contributions[0].Date.Year</h5>
+                        <div class="w-5"> 
+                            <select class="form-select" id="yearStudent" aria-label="Default select example" onchange="SelectedCommentYearByStudent(this.value)">
+                                @foreach (var item in ViewBag.Years)
+                                {
+                                    if (item == ViewBag.Contributions[0].Year)
+                                    {
+                                        <option value="@item" selected>@item</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item" >@item</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>                    
+                     <div id="contributionGuest"
+                            data-contributionguest='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'>
+                    </div>
+                     <div id="contributionWithoutCommentsGuest"
+                            data-contributionwithoutcommentsguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutComments"]))'>
+                    </div>
+                     <div id="contributionCommentGuest"
+                            data-contributioncommentguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutCommentsAfter14Days"]))'>
+                    </div>
+                    <div id="chartStudent"></div>
+                </div>
+        </div>
+    </div><!--end row-->
+
+</main>
+<!--end page main-->
