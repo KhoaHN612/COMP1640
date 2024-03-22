@@ -24,4 +24,10 @@ public class Post
 
     [InverseProperty("Post")]
     public virtual ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
+
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; }
+
+    [StringLength(100)]
+    public string? ImagePath { get; set; }
 }

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using COMP1640.Models;
 using COMP1640.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
+using System.Drawing.Printing;
 
 namespace COMP1640.Controllers
 {
@@ -15,11 +17,13 @@ namespace COMP1640.Controllers
     {
         private readonly Comp1640Context _context;
         private readonly UserManager<COMP1640User> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public PostController(Comp1640Context context, UserManager<COMP1640User> UserManager)
+        public PostController(Comp1640Context context, UserManager<COMP1640User> UserManager, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _userManager = UserManager;
+            _webHostEnvironment = webHostEnvironment;
         }
         private async Task<string> GetUserFullName()
         {
@@ -37,7 +41,7 @@ namespace COMP1640.Controllers
             }
             var comp1640Context = _context.Posts.Include(p => p.User);
             return View(await comp1640Context.ToListAsync());
-            
+
         }
 
         // GET: Post/Details/5
@@ -92,6 +96,8 @@ namespace COMP1640.Controllers
             {
                 return NotFound();
             }
+            var imagePath = post.ImagePath;
+            ViewBag.imagePath = imagePath;
 
             return View(post);
         }
@@ -108,16 +114,23 @@ namespace COMP1640.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PostId,Title,Content,PostedAt,UserId")] Post post)
+        public async Task<IActionResult> Create([Bind("PostId,Title,Content,PostedAt,UserId")] Post post, IFormFile imageFile)
         {
             if (ModelState.IsValid)
             {
+                post.ImageFile = imageFile;
+                string uniqueFileName = GetUniqueFileName(post.ImageFile.FileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "postUpload", uniqueFileName);
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await post.ImageFile.CopyToAsync(fileStream);
+                }
+                post.ImagePath = uniqueFileName;
                 _context.Add(post);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] =  _userManager.GetUserId(User);
-            return View(post);
+            ViewData["UserId"] = _userManager.GetUserId(User);
+            return RedirectToAction("Index");
         }
 
         // GET: Post/Edit/5
@@ -211,6 +224,15 @@ namespace COMP1640.Controllers
         private bool PostExists(int id)
         {
             return _context.Posts.Any(e => e.PostId == id);
+        }
+
+        private string GetUniqueFileName(string fileName)
+        {
+            fileName = Path.GetFileName(fileName);
+            return Path.GetFileNameWithoutExtension(fileName)
+                   + "_"
+                   + Guid.NewGuid().ToString().Substring(0, 4)
+                   + Path.GetExtension(fileName);
         }
     }
 }
