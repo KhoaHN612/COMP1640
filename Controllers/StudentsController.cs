@@ -56,7 +56,7 @@ namespace COMP1640.Controllers
             }
             return View();
         }
-        [Authorize(Roles="Student")]
+        [Authorize]
         public async Task<IActionResult> SubmissionList()
         {
             ViewData["Title"] = "Submission List";

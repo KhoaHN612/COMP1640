@@ -503,6 +503,7 @@ namespace COMP1640.Controllers
             return contributions;
         }
 
+        [Authorize(Roles="Coordinator")]
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
             ViewData["Title"] = "List Submission";
@@ -527,6 +528,8 @@ namespace COMP1640.Controllers
             return View("coordinators/student_submission", contributions);
         }
 
+
+        [Authorize(Roles="Coordinator, Student")]
         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
@@ -859,7 +862,7 @@ namespace COMP1640.Controllers
             return View("profile_managers",curUser);
         }
 
-
+        [Authorize(Roles="Coordinator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status)
@@ -890,6 +893,8 @@ namespace COMP1640.Controllers
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
+        
+        [Authorize(Roles="Coordinator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateComment(Contribution contribution)
@@ -925,6 +930,8 @@ namespace COMP1640.Controllers
 
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
+        
+        [Authorize(Roles="Coordinator")]
         [HttpPost]
         public async Task<IActionResult> Publish(int id, bool isPublished)
         {
