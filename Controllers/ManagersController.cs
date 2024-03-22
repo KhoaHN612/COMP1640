@@ -898,7 +898,7 @@ namespace COMP1640.Controllers
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
 
-        [Authorize(Roles = "Coordinator")]
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateComment(Contribution contribution, string userId)
