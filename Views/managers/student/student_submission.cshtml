@@ -52,12 +52,54 @@
                                 <input asp-for="SubmissionDate" readonly type="date" class="form-control" id="submissionDate"
                                     required>
                             </div>
-                            <div class="col-12">
+                            @* <div class="col-12">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
                                         onchange="validateCheckbox()" required>
                                     <label class="form-check-label" for="invalidCheck2">Agree to terms and
                                         conditions</label>
+                                </div>
+                            </div> *@
+                            <div class="col-lg-3">
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#termsModal">
+                                    View Terms and Conditions
+                                </button>
+                            </div>
+                            <!-- Terms and Conditions Modal -->
+                            <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Place your terms and conditions text here -->
+                                                <section>
+                                                    <h4>Submission Guidelines:</h4>
+                                                    <p>a. By submitting content, you agree to follow our submission guidelines as outlined by the editorial team.</p>
+                                                    <p>b. Content submitted must be original work created by you and not infringe upon the intellectual property rights of any third party.</p>
+                                                </section>
+                                                <section>
+                                                    <h4>Rights and Ownership:</h4>
+                                                    <p>a. By submitting content to the magazine, you grant us a non-exclusive, royalty-free, perpetual, and worldwide license to reproduce, distribute, modify, adapt, and publish the content in any form or medium.</p>
+                                                    <p>b. You retain the copyright to your original work and may use it for any other purpose not conflicting with the rights granted to us.</p>
+                                                    <p>c. We reserve the right to edit or modify submitted content for clarity, style, or length without seeking additional approval.</p>
+                                                </section>
+                                                <section>
+                                                    <h4>Representation and Warranties:</h4>
+                                                    <p>a. By submitting content, you represent and warrant that you have the legal right and authority to do so.</p>
+                                                    <p>b. You agree to indemnify and hold harmless the magazine and its affiliates from any claims, liabilities, damages, or expenses arising out of or related to your submission.</p>
+                                                </section>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="invalidCheck2" onchange="validateCheckbox()" required>
+                                                <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions</label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-12">

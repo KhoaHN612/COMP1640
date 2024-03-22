@@ -63,6 +63,11 @@ namespace COMP1640.Controllers
             var publishedContributions = await _context.Contributions
                 .Where(c => c.IsPublished) 
                 .ToListAsync();
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             return View("submissionList", publishedContributions);
         }
 
