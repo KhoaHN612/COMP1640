@@ -44,7 +44,7 @@
                             <th>
                                 @Html.DisplayNameFor(model => model.User)
                             </th>
-                            <th></th>
+                            <th> Acctions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -64,9 +64,17 @@
                                     @Html.DisplayFor(modelItem => item.User.Id)
                                 </td>
                                 <td>
-                                    <a asp-action="Edit" asp-route-id="@item.PostId">Edit</a> |
-                                    <a asp-action="Details" asp-route-id="@item.PostId">Details</a> |
-                                    <a asp-action="Delete" asp-route-id="@item.PostId">Delete</a>
+                                    <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                        <a asp-action="Edit" asp-route-id="@item.PostId" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.PostId" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Views">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a> 
+                                        <a class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" onclick="confirmDelete('@item.Title', @item.PostId)">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -94,4 +102,22 @@
     </div>
 </main>
 <!--end page main-->
+
+<script>
+    function confirmDelete(title, id) {
+        Swal.fire({
+            title: 'Are you sure to delete ' + title + ' ?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#9C9C9C',
+            confirmButtonText: 'Delete'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/Post/Delete/" + id;
+            }
+        })
+    }
+</script>
 
