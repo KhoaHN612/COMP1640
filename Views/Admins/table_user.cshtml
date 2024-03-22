@@ -1,8 +1,12 @@
-﻿@model IEnumerable<COMP1640.Areas.Identity.Data.COMP1640User>
+﻿@using Microsoft.AspNetCore.Identity
+@using COMP1640.Areas.Identity.Data
+@inject UserManager<COMP1640User> UserManager
+@model IEnumerable<COMP1640.Areas.Identity.Data.COMP1640User>
 @{
     var context = ViewBag.Context as COMP1640.Models.Comp1640Context;
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
 }
+
 
 <!--start content-->
 <main class="page-content">
@@ -34,10 +38,11 @@
                         <tr>
                             <th>No</th>
                             <th>Name</th>
+                            <th>Email</th>
                             <th>Faculty</th>
                             <th>Address</th>
                             <th>Date Of Birth</th>
-                            <th>Status</th>
+                            <th>Role</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -50,6 +55,7 @@
                         <tr>
                             <td>@index</td>
                             <td>@user.FullName</td>
+                            <td>@user.Email</td>
                             <td>
                                 @* @(string.IsNullOrEmpty(user.FacultyId.ToString())?"Unknown":user.FacultyId) *@
                                 @{
@@ -60,7 +66,18 @@
                             </td>
                             <td>@user.Address</td>
                             <td>@user.DayOfBirth</td>
-                            <td><span class="badge bg-light-warning text-warning w-50">Pending</span></td>
+                            <td>
+                                @{
+                                var roles = await UserManager.GetRolesAsync(user);
+                                    if (roles.Count > 0)
+                                    {
+                                        @foreach (var role in roles)
+                                        {
+                                            <span class="badge bg-light-warning text-warning w-50">@role</span>
+                                        }
+                                    }
+                                }
+                            </td>
                             <td>
                                 <div class="table-actions d-flex align-items-center gap-3 fs-6">
                                     <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
@@ -79,10 +96,11 @@
                         <tr>
                             <th>No</th>
                             <th>Name</th>
+                            <th>Email</th>
                             <th>Faculty</th>
                             <th>Address</th>
                             <th>Date Of Birth</th>
-                            <th>Status</th>
+                            <th>Role</th>
                             <th>Actions</th>
                         </tr>
                     </tfoot>

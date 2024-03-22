@@ -4,7 +4,62 @@
     ViewData["Title"] = "Access denied";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Theme Starz">
+
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href="assets/css/font-awesome.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/selectize.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/owl.carousel.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/vanillabox/vanillabox.css" type="text/css">
+
+    <link rel="stylesheet" href="assets/css/style.css" type="text/css">
+
+    <title>Do not have Permission</title>
+
+</head>
+
+<body class="page-sub-page page-about-us">
+    <!-- Wrapper -->
+    <div class="wrapper">
+    <!-- Header -->
+    <section class="flex items-center h-full">
+        <div class="container">
+            <div class="text-center max-w-2xl mx-auto">
+                <!-- đổi link hình ảnh -->
+                <img src="~/error.jpg" alt="error" class="h-72 mb-5 mx-auto">
+                <br>
+                <h1 class="font-bold sm:text-[150px] text-9xl mb-2">Opps!</h1>
+                <h3 class="text-gray-800 sm:text-2xl text-xl font-bold mb-4">You do not have permission to access the website</h3>
+                <p class="text-gray-700 font-medium leading-relaxed">Oopsie-daisy! The page you requested seems to have taken a vacation. Return to the homepage and continue your journey.</p>
+                <div class="mt-8">
+                    <button class="border border-black text-black font-medium rounded-full transition-all duration-300 hover:bg-black hover:text-white py-3 px-7">Back to Safety</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    </div>
+    <style>
+        button {
+            border: 2px solid #000000;
+            color: #000000;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            padding: 12px 28px;
+        }
+        
+        button:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+    </style>
+</body>
+<!-- end Wrapper -->
+</html>
