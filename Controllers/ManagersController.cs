@@ -365,6 +365,7 @@ namespace COMP1640.Controllers
             return Ok();
         }
 
+        [Authorize(Roles="Coordinator")]
         public async Task<IActionResult> IndexCooridinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";

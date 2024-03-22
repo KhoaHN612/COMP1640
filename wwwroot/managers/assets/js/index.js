@@ -682,7 +682,221 @@ $(window).on('load', function () {
 
 	//=======================================================ADMIN DASHBOARD=======================================================
 	GetContributionByFaculty();
+	//=======================================================ADMIN END=======================================================
+
+	//=======================================================GUEST DASHBOARD=======================================================
+	GetContributionForGuest();
+	//=======================================================GUEST END=======================================================
 });
+
+function GetContributionForGuest() {
+	//Retrieve the data from the HTML data attribute
+	var contributionDataElement = document.getElementById("contributionGuest");
+	if (contributionDataElement) {
+		var contributionsData = JSON.parse(contributionDataElement.dataset.contributionguest);
+		console.log(contributionsData);
+		
+		var contributionWithoutCommentsDataElement = document.getElementById("contributionWithoutCommentsGuest");
+		var contributionWithoutCommentsData = JSON.parse(contributionWithoutCommentsDataElement.dataset.contributionwithoutcommentsguest);
+		console.log(contributionWithoutCommentsData);
+
+		var contributiomCommentDataElement = document.getElementById("contributionCommentGuest");
+		var contributiomCommentData = JSON.parse(contributiomCommentDataElement.dataset.contributioncommentguest);
+		console.log(contributiomCommentData);
+
+		var arrDataChartGuest = [[], [], [], []];
+		//get month name from January to December
+		var month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		// get to current month
+		var currentMonth = new Date().getMonth();
+		month = month.slice(0, currentMonth + 1);
+			
+		var totalArticles = RecursiveCleanData(contributionsData, contributionsData.length - 1);
+		var totalWithoutComments = RecursiveCleanData(contributionWithoutCommentsData, contributionWithoutCommentsData.length - 1);
+		var totalComment = RecursiveCleanData(contributiomCommentData, contributiomCommentData.length - 1);
+
+		var arrDataChartGuest = FillData(month, totalArticles, totalWithoutComments, totalComment);
+
+		var options = {
+			series: [{
+			name: 'Without Comments',
+			type: 'column',
+			data: arrDataChartGuest[1]
+		  }, {
+			name: 'Comments',
+			type: 'column',
+			data: arrDataChartGuest[2]
+		  }, {
+			name: 'Total Articles',
+			type: 'line',
+			data: arrDataChartGuest[0]
+		  }],
+			chart: {
+			height: 350,
+			type: 'line',
+			stacked: false
+		  },
+		  dataLabels: {
+			enabled: false
+		  },
+		  stroke: {
+			width: [1, 1, 4]
+		  },
+		  xaxis: {
+			categories: arrDataChartGuest[3],
+		  },
+		  yaxis: [
+			{
+			  axisTicks: {
+				show: true,
+			  },
+			  axisBorder: {
+				show: true,
+				color: '#008FFB'
+			  },
+			  labels: {
+				style: {
+				  colors: '#008FFB',
+				}
+			  },
+			  title: {
+				text: "Approved articles have no comments",
+				style: {
+				  color: '#008FFB',
+				}
+			  },
+			  tooltip: {
+				enabled: true
+			  }
+			},
+			{
+			  seriesName: 'Without Comments',
+			  opposite: true,
+			  axisTicks: {
+				show: true,
+			  },
+			  axisBorder: {
+				show: true,
+				color: '#00E396',
+				formatter: function (value) {
+				  return value + " articles";
+				}
+			  },
+			  labels: {
+				style: {
+				  colors: '#00E396',
+				}
+			  },
+			  title: {
+				text: "Approved article with comments",
+				style: {
+				  color: '#00E396',
+				}
+			  },
+			},
+			{
+			  seriesName: 'Comments',
+			  opposite: true,
+			  axisTicks: {
+				show: true,
+			  },
+			  axisBorder: {
+				show: true,
+				color: '#FEB019'
+			  },
+			  labels: {
+				style: {
+				  colors: '#FEB019',
+				},
+			  },
+			  title: {
+				text: "Total articles in this year",
+				style: {
+				  color: '#FEB019',
+				}
+			  }
+			},
+		  ],
+		  tooltip: {
+			fixed: {
+			  enabled: true,
+			  position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+			  offsetY: 30,
+			  offsetX: 60
+			},
+		  },
+		  legend: {
+			horizontalAlign: 'center',
+			offsetX: 40
+		  }
+		  };
+  
+		  var chart = new ApexCharts(document.querySelector("#chartStudent"), options);
+		  chart.render();
+	}
+}
+
+function RecursiveCleanData(contributionsData, i) {
+	if (i < 0) {
+		return contributionsData;
+	}
+
+	var month = new Date(contributionsData[i].date).getMonth() + 1;
+	if (i > 0) {
+        var previousMonth = new Date(contributionsData[i - 1].date).getMonth() + 1;
+        if(month == previousMonth) {
+            contributionsData[i - 1].quantity += contributionsData[i].quantity;
+			contributionsData.splice(i, 1);
+        }
+    }
+	return RecursiveCleanData(contributionsData, i - 1);
+}
+
+function FillData(month, totalArticles, totalWithoutComments, totalComment) {
+	var arrDataChartGuest = [[], [], [], []];
+	
+	for (var i = 0; i < month.length; i++) {
+		arrDataChartGuest[3].push(month[i]);
+		arrDataChartGuest[0].push(0);	
+		arrDataChartGuest[1].push(0);
+		arrDataChartGuest[2].push(0);
+		
+		for (let j = 0; j < totalArticles.length; j++) {
+			console.log(j);
+
+			if ((i + 1) == new Date(totalArticles[j].date).getMonth() + 1) {
+				arrDataChartGuest[0][i] = totalArticles[j].quantity;
+			}
+			
+			if (totalWithoutComments.length > j){
+				if ((i + 1) == new Date(totalWithoutComments[j].date).getMonth() + 1) {
+					arrDataChartGuest[1][i] = totalWithoutComments[j].quantity;
+				}
+			}
+
+			if (totalComment.length > j){
+				if ((i + 1) == new Date(totalComment[j].date).getMonth() + 1) {
+					console.log(totalComment[j]);
+					arrDataChartGuest[2][i] = totalComment[j].quantity;
+				}
+			}
+		}
+	}
+
+	console.log(arrDataChartGuest);	
+	
+	return arrDataChartGuest;
+}
+
+function SelectedContributionsYearByStudent(year) {
+	var url = '/Students/IndexGuest?task=Contributions&year=' + year;
+	window.location.href = url;
+}
+
+function SelectedCommentYearByStudent(year) {
+	var url = '/Students/IndexGuest?task=CommentContributions&year=' + year;
+	window.location.href = url;
+}
 
 function StatisticContributionsByYear() {
 	// Retrieve the data from the HTML data attribute

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
+using COMP1640.Models.MultiModels;
+using Humanizer;
 
 namespace COMP1640.Controllers
 {
@@ -56,6 +58,160 @@ namespace COMP1640.Controllers
             }
             return View();
         }
+
+        public async Task<IActionResult> IndexGuest(string task, string year)
+        {
+            ViewData["Title"] = "Dashboard Guest";
+
+            List<TotalContribution> TotalContribution = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsPushlish = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsRejected = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsPending = new List<TotalContribution>();
+            List<ContributionWithoutComment> contributions = new List<ContributionWithoutComment>();
+            List<ContributionWithoutComment> contributionWithoutComments = new List<ContributionWithoutComment>();
+            List<ContributionWithoutComment> contributionComments = new List<ContributionWithoutComment>();
+
+            //GET ALL YEARS
+            List<int> years = await _context.Contributions
+                .Select(c => c.SubmissionDate.Year)
+                .Distinct()
+                .ToListAsync();
+
+            //Total Contributions
+            DateTime currentDate = DateTime.Now;
+            if (task == "Contributions" && !string.IsNullOrEmpty(year))
+            {
+                currentDate = new DateTime(Convert.ToInt32(year), 1, 1);
+            }     
+
+            DateTime date = DateTime.Now;
+            if (task == "CommentContributions" && !string.IsNullOrEmpty(year))
+            {
+                date = new DateTime(Convert.ToInt32(year), 1, 1);
+            }         
+            
+            //get current faculty of current user
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null || currentUser.FacultyId == null)
+            {
+                return null;
+            }
+            else
+            {                 
+                int currentFacultyId = currentUser.FacultyId ?? 0;;
+                        
+                TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
+
+                //Total Contributions Puslished
+                TotalContributionsPushlish = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
+
+                //Total Contributions Rejected
+                TotalContributionsRejected = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsRejected");
+
+                //Total Contributions Pending
+                TotalContributionsPending = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPending");
+                                
+                //GET ALL CONTRIBUTIONS
+                contributions = await GetComments(currentFacultyId, date.Year, "Contribution");  
+
+                //GET ALL CONTRIBUTIONS WITHOUT COMMENTS  
+                contributionWithoutComments =  await GetComments(currentFacultyId, date.Year, "ContributionWithoutComments");
+                
+                //GET ALL CONTRIBUTIONS HAVE COMMENT
+                contributionComments = await GetComments(currentFacultyId, date.Year, "ContributionComments");
+            }
+
+            if (TotalContribution.Count == 0)
+            {
+                TotalContribution.Add(new TotalContribution { Year = currentDate.Year, Month = currentDate.Month, Total = 0 });
+            }
+
+            if (contributions.Count == 0)
+            {
+                contributions.Add(new ContributionWithoutComment { Date = date, Year = date.Year, Quantity = 0 });
+            }
+
+            ViewData["TotalContributionsAccepted"] = TotalContributionsPushlish;
+            ViewData["TotalContributionsRejected"] = TotalContributionsRejected;
+            ViewData["TotalContributionsPending"] = TotalContributionsPending;
+            ViewData["TotalContribution"] = TotalContribution;
+            ViewData["ContributionWithoutComments"] = contributionWithoutComments;
+            ViewData["ContributionWithoutCommentsAfter14Days"] = contributionComments;
+            ViewData["Contributions"] = contributions;
+            ViewData["Years"] = years;
+
+            return View("~/Views/managers/student/index.cshtml");
+        }
+
+        public async Task<List<ContributionWithoutComment>> GetComments(int facultyID, int year, string actions)
+        {
+            var query = from c in _context.Contributions
+            join u in _context.Users on c.UserId equals u.Id
+            select new { Contribution = c, User = u };
+
+            if(actions == "ContributionWithoutComments")
+            {
+                query = query.Where(c => c.Contribution.Comment == null);
+            }
+            else if(actions == "ContributionComments")
+            {
+                query = query.Where(c => c.Contribution.Comment != null);
+            }
+
+            List<ContributionWithoutComment> contributions = await query 
+                .Where(c => c.Contribution.SubmissionDate.Year == year
+                            && c.Contribution.Status == "Approved"
+                            && c.User.FacultyId == facultyID)
+                .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
+                .Select(g => new ContributionWithoutComment
+                {
+                    Date = g.Key.Date,
+                    Year = g.Key.Date.Year,
+                    Quantity = g.Count()
+                })
+                .OrderBy(c => c.Date)
+                .ToListAsync();
+            return contributions;
+        }
+
+        public async Task<List<TotalContribution>> GetTotalContributions(int facultyID, int year, string action)
+        {
+            var query = from c in _context.Contributions
+            join u in _context.Users on c.UserId equals u.Id
+            where c.SubmissionDate.Year == year && u.FacultyId == facultyID
+            select new { Contribution = c, User = u };
+
+            switch (action)
+            {
+                case "TotalContributionsPuslished":
+                    query = query.Where(c => c.Contribution.IsPublished == true);
+                    break;
+                case "TotalContributionsRejected":
+                    query = query.Where(c => c.Contribution.Status == "Rejected");
+                    break;
+                case "TotalContributionsPending":
+                    query = query.Where(c => c.Contribution.Status == "Pending");
+                    break;
+                default:
+                    break;
+            }
+
+            List<TotalContribution> contributions =  await query
+            .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
+            .Select(g => new TotalContribution
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                Total = g.Count()
+            })
+            .OrderBy(c => c.Year)
+            .ThenBy(c => c.Month)
+            .ToListAsync();
+
+            return contributions;
+        }
+
         [Authorize]
         public async Task<IActionResult> SubmissionList()
         {
