@@ -15,10 +15,10 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCooridinators"><i
+                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCoordinators"><i
                                 class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active"><a asp-controller="Managers"
-                            asp-action="TablePost">List post</a></li>
+                    <li class="breadcrumb-item active"><a asp-controller="Post"
+                            asp-action="Index">List post</a></li>
                     <li class="breadcrumb-item active" aria-current="page">From @ViewData["Title"]</li>
                 </ol>
             </nav>
@@ -35,7 +35,7 @@
                         <!-- Start of form -->
                         <form asp-action="Edit" asp-controller="Post" method="Post">
                             <div class="card-title d-flex align-items-center">
-                                <h5 class="mb-0">>@ViewData["Title"] Registration</h5>
+                                <h5 class="mb-0">@ViewData["Title"] Registration</h5>
                             </div>
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <hr />
