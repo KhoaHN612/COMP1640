@@ -64,7 +64,7 @@
                                 }
                                 @facultyName
                             </td>
-                            <td>@user.Address</td>
+                            <td class="text-ellipsis">@user.Address</td>
                             <td>@user.DayOfBirth</td>
                             <td>
                                 @{
@@ -110,3 +110,10 @@
     </div>
 </main>
 <!--end page main-->
+<style>
+.text-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+</style>

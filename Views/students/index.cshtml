@@ -179,3 +179,21 @@
     <!-- end Divisions, Connect -->
 </div>
 <!-- end Page Content -->
+<script>
+var hasLoggedVisit = false;
+
+function logVisit() {
+    if (!hasLoggedVisit) {
+        var browserName = navigator.userAgent;
+        fetch('/WebAccessLog/AddVisitLog', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ browserName: browserName })
+        });
+        hasLoggedVisit = true;
+    }
+}
+document.addEventListener('DOMContentLoaded', logVisit);
+</script>
