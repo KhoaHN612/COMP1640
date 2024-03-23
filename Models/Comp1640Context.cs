@@ -40,8 +40,9 @@ public partial class Comp1640Context : IdentityDbContext<COMP1640User>
 
     public virtual DbSet<Post> Posts {get; set;}
     public virtual DbSet<PostComment> PostComments {get; set;}
-    
+    public virtual DbSet<WebAccessLog> WebAccessLogs {get; set;}
     public object COMP1640Users { get; internal set; }
+    public object VisitLogs { get; internal set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=ConnectionStrings:MyConnect");

@@ -31,17 +31,17 @@
                         @{
                             foreach (var item in Model)
                             {
-                                <form asp-controller="Students" asp-action="EditSubmission" enctype='multipart/form-data'
-                                    class="row g-3" method="post">
+                                <form asp-controller="Students" asp-action="EditSubmission" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate method="post">
                                     @* <input type="hidden" name="id" value="@item.ContributionId"> *@
-                                    <div class="col-md-6">
-                                        <div class="file">
-                                            <input type="file" name='newFile' class="form-control">
-                                            <label>@item.FilePath.</label>
+                                    <div class="col-md-10">
+                                        <div class="form-group file">
+                                            <input type="file" name="newFile" class="form-control" required>
+                                            <label for="newFile" class="form-label">@item.FilePath</label>
                                             <input type="hidden" name="id" value="@item.FileId">
+                                            <div class="invalid-feedback">Please choose a file.</div>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-2 pb-5">
                                         <button id="submitBtn" class="btn btn-primary" type="submit">Replace</button>
                                     </div>
                                 </form>
