@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Drawing.Printing;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace COMP1640.Controllers
 {
@@ -162,33 +163,48 @@ namespace COMP1640.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PostId,Title,Content,PostedAt,UserId")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("PostId,Title,Content,PostedAt,UserId")] Post post, IFormFile newImageFile)
         {
             if (id != post.PostId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+
+            try
             {
-                try
+                string oldFileName = post.ImagePath ?? "";
+                string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "postUpload", oldFileName);
+                if (System.IO.File.Exists(oldFilePath))
                 {
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
+                    System.IO.File.Delete(Path.Combine(oldFilePath));
                 }
-                catch (DbUpdateConcurrencyException)
+                post.ImagePath = "";
+
+                var uniqueFileName = GetUniqueFileName(newImageFile.FileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "postUpload", uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    if (!PostExists(post.PostId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    await newImageFile.CopyToAsync(fileStream);
                 }
-                return RedirectToAction(nameof(Index));
+                post.ImagePath = uniqueFileName;
+
+                _context.Update(post);
+                await _context.SaveChangesAsync();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PostExists(post.PostId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+
             ViewData["UserId"] = _userManager.GetUserId(User);
             return View(post);
         }
@@ -249,7 +265,8 @@ namespace COMP1640.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateComment(int PostId, string UserId, string Content, DateTime CreatedAt)
         {
-            var PostComment = new PostComment {
+            var PostComment = new PostComment
+            {
                 PostId = PostId,
                 Content = Content,
                 UserId = UserId,
@@ -259,7 +276,7 @@ namespace COMP1640.Controllers
             _context.Add(PostComment);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("PostDetail", new {id = PostId});
+            return RedirectToAction("PostDetail", new { id = PostId });
         }
     }
 }

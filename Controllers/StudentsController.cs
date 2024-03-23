@@ -330,7 +330,7 @@ namespace COMP1640.Controllers
         [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetails)
+        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title")] Contribution contribution, FileDetail fileDetails)
         {
             ViewBag.wrongFileMessage = "";
             var currentContributionId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
@@ -370,6 +370,7 @@ namespace COMP1640.Controllers
             contribution.AnnualMagazineId = AnnualMagazineId;
 
             var userId = _userManager.GetUserId(User);
+            contribution.SubmissionDate = DateTime.Now;
             contribution.Comment = null;
             contribution.Status = "Pending";
             contribution.UserId = userId ?? "Unknown";
