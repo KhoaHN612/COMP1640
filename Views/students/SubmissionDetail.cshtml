@@ -95,7 +95,7 @@
                                     <span class="course-summary" id="course-length"><i class="fa fa-book"></i>Magazine
                                         Name</span>
                                     <span class="course-summary" id="course-time-amount"><i class="fa fa-rocket"
-                                            aria-hidden="true"></i></i>Status: <strong>@Model.Status</strong></span>
+aria-hidden="true"></i></i>Status: <strong>@Model.Status</strong></span>
                                 </figure><!-- /#course-summary -->
                             </section><!-- /#course-header -->
 
@@ -110,15 +110,15 @@
                                                 {
                                                     foreach (var comment in ViewBag.Comments)
                                                     {
-                                                                <div class="card mb-3 comment-card">
-                                                                    <div class="card-body">
+                                                        <div class="card mb-3 comment-card">
+                                                            <div class="card-body">
                                                                 @* <h6 class="card-title" style="color: red; font-weight:
                                         bold;">@ViewBag.userFullName</h6> *@
-                                                                        <p class="card-text comment-content">@comment.CommentField</p>
-                                                                        <p class="card-text"><small class="text-muted">Comment Date:
+                                                                <p class="card-text comment-content">@comment.CommentField</p>
+                                                                <p class="card-text"><small class="text-muted">Comment Date:
                                                                         @comment.CommentDate</small></p>
-                                                                    </div>
-                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     }
                                                 }
                                                 else
@@ -134,22 +134,16 @@
                             <div class="col-xl-6 mx-auto">
                                 <div class="card">
                                     <div class="card-body">
+                                        @if(User.IsInRole("Student")){
                                         <div class="border p-3 rounded">
                                             <hr />
                                             <form class="row g-3" asp-action="UpdateComment" method="post">
-                                                <input type="hidden" asp-for="ContributionId" />
+<input type="hidden" asp-for="ContributionId" />
                                                 <div class="form-group"> 
                                                     <label class="form-label">Comment</label>
-                                                    @{
-                                                        var daysSinceSubmission = (DateTime.Now - @Model.SubmissionDate).TotalDays;
-                                                        if(daysSinceSubmission <= 14){
-                                                            <input asp-for="Comment" class="form-control"/>
-                                                        }
-                                                        else
-                                                        {
-                                                            <input asp-for="Comment" class="form-control" value="Cannot give a comment because it's over 14 days"readonly/>
-                                                        }
-                                                    }                           
+                                                    <div>
+                                                        <input asp-for="Comment" id="commentInput" class="form-control" />
+                                                    </div>
                                                     <span asp-validation-for="Comment" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group"> 
@@ -161,7 +155,7 @@
                                                 <div class="col-12 mt-3">
                                                     <div class="alert alert-warning" role="alert">
                                                         The deadline to comment on this contribution is <strong>
-                                                            @Model.CommentDeadline
+                                                            @ViewBag.Deadline
                                                         </strong>
                                                     </div>
                                                     <input type="hidden" name="contributionId" value="">
@@ -169,10 +163,10 @@
                                                 <input type="hidden" id="userId" name="id" value="@UserManager.GetUserId(User)">
                                             </form>
                                         </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
-
                         </article><!-- /.course-detail -->
                     </section><!-- /.course-detail -->
                 </div><!-- /#page-main -->
@@ -181,3 +175,18 @@
     </div><!-- /.container -->
 </div>
 <!-- end Page Content -->
+@if(User.IsInRole("Student")){
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var commentInput = document.getElementById('commentInput');
+        if (commentInput.value.trim() === '') {
+            commentInput.value = "Student: ";
+        }
+        commentInput.addEventListener('input', function () {
+            if (!commentInput.value.startsWith("Student: ")) {
+                commentInput.value = "Student: " + commentInput.value;
+            }
+        });
+    });
+</script>
+}

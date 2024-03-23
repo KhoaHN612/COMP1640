@@ -6,16 +6,13 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCoordinators"><i
-                                class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active"><a asp-controller="Managers"
-                            asp-action="StudentSubmissionCoordinators">List submission</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCooridinators"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active"><a asp-controller="Managers" asp-action="StudentSubmissionCoordinators">List submission</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Make Comments</li>
                 </ol>
             </nav>
         </div>
     </div>
-
     <div class="row">
         <div class="col-xl-6 mx-auto">
             <div class="card">
@@ -36,7 +33,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-body">
                     <div class="border p-3 rounded">
@@ -49,20 +45,15 @@
                                 {
                                     <div class="card mb-3">
                                         <div class="card-body">
-                                            @* <h6 class="card-title" style="color: red; font-weight:
-                                    bold;">@ViewBag.userFullName</h6> *@
-                                            <p class="card-text" style="color: rgb(12, 20, 169); font-weight: bold;">
-                                                @comment.CommentField
-                                            </p>
-                                            <p class="card-text"><small class="text-muted">Comment Date:
-                                                    @comment.CommentDate</small></p>
+                                            <p class="card-text" style="color: rgb(12, 20, 169); font-weight: bold;">@comment.CommentField</p>
+                                            <p class="card-text"><small class="text-muted">Comment Date: @comment.CommentDate</small></p>
                                         </div>
                                     </div>
                                 }
                             }
                             else
                             {
-                                <p>No comments available.</p>
+<p>No comments available.</p>
                             }
                         </div>
                     </div>
@@ -70,79 +61,63 @@
             </div>
         </div>
 
-
         <div class="col-xl-6 mx-auto">
             <div class="card">
                 <div class="card-body">
                     <div class="border p-3 rounded">
                         <h6 class="mb-0 text-uppercase">Comment Form</h6>
                         <hr />
-                        <form class="row g-3" method="post">
+                        <form class="row g-3" method="post" asp-action="UpdateComment">
+                            <input type="hidden" asp-for="ContributionId" />
                             <div class="col-6">
                                 <label class="form-label"> COORDINATORS NAME</label>
-                                <input type="text" class="form-control" readonly disabled value="@ViewBag.userFullName">
+                                <input type="text" class="form-control" readonly value="@ViewBag.userFullName">
                             </div>
                             <div class="col-6">
                                 <label class="form-label">COORDINATORS EMAIL</label>
-                                <input type="email" class="form-control" readonly disabled value="@ViewBag.userEmail">
+                                <input type="email" class="form-control" readonly value="@ViewBag.userEmail">
+                            </div>
+                            
+                            @if(User.IsInRole("Coordinator")){
+                            <div class="form-group">
+                                <label class="form-label">Comment</label>
+                                <div>
+                                    <input asp-for="Comment" id="commentInput" class="form-control" />
+                                </div>
+                                <span asp-validation-for="Comment" class="text-danger"></span>
+                            </div>
+                            }
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Send</button>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <div class="alert alert-warning" role="alert">
+                                    The deadline to comment on this contribution is <strong>@ViewBag.Deadline</strong>
+                                </div>
+                                <input type="hidden" name="contributionId" value="">
                             </div>
                         </form>
-                        @{
-                            if (DateTime.UtcNow <= @Model.CommentDeadline)
-                            {
-                                <form class="row g-3" asp-action="UpdateComment" method="post">
-                                    <input type="hidden" asp-for="ContributionId" />
-                                    <div class="col-12">
-                                        <label class="form-label">Comment</label>
-                                        <input asp-for="Comment" class="form-control" />
-                                        <span asp-validation-for="Comment" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-primary">Send</button>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 mt-3">
-                                        <div class="alert alert-warning" role="alert">
-                                            The deadline to comment on this contribution is<strong>
-                                                @Model.CommentDeadline
-                                            </strong>
-                                        </div>
-                                        <input type="hidden" name="contributionId" value="">
-                                    </div>
-                                </form>
-                            }
-                            else
-                            {
-                                <form class="row g-3" asp-action="UpdateComment" method="post">
-                                    <input type="hidden" asp-for="ContributionId" />
-                                    <div class="col-12">
-                                        <label class="form-label">Comment</label>
-                                        <input asp-for="Comment" class="form-control" disabled readonly/>
-                                        <span asp-validation-for="Comment" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-primary">Send</button>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 mt-3">
-                                        <div class="alert alert-warning" role="alert">
-                                            <strong>
-                                                Cannot give comment as the deadline is over
-                                            </strong>
-                                        </div>
-                                        <input type="hidden" name="contributionId" value="">
-                                    </div>
-                                </form>
-                            }
-                        }
-
                     </div>
                 </div>
             </div>
         </div>
-
-
     </div>
 </main>
+
+@if(User.IsInRole("Coordinator")){
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var commentInput = document.getElementById('commentInput');
+        if (commentInput.value.trim() === '') {
+            commentInput.value = "Coordinator: ";
+        }
+        commentInput.addEventListener('input', function () {
+            if (!commentInput.value.startsWith("Coordinator: ")) {
+commentInput.value = "Coordinator: " + commentInput.value;
+            }
+        });
+    });
+</script>
+}

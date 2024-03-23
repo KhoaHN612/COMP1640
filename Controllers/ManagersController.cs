@@ -934,7 +934,7 @@ namespace COMP1640.Controllers
             return user?.FullName; // This will return null if user is null.
         }
 
-        [Authorize(Roles = "Coordinator")]
+        
         [HttpPost]
         public async Task<IActionResult> Publish(int id, bool isPublished)
         {
