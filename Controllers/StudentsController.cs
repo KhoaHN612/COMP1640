@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using COMP1640.Models.MultiModels;
 using Humanizer;
+using Microsoft.VisualBasic;
 
 namespace COMP1640.Controllers
 {
@@ -322,7 +323,8 @@ namespace COMP1640.Controllers
             {
                 ViewBag.academicYear = academicYear;
             }
-            return View("~/Views/managers/student/student_edit_submission.cshtml", contribution);
+            var uploadedFiles = await _context.FileDetails.Where(f => f.ContributionId == id).ToListAsync();
+            return View("~/Views/managers/student/student_edit_submission.cshtml", uploadedFiles);
         }
 
         [Authorize(Roles = "Student")]
@@ -428,46 +430,31 @@ namespace COMP1640.Controllers
         }
 
         // POST: StudentsController/Edit/5
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<ActionResult> EditSubmission(int id, FileDetail newContribution)
-        // {
-        //     // var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
-        //     var currentFile = await _context.FileDetails
-        //         .FirstOrDefaultAsync(fd => fd.ContributionId == id);
-        //     if (currentFile != null)
-        //     {
-        //         string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
-        //         string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
-        //         System.IO.File.Delete(currentFilePath);
-        //     }
-
-        //     string uniqueFileName = GetUniqueFileName(newContribution.ContributionFile.FileName);
-        //     string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
-        //     using (var fileStream = new FileStream(newFilePath, FileMode.Create))
-        //     {
-        //         await newContribution.ContributionFile.CopyToAsync(fileStream);
-        //     }
-
-        //     currentFile.FilePath = uniqueFileName;
-        //     await _context.SaveChangesAsync();
-        //     return RedirectToAction(nameof(Index));
-        // }
-
-        [Authorize(Roles = "Student")]
-        // POST: StudentsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> EditSubmission(int id, IFormFile newFile)
         {
-            try
+            var currentFile = await _context.FileDetails
+                .FirstOrDefaultAsync(fd => fd.FileId == id);
+
+            if (currentFile != null)
             {
-                return RedirectToAction(nameof(Index));
+                string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
+                string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
+                System.IO.File.Delete(currentFilePath);
             }
-            catch
+
+            string uniqueFileName = GetUniqueFileName(newFile.FileName);
+            string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+            using (var fileStream = new FileStream(newFilePath, FileMode.Create))
             {
-                return View();
+                await newFile.CopyToAsync(fileStream);
             }
+
+            currentFile.FilePath = uniqueFileName;
+            await _context.SaveChangesAsync();
+            
+            return RedirectToAction(nameof(Index));
         }
 
         [Authorize(Roles = "Student")]
