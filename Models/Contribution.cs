@@ -42,6 +42,9 @@ public partial class Contribution
 
     [InverseProperty("Contribution")]
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+    [Column("commentDeadline")]
+    public DateTime CommentDeadline { get; set; }
 }
 
 // INSERT INTO [dbo].[Contributions]

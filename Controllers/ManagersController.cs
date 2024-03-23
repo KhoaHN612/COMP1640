@@ -541,7 +541,6 @@ namespace COMP1640.Controllers
             var comments = await _context.Comments
                                 .Where(c => c.ContributionId == id)
                                 .ToListAsync();
-
             var contributions = _context.Contributions.ToList();
             var userId = _userManager.GetUserId(User);
             var anotherUserId = userId;
@@ -552,15 +551,9 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-            if (contribution != null)
-            {
-                var submissionDate = contribution.SubmissionDate;
-                var deadline = submissionDate.AddDays(14);
-                if (deadline >= submissionDate)
-                {
-                    ViewBag.Deadline = deadline;
-                }
-            }
+           
+        //    điều kiện sao cho khi quá 14 ngày kể từ submissionDate, thẻ input sẽ có thêm 2 thuộc tính là disabled và readonly
+
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
@@ -571,10 +564,6 @@ namespace COMP1640.Controllers
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
             ViewBag.Comments = comments;
-
-
-
-
             return View("coordinators/create_comment", contribution);
         }
         //=============================== POSTS ====================================//

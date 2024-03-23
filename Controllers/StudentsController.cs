@@ -371,6 +371,7 @@ namespace COMP1640.Controllers
             contribution.Comment = null;
             contribution.Status = "Pending";
             contribution.UserId = userId ?? "Unknown";
+            contribution.CommentDeadline = contribution.SubmissionDate.AddDays(14).AddHours(23).AddMinutes(59).AddSeconds(59);
             _context.Add(contribution);
             var result = await _context.SaveChangesAsync();
 
