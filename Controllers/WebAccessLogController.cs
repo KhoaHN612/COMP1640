@@ -19,12 +19,20 @@ namespace COMP1640.Controllers
             // Lấy thông tin trình duyệt của người dùng từ User-Agent header
             var browserName = Request.Headers["User-Agent"].ToString();
 
+            Console.WriteLine(browserName);
+
             // Lưu thông tin vào bảng VisitLogs
             var visitLog = new WebAccessLog
             {
                 BrowserName = browserName,
                 AccessDate = DateTime.Now
             };
+
+            //print out the WebAccessLog object
+            foreach (var prop in visitLog.GetType().GetProperties())
+            {
+                Console.WriteLine($"{prop.Name} = {prop.GetValue(visitLog, null)}");
+            }
 
             _context.WebAccessLogs.Add(visitLog);
             _context.SaveChanges();
