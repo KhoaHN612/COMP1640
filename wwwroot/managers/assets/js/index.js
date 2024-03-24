@@ -50,13 +50,17 @@ function GetTotalContributionsData() {
 			dataTotalColumn[1].push(total);
 		}
 
+		var arrLabelPie = [];
+		for (var i = 0; i < dataTotalPie[0].length; i++) {
+			arrLabelPie.push(dataTotalPie[0][i] + ' - ' + dataTotalPie[1][i] + ' articles');
+		}
 		// CHART TOTAL CONTRIBUTIONS
 		var optionsPie = {
 			series: dataTotalPie[1],
 			chart: {
 				type: 'pie',
 			},
-			labels: dataTotalPie[0],
+			labels: arrLabelPie,
 			responsive: [{
 				breakpoint: 480,
 				options: {
@@ -202,12 +206,17 @@ function GetApprovedContributionData() {
 			dataApprovedColumn[1].push(total);
 		}
 
+		var arrLabelPie = [];
+		for (var i = 0; i < dataApprovedPie[0].length; i++) {
+			arrLabelPie.push(dataApprovedPie[0][i] + ' - ' + dataApprovedPie[1][i] + ' articles');
+		}
+
 		var optionsPie = {
 			series: dataApprovedPie[1],
 			chart: {
 				type: 'pie',
 			},
-			labels: dataApprovedPie[0],
+			labels: arrLabelPie,
 			responsive: [{
 				breakpoint: 480,
 				options: {
@@ -349,12 +358,17 @@ function GetRejectedContributionData() {
 			dataRejectedColumn[1].push(total);
 		}
 
+		var arrLabelPie = [];
+		for (var i = 0; i < dataRejectedPie[0].length; i++) {
+			arrLabelPie.push(dataRejectedPie[0][i] + ' - ' + dataRejectedPie[1][i] + ' articles');
+		}
+
 		var optionsPie = {
 			series: dataRejectedPie[1],
 			chart: {
 				type: 'pie',
 			},	
-			labels: dataRejectedPie[0],
+			labels: arrLabelPie,
 			responsive: [{
 				breakpoint: 480,
 				options: {
@@ -496,12 +510,17 @@ function GetPendingContributionData() {
 			dataPendingColumn[1].push(total);
 		}
 
+		var arrLabelPie = [];
+		for (var i = 0; i < dataPendingPie[0].length; i++) {
+			arrLabelPie.push(dataPendingPie[0][i] + ' - ' + dataPendingPie[1][i] + ' articles');
+		}
+
 		var optionsPie = {
 			series: dataPendingPie[1],
 			chart: {
 				type: 'pie',
 			},
-			labels: dataPendingPie[0],
+			labels: arrLabelPie,
 			responsive: [{
 				breakpoint: 480,
 				options: {
