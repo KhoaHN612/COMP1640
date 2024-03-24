@@ -67,6 +67,7 @@
                     <div class="border p-3 rounded">
                         <h6 class="mb-0 text-uppercase">Comment Form</h6>
                         <hr />
+                        @if(User.IsInRole("Coordinator")){
                         <form class="row g-3" method="post" asp-action="UpdateComment">
                             <input type="hidden" asp-for="ContributionId" />
                             <div class="col-6">
@@ -78,7 +79,7 @@
                                 <input type="email" class="form-control" readonly value="@ViewBag.userEmail">
                             </div>
                             
-                            @if(User.IsInRole("Coordinator")){
+                            
                             <div class="form-group">
                                 <label class="form-label">Comment</label>
                                 <div>
@@ -86,7 +87,7 @@
                                 </div>
                                 <span asp-validation-for="Comment" class="text-danger"></span>
                             </div>
-                            }
+                            
                             <div class="col-12">
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary">Send</button>
@@ -99,6 +100,42 @@
                                 <input type="hidden" name="contributionId" value="">
                             </div>
                         </form>
+                        }
+
+                        @if(User.IsInRole("Manager")){
+                        <form class="row g-3" method="post" asp-action="UpdateComment">
+                            <input type="hidden" asp-for="ContributionId" />
+                            <div class="col-6">
+                                <label class="form-label"> COORDINATORS NAME</label>
+                                <input type="text" class="form-control" readonly value="@ViewBag.userFullName">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">COORDINATORS EMAIL</label>
+                                <input type="email" class="form-control" readonly value="@ViewBag.userEmail">
+                            </div>
+                            
+                            
+                            <div class="form-group">
+                                <label class="form-label">Comment</label>
+                                <div>
+                                    <input asp-for="Comment" id="commentInput" class="form-control" />
+                                </div>
+                                <span asp-validation-for="Comment" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Send</button>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <div class="alert alert-warning" role="alert">
+                                    The deadline to comment on this contribution is <strong>@ViewBag.Deadline</strong>
+                                </div>
+                                <input type="hidden" name="contributionId" value="">
+                            </div>
+                        </form>
+                        }
                     </div>
                 </div>
             </div>
@@ -116,6 +153,22 @@
         commentInput.addEventListener('input', function () {
             if (!commentInput.value.startsWith("Coordinator: ")) {
 commentInput.value = "Coordinator: " + commentInput.value;
+            }
+        });
+    });
+</script>
+}
+
+@if(User.IsInRole("Manager")){
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var commentInput = document.getElementById('commentInput');
+        if (commentInput.value.trim() === '') {
+            commentInput.value = "Manager: ";
+        }
+        commentInput.addEventListener('input', function () {
+            if (!commentInput.value.startsWith("Manager: ")) {
+commentInput.value = "Manager: " + commentInput.value;
             }
         });
     });

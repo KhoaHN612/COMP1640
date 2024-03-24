@@ -536,7 +536,7 @@ namespace COMP1640.Controllers
             return contributions;
         }
 
-        [Authorize(Roles = "Coordinator")]
+        [Authorize(Roles = "Coordinator, Manager")]
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
             ViewData["Title"] = "List Submission";
@@ -562,7 +562,7 @@ namespace COMP1640.Controllers
         }
 
 
-        [Authorize(Roles = "Coordinator, Student")]
+        [Authorize(Roles = "Coordinator, Student, Manager")]
         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
@@ -580,8 +580,7 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-           
-        //    điều kiện sao cho khi quá 14 ngày kể từ submissionDate, thẻ input sẽ có thêm 2 thuộc tính là disabled và readonly
+   
 
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
