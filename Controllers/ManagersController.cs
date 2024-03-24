@@ -31,7 +31,7 @@ namespace COMP1640.Controllers
             _emailSender = EmailSender;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string task, string year)
         {
             ViewData["Title"] = "Dashboard";

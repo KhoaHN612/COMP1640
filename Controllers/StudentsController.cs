@@ -60,6 +60,7 @@ namespace COMP1640.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> IndexGuest(string task, string year)
         {
             ViewData["Title"] = "Dashboard Guest";
