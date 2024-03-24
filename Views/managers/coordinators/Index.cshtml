@@ -86,5 +86,66 @@
         </div>
     </div><!--end row-->
 
+    <div class="row">
+            <div class="col">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex">
+                                <h5>Quantity Of Contributors in "@ViewBag.ContributionUser[0].Faculty"</h5>
+                            </div>
+                            <div class="dropdown ms-auto">
+                                <select class="form-select" id="yearUser" aria-label="Default select example" onchange="SelectedYearContributors(this.value)">
+                                    @foreach (var item in ViewBag.Years)
+                                    {
+                                        if (item == ViewBag.ContributionUser[0].Year)
+                                        {
+                                            <option value="@item" selected>@item</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item" >@item</option>
+                                        }
+                                    }   
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No </th>
+                                        <th>Student Name</th>
+                                        <th>Total contributions</th>
+                                        <th>Accepted</th>
+                                        <th>Rejected</th>
+                                        <th>Pending</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="qtyContribution">
+                                    @{
+                                        var i = 1;
+                                    }
+                                    
+                                    @foreach (var item in ViewBag.ContributionUser)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>@item.FullName</td>
+                                            <td class="totalContributionCell">@item.TotalContribution</td>
+                                            <td>@item.TotalAccept</td>
+                                            <td>@item.TotalReject</td>
+                                            <td>@item.TotalPending</td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end row-->
 </main>
 <!--end page main-->
