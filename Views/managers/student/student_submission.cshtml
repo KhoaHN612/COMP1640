@@ -26,7 +26,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="p-4 border rounded">
-                        <form asp-action='Create' enctype='multipart/form-data' class="row g-3">
+                        <form asp-action='Create' enctype='multipart/form-data' class="row g-3"
+                            onsubmit="return validateForm();">
                             <div class="col-md-6">
                                 <label asp-for='Title' for="annualMagazineId" class="form-label">Title</label>
                                 <input asp-for='Title' type="text" class="form-control" id="validationDefault02"
@@ -43,21 +44,100 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label" for="inputGroupFile01">Upload (.docx, .png, .jpg, .jpeg...)</label>
+                                <label class="form-label" for="inputGroupFile01">Upload (.docx, .png, .jpg,
+                                    .jpeg...)</label>
                                 <input type="file" name='ContributionFile' class="form-control" id="inputGroupFile01"
                                     multiple required accept=".docx, .png, .jpg, .jpeg">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Submission Date:</label>
-                                <input asp-for="SubmissionDate" readonly type="date" class="form-control" id="submissionDate"
-                                    required>
+                                <input asp-for="SubmissionDate" readonly type="date" class="form-control"
+                                    id="submissionDate" required>
                             </div>
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
-                                        onchange="validateCheckbox()" required>
-                                    <label class="form-check-label" for="invalidCheck2">Agree to terms and
-                                        conditions</label>
+                            @* <div class="col-12">
+                            <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
+                            onchange="validateCheckbox()" required>
+                            <label class="form-check-label" for="invalidCheck2">Agree to terms and
+                            conditions</label>
+                            </div>
+                            </div> *@
+                            <div class="col-lg-3">
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                                    data-bs-target="#termsModal">
+                                    View Terms and Conditions
+                                </button>
+                            </div>
+                            <!-- Terms and Conditions Modal -->
+                            <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Place your terms and conditions text here -->
+                                            <section>
+                                                <h4>Submission Guidelines:</h4>
+                                                <p>a. By submitting content, you agree to follow our submission
+                                                    guidelines as outlined by the editorial team.</p>
+                                                <p>b. Content submitted must be original work created by you and not
+                                                    infringe upon the intellectual property rights of any third party.
+                                                </p>
+                                            </section>
+                                            <section>
+                                                <h4>Rights and Ownership:</h4>
+                                                <p>a. By submitting content to the magazine, you grant us a
+                                                    non-exclusive, royalty-free, perpetual, and worldwide license to
+                                                    reproduce, distribute, modify, adapt, and publish the content in any
+                                                    form or medium.</p>
+                                                <p>b. You retain the copyright to your original work and may use it for
+                                                    any other purpose not conflicting with the rights granted to us.</p>
+                                                <p>c. We reserve the right to edit or modify submitted content for
+                                                    clarity, style, or length without seeking additional approval.</p>
+                                            </section>
+                                            <section>
+                                                <h4>Representation and Warranties:</h4>
+                                                <p>a. By submitting content, you represent and warrant that you have the
+                                                    legal right and authority to do so.</p>
+                                                <p>b. You agree to indemnify and hold harmless the magazine and its
+                                                    affiliates from any claims, liabilities, damages, or expenses
+                                                    arising out of or related to your submission.</p>
+                                            </section>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value=""
+                                                    id="invalidCheck2" onchange="validateCheckbox()" required>
+                                                <label class="form-check-label" for="agreeTerms">I agree to the terms
+                                                    and conditions</label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary"
+                                                data-bs-dismiss="modal">Ok</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="errorModal" class="modal fade" tabindex="-1" aria-labelledby="errorModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p id="errorMessage"></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -86,4 +166,22 @@
     }
     var currentDate = new Date().toISOString().slice(0, 10);
     document.getElementById('submissionDate').value = currentDate;
+</script>
+<script>
+    function validateForm() {
+        var files = document.getElementById('inputGroupFile01').files;
+        var isValid = true;
+
+        for (var i = 0; i < files.length; i++) {
+            var extension = files[i].name.split('.').pop().toLowerCase();
+            var acceptedExtensions = ['.docx', '.doc', '.jpg', '.jpeg', '.webp', '.png'];
+            if (!acceptedExtensions.includes('.' + extension)) {
+                isValid = false;
+                $('#errorMessage').text('Invalid file extension: ' + files[i].name);
+                $('#errorModal').modal('show');
+                break;
+            }
+        }
+        return isValid;
+    }
 </script>

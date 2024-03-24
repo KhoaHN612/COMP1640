@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using COMP1640.Models.MultiModels;
 using Humanizer;
+using Microsoft.VisualBasic;
 
 namespace COMP1640.Controllers
 {
@@ -82,14 +83,14 @@ namespace COMP1640.Controllers
             if (task == "Contributions" && !string.IsNullOrEmpty(year))
             {
                 currentDate = new DateTime(Convert.ToInt32(year), 1, 1);
-            }     
+            }
 
             DateTime date = DateTime.Now;
             if (task == "CommentContributions" && !string.IsNullOrEmpty(year))
             {
                 date = new DateTime(Convert.ToInt32(year), 1, 1);
-            }         
-            
+            }
+
             //get current faculty of current user
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -98,9 +99,9 @@ namespace COMP1640.Controllers
                 return null;
             }
             else
-            {                 
-                int currentFacultyId = currentUser.FacultyId ?? 0;;
-                        
+            {
+                int currentFacultyId = currentUser.FacultyId ?? 0; ;
+
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
 
                 //Total Contributions Puslished
@@ -111,13 +112,13 @@ namespace COMP1640.Controllers
 
                 //Total Contributions Pending
                 TotalContributionsPending = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPending");
-                                
+
                 //GET ALL CONTRIBUTIONS
-                contributions = await GetComments(currentFacultyId, date.Year, "Contribution");  
+                contributions = await GetComments(currentFacultyId, date.Year, "Contribution");
 
                 //GET ALL CONTRIBUTIONS WITHOUT COMMENTS  
-                contributionWithoutComments =  await GetComments(currentFacultyId, date.Year, "ContributionWithoutComments");
-                
+                contributionWithoutComments = await GetComments(currentFacultyId, date.Year, "ContributionWithoutComments");
+
                 //GET ALL CONTRIBUTIONS HAVE COMMENT
                 contributionComments = await GetComments(currentFacultyId, date.Year, "ContributionComments");
             }
@@ -147,19 +148,19 @@ namespace COMP1640.Controllers
         public async Task<List<ContributionWithoutComment>> GetComments(int facultyID, int year, string actions)
         {
             var query = from c in _context.Contributions
-            join u in _context.Users on c.UserId equals u.Id
-            select new { Contribution = c, User = u };
+                        join u in _context.Users on c.UserId equals u.Id
+                        select new { Contribution = c, User = u };
 
-            if(actions == "ContributionWithoutComments")
+            if (actions == "ContributionWithoutComments")
             {
                 query = query.Where(c => c.Contribution.Comment == null);
             }
-            else if(actions == "ContributionComments")
+            else if (actions == "ContributionComments")
             {
                 query = query.Where(c => c.Contribution.Comment != null);
             }
 
-            List<ContributionWithoutComment> contributions = await query 
+            List<ContributionWithoutComment> contributions = await query
                 .Where(c => c.Contribution.SubmissionDate.Year == year
                             && c.Contribution.Status == "Approved"
                             && c.User.FacultyId == facultyID)
@@ -178,9 +179,9 @@ namespace COMP1640.Controllers
         public async Task<List<TotalContribution>> GetTotalContributions(int facultyID, int year, string action)
         {
             var query = from c in _context.Contributions
-            join u in _context.Users on c.UserId equals u.Id
-            where c.SubmissionDate.Year == year && u.FacultyId == facultyID
-            select new { Contribution = c, User = u };
+                        join u in _context.Users on c.UserId equals u.Id
+                        where c.SubmissionDate.Year == year && u.FacultyId == facultyID
+                        select new { Contribution = c, User = u };
 
             switch (action)
             {
@@ -197,7 +198,7 @@ namespace COMP1640.Controllers
                     break;
             }
 
-            List<TotalContribution> contributions =  await query
+            List<TotalContribution> contributions = await query
             .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
             .Select(g => new TotalContribution
             {
@@ -217,8 +218,13 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "Submission List";
             var publishedContributions = await _context.Contributions
-                .Where(c => c.IsPublished) 
+                .Where(c => c.IsPublished)
                 .ToListAsync();
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
             return View("submissionList", publishedContributions);
         }
 
@@ -247,7 +253,7 @@ namespace COMP1640.Controllers
         }
 
         // Action for the My Account page
-        [Authorize(Roles="Student, Guest")]
+        [Authorize(Roles = "Student, Guest")]
         public async Task<IActionResult> MyAccount()
         {
             ViewData["Title"] = "My Account";
@@ -293,7 +299,7 @@ namespace COMP1640.Controllers
         //     return View();
         // }
 
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         public IActionResult FromCreateSubmission()
         {
             ViewData["Title"] = "From Submission";
@@ -304,7 +310,7 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> FromEditSubmission(int id)
         {
             ViewData["Title"] = "From Submission";
@@ -316,137 +322,59 @@ namespace COMP1640.Controllers
             if (academicYear != null)
             {
                 ViewBag.academicYear = academicYear;
-            }   
-            return View("~/Views/managers/student/student_edit_submission.cshtml", contribution);
+            }
+            var uploadedFiles = await _context.FileDetails.Where(f => f.ContributionId == id).ToListAsync();
+            return View("~/Views/managers/student/student_edit_submission.cshtml", uploadedFiles);
         }
 
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetail)
-        // {
-
-        //     string uniqueFileName = GetUniqueFileName(fileDetail.ContributionFile.FileName);
-        //     string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
-        //     string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
-        //     if (fileExtension == ".docx")
-        //     {
-        //         using (var fileStream = new FileStream(filePath, FileMode.Create))
-        //         {
-        //             await fileDetail.ContributionFile.CopyToAsync(fileStream);
-        //         }
-        //         fileDetail.FilePath = uniqueFileName;
-        //         fileDetail.Type = "Document";
-        //     }
-        //     else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".webp")
-        //     {
-        //         using (var fileStream = new FileStream(filePath, FileMode.Create))
-        //         {
-        //             await fileDetail.ContributionFile.CopyToAsync(fileStream);
-        //         }
-        //         fileDetail.FilePath = uniqueFileName;
-        //         fileDetail.Type = "Image";
-        //     }
-        //     int maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
-        //     fileDetail.FileId = maxId + 1;
-
-        //     maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-        //     contribution.ContributionId = maxId + 1;
-        //     contribution.AnnualMagazineId = AnnualMagazineId;
-
-        //     var userId = _userManager.GetUserId(User);
-        //     contribution.Comment = null;
-        //     contribution.Status = "Pending";
-        //     contribution.UserId = userId;
-        //     fileDetail.ContributionId = contribution.ContributionId;
-        //     _context.Add(contribution);
-        //     _context.Add(fileDetail);
-        //     var result = await _context.SaveChangesAsync();
-        //     if (result > 0)
-        //     {
-        //         var currentUser = await _userManager.GetUserAsync(User);
-
-        //         if (currentUser == null)
-        //         {
-        //             return NotFound("User not found.");
-        //         }
-
-        //         // Get the Faculty ID of the current user
-        //         var facultyId = currentUser.FacultyId;
-
-        //         // Get the role ID for "Coordinator"
-        //         var coordinatorRole = (await _roleManager.FindByNameAsync("Coordinator"));
-
-        //         if (facultyId != null && coordinatorRole != null)
-        //         {
-        //             // // Retrieve users with the same Faculty and "Coordinator" role
-        //             // var coordinators = await _userManager.Users
-        //             //     .Include(u => u.Faculty) // Eager load the Faculty navigation property
-        //             //     .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
-        //             //     .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result) // Check if user has the "Coordinator" role
-        //             //     .ToListAsync();
-
-        //             var sameFacultyUsers = await _userManager.Users
-        //                 .Include(u => u.Faculty) // Eager load the Faculty navigation property
-        //                 .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
-        //                 .ToListAsync();
-
-        //             // Filter users who have the "Coordinator" role
-        //             var coordinators = sameFacultyUsers
-        //                 .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result)
-        //                 .ToList();
-
-        //             var coordinatorEmails = coordinators.Select(u => u.Email).ToArray();
-        //             var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
-
-        //             string body = "Title: New Contribution\n" +
-        //             "Dear sir/madam, \n" +
-        //             "There are new contribution(s) for the annual magazine.\n" +
-        //             "- Name Contribution: " + contribution.Title + "\n" +
-        //             "- Annual Magazine name:" + annualMagazine.Title + "\n" +
-        //             "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
-        //             "Sincerely, \n" +
-        //             "Developer team";
-        //             var message = new Message(coordinatorEmails, "New Contribution", body);
-        //             await _emailSender.SendEmailAsync(message);
-        //         }
-        //     }
-        //     return RedirectToAction(nameof(MyAccount));
-        // }
-
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title, SubmissionDate")] Contribution contribution, FileDetail fileDetails)
+        public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title")] Contribution contribution, FileDetail fileDetails)
         {
+            ViewBag.wrongFileMessage = "";
             var currentContributionId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.ContributionId = currentContributionId + 1;
             int maxId = 0;
             maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
+
             foreach (var file in fileDetails.ContributionFile)
             {
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
                 fileDetails.FileId = maxId + 1;
                 maxId++;
+
                 string uniqueFileName = GetUniqueFileName(file.FileName);
                 string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
                 string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
+
+
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(fileStream);
                 }
                 fileDetails.FilePath = uniqueFileName;
-                fileDetails.Type = "Document";
+
+                var documentExtensions = new List<string> { ".doc", ".docx" };
+                var imageExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
+                fileDetails.Type = documentExtensions.Any(e => e == fileExtension) ? "Document" :
+                   imageExtensions.Any(e => e == fileExtension) ? "Image" : "Unknown";
+
                 fileDetails.ContributionId = contribution.ContributionId;
                 _context.Add(fileDetails);
                 await _context.SaveChangesAsync();
             }
-            maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
 
+            maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
             contribution.AnnualMagazineId = AnnualMagazineId;
 
             var userId = _userManager.GetUserId(User);
+            contribution.SubmissionDate = DateTime.Now;
             contribution.Comment = null;
             contribution.Status = "Pending";
-            contribution.UserId = userId;
+            contribution.UserId = userId ?? "Unknown";
+            contribution.CommentDeadline = contribution.SubmissionDate.AddDays(14).AddHours(23).AddMinutes(59).AddSeconds(59);
             _context.Add(contribution);
             var result = await _context.SaveChangesAsync();
 
@@ -463,7 +391,7 @@ namespace COMP1640.Controllers
                 var facultyId = currentUser.FacultyId;
 
                 // Get the role ID for "Coordinator"
-                var coordinatorRole = (await _roleManager.FindByNameAsync("Coordinator"));
+                var coordinatorRole = await _roleManager.FindByNameAsync("Coordinator");
 
                 if (facultyId != null && coordinatorRole != null)
                 {
@@ -503,49 +431,34 @@ namespace COMP1640.Controllers
         }
 
         // POST: StudentsController/Edit/5
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<ActionResult> EditSubmission(int id, FileDetail newContribution)
-        // {
-        //     // var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
-        //     var currentFile = await _context.FileDetails
-        //         .FirstOrDefaultAsync(fd => fd.ContributionId == id);
-        //     if (currentFile != null)
-        //     {
-        //         string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
-        //         string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
-        //         System.IO.File.Delete(currentFilePath);
-        //     }
-
-        //     string uniqueFileName = GetUniqueFileName(newContribution.ContributionFile.FileName);
-        //     string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
-        //     using (var fileStream = new FileStream(newFilePath, FileMode.Create))
-        //     {
-        //         await newContribution.ContributionFile.CopyToAsync(fileStream);
-        //     }
-
-        //     currentFile.FilePath = uniqueFileName;
-        //     await _context.SaveChangesAsync();
-        //     return RedirectToAction(nameof(Index));
-        // }
-
-        [Authorize(Roles="Student")]
-        // POST: StudentsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> EditSubmission(int id, IFormFile newFile)
         {
-            try
+            var currentFile = await _context.FileDetails
+                .FirstOrDefaultAsync(fd => fd.FileId == id);
+
+            if (currentFile != null)
             {
-                return RedirectToAction(nameof(Index));
+                string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload");
+                string currentFilePath = Path.Combine(uploadsFolderPath, currentFile.FilePath);
+                System.IO.File.Delete(currentFilePath);
             }
-            catch
+
+            string uniqueFileName = GetUniqueFileName(newFile.FileName);
+            string newFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+            using (var fileStream = new FileStream(newFilePath, FileMode.Create))
             {
-                return View();
+                await newFile.CopyToAsync(fileStream);
             }
+
+            currentFile.FilePath = uniqueFileName;
+            await _context.SaveChangesAsync();
+            
+            return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
@@ -609,7 +522,7 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> SubmissionDetail(int id)
         {
             ViewData["Title"] = "Submission Detail";
@@ -655,7 +568,7 @@ namespace COMP1640.Controllers
 
         }
 
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> PostLists()
         {
             ViewData["Title"] = "Post Lists";
@@ -667,7 +580,7 @@ namespace COMP1640.Controllers
             return View();
         }
 
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> PostDetail()
         {
             ViewData["Title"] = "Post Detail";
@@ -692,8 +605,8 @@ namespace COMP1640.Controllers
                 {
                     UserId = user.Id,
                     ContributionId = contribution.ContributionId,
-                    CommentField = contribution.Comment, 
-                    CommentDate = DateTime.Now 
+                    CommentField = contribution.Comment,
+                    CommentDate = DateTime.Now
                 };
                 _context.Comments.Add(newComment);
                 await _context.SaveChangesAsync();

@@ -1,4 +1,5 @@
-﻿@model COMP1640.Models.Contribution;
+﻿@model IEnumerable<COMP1640.Models.FileDetail>;
+
 @{
     Layout = "~/Views/Shared/_Layout_Students_Submission.cshtml";
 }
@@ -26,46 +27,25 @@
             <div class="card">
                 <div class="card-body">
                     <div class="p-4 border rounded">
-                        <form asp-controller="Students" asp-action="EditSubmission" enctype='multipart/form-data'
-                            class="row g-3" method="post">
-                            <input type="hidden" name="id" value="@Model.ContributionId">
-                            <div class="col-md-4">
-                                <label asp-for='Title' for="annualMagazineId" class="form-label">Title</label>
-                                <input readonly type="text" class="form-control" id="validationDefault02"
-                                    value="@Model.Title">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label asp-for='AnnualMagazineId' class="form-label">Academic Year</label>
-                                <input readonly type="text" class="form-control" id="validationDefault02"
-                                    value="@ViewBag.academicYear">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label" for="inputGroupFile01">Upload</label>
-                                <input type="file" name='ContributionFile' class="form-control" required>
-                            </div>
-
-                            <div class=" col-md-6">
-                                <label class="form-label">Submission Date:</label>
-                                <input readonly type="date" class="form-control" id="submissionDate"
-                                    value="@Model.SubmissionDate">
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
-                                        onchange="validateCheckbox()" required>
-                                    <label class="form-check-label" for="invalidCheck2">Agree to terms and
-                                        conditions</label>
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <button id="submitBtn" class="btn btn-primary" type="submit" disabled>Submit
-                                    form</button>
-                            </div>
-                        </form>
+                        <label class="form-label" for="inputGroupFile01">Upload</label>
+                        @{
+                            foreach (var item in Model)
+                            {
+                                <form asp-controller="Students" asp-action="EditSubmission" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate method="post">
+                                    <div class="col-md-10">
+                                        <div class="form-group file">
+                                            <input type="file" name="newFile" class="form-control" required>
+                                            <label for="newFile" class="form-label">@item.FilePath</label>
+                                            <input type="hidden" name="id" value="@item.FileId">
+                                            <div class="invalid-feedback">Please choose a file.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 pb-5">
+                                        <button id="submitBtn" class="btn btn-primary" type="submit">Replace</button>
+                                    </div>
+                                </form>
+                            }
+                        }
                     </div>
                 </div>
             </div>

@@ -1,5 +1,7 @@
 @model IEnumerable<COMP1640.Models.Post>
-
+@using Microsoft.AspNetCore.Identity
+@using COMP1640.Areas.Identity.Data
+@inject UserManager<COMP1640User> UserManager
 @{
     Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
 }
@@ -44,12 +46,14 @@
                             <th>
                                 @Html.DisplayNameFor(model => model.User)
                             </th>
-                            <th> Acctions</th>
+                            <th> Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
+                            var user = await UserManager.FindByIdAsync(item.UserId);
+                            var fullName = user != null ? user.FullName : "Unknown";
                             <tr>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Title)
@@ -61,17 +65,20 @@
                                     @Html.DisplayFor(modelItem => item.PostedAt)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.User.Id)
+                                    @fullName
                                 </td>
                                 <td>
                                     <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                                        <a asp-action="Edit" asp-route-id="@item.PostId" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment">
+                                        <a asp-action="Edit" asp-route-id="@item.PostId" class="text-warning"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
                                             <i class="bi bi-pencil-fill"></i>
                                         </a>
-                                        <a asp-action="Details" asp-route-id="@item.PostId" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Views">
+                                        <a asp-action="Details" asp-route-id="@item.PostId" class="text-primary"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Views">
                                             <i class="bi bi-eye-fill"></i>
-                                        </a> 
-                                        <a class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete" onclick="confirmDelete('@item.Title', @item.PostId)">
+                                        </a>
+                                        <a class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                            title="Delete" onclick="confirmDelete('@item.Title', @item.PostId)">
                                             <i class="bi bi-trash-fill"></i>
                                         </a>
                                     </div>
@@ -120,4 +127,3 @@
         })
     }
 </script>
-

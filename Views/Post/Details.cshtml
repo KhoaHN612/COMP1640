@@ -1,47 +1,74 @@
+@using Microsoft.AspNetCore.Identity
+@using COMP1640.Areas.Identity.Data
+@inject UserManager<COMP1640User> UserManager
 @model COMP1640.Models.Post
 
-<!DOCTYPE html>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Details</title>
-</head>
-<body>
+<main class="page-content">
+    <div class="container">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">Tables</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCoordinators"><i
+                                    class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item active"><a asp-controller="Post" asp-action="Index">List Post</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">From @ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <hr />
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Post Detail</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">Title</dt>
+                    <dd class="col-sm-10">
+                        <input type="text" class="form-control" value="@Model.Title" readonly />
+                    </dd>
 
-<div>
-    <h4>Post</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PostedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PostedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.PostId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
-</body>
-</html>
+                    <dt class="col-sm-2">Content</dt>
+                    <dd class="col-sm-10">
+                        <textarea class="form-control" rows="5" readonly>@Model.Content</textarea>
+                    </dd>
+
+                    <dt class="col-sm-2">Image</dt>
+                    <dd class="col-sm-10">
+                        <img src="~/postUpload/@Model.ImagePath" alt="" class="limited-image">
+                    </dd>
+
+
+                    <dt class="col-sm-2">Posted At</dt>
+                    <dd class="col-sm-10">
+                        <input type="text" class="form-control" value="@Model.PostedAt" readonly />
+                    </dd>
+
+                    <dt class="col-sm-2">Posted by</dt>
+                    <dd class="col-sm-10">
+                        @{
+                            var user = await UserManager.FindByIdAsync(Model.UserId);
+                            var fullName = user != null ? user.FullName : "Unknown";
+                        }
+                        <input type="text" class="form-control" value="@fullName" readonly />
+                    </dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("Edit", new { id = Model?.PostId })" class="btn btn-primary">Edit</a>
+                <a href="@Url.Action("Index")" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</main>
+<style>
+    .limited-image {
+        max-width: 100%;
+        height: auto;
+    }
+</style>

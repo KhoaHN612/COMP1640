@@ -1109,7 +1109,7 @@ function GetData(startDate, endDate, contributionsData, totalContributionData, t
 }
 
 function SelectedYearInCoordinators(year) {
-	var url = '/Managers/IndexCooridinators?task=TotalContribution&year=' + year;
+	var url = '/Managers/IndexCoordinators?task=TotalContribution&year=' + year;
 
 	//redirect to url
 	window.location.href = url;

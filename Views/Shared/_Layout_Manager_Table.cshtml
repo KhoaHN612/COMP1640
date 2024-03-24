@@ -104,12 +104,15 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="authentication-signup-with-header-footer.html">
+                                    <a class="dropdown-item" href="#" id="logoutLink">
                                         <div class="d-flex align-items-center">
                                             <div class=""><i class="bi bi-lock-fill"></i></div>
                                             <div class="ms-3"><span>Logout</span></div>
                                         </div>
                                     </a>
+                                    <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post" style="display: none;">
+                                        <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                                    </form>
                                 </li>
                             </ul>
                         </li>
@@ -176,7 +179,7 @@
             <ul class="metismenu" id="menu">
                 <li class="menu-label">Marketing Coordinators</li>
                 <li>
-                    <a asp-controller="Managers" asp-action="IndexCooridinators">
+                    <a asp-controller="Managers" asp-action="IndexCoordinators">
                         <div class="parent-icon">
                             <i class="bi bi-house-fill"></i>
                         </div>
@@ -217,6 +220,14 @@
                     </a>
                 </li>
                 <li class="menu-label">Students</li>
+                <li>
+                    <a asp-controller="Students" asp-action="IndexGuest">
+                        <div class="parent-icon">
+                            <i class="bi bi-house-fill"></i>
+                        </div>
+                        <div class="menu-title">Dashboad</div>
+                    </a>
+                </li>
                 <li>
                     <a asp-controller="Students" asp-action="FromCreateSubmission">
                         <div class="parent-icon"><i class="bi bi-file-earmark-break-fill"></i></div>
@@ -280,6 +291,13 @@
     <!--app-->
     
     <script src="~/managers/assets/js/app.js"></script>
+    <script>
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent the default anchor behavior
+            document.getElementById('logoutForm').submit(); // Submit the hidden form
+        });
+    </script>
+
     <script type="text/javascript">
     $(document).ready(function() {
         function updateNotificationCount() {

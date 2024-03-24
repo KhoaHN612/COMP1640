@@ -47,34 +47,36 @@
                             <section id="course-info">
                                 <header><h2>Post Info</h2></header>
                                 <p>@Model.Content</p>
-                                <img src="~/postUpload/@ViewBag.imagePath" alt="Post Image" style="max-width:100%; height:auto;">
+                                <img src="~/postUpload/@Model.ImagePath" alt="Post Image" style="max-width:100%; height:auto;">
                             </section><!-- /#course-info -->
 
                             <section id="comments">
                                 <header><h2>Comments</h2></header>
                                 <ul class="discussion-list">
-                                    <li class="author-block">
-                                        @* <figure class="author-picture"><img src="assets/img/student-testimonial.jpg"></figure> *@
-                                        <article class="paragraph-wrapper">
-                                            <div class="inner">
-                                                <header><h5>Rachel Britain</h5></header>
-                                                <div class="rating-individual" data-score="5"></div>
-                                                <p>
-                                                    Mauris elementum et libero ac pharetra. Proin tristique dapibus tellus,
-                                                    lacinia blandit mi tincidunt at. Vivamus vitae interdum felis.
-                                                    Pellentesque congue mollis erat in imperdiet.
-                                                </p>
-                                            </div>
-                                            <div class="comment-controls">
-                                                <span>08-24-2014</span>
-                                                <a href="#leave-reply">Reply</a>
-                                            </div>
-                                        </article>
-                                    </li><!-- /parent item -->
-                                    <li>
+                                    @foreach (var comment in ViewBag.Comments){
+                                        <li class="author-block">
+                                            @* <figure class="author-picture"><img src="assets/img/student-testimonial.jpg"></figure> *@
+                                            <article class="paragraph-wrapper">
+                                                <div class="inner">
+                                                    <header><h5>@comment.User.FullName</h5></header>
+                                                    <div class="rating-individual" data-score="5"></div>
+                                                    <p>
+                                                        @comment.Content
+                                                    </p>
+                                                </div>
+                                                <div class="comment-controls">
+                                                    <span>@comment.CreatedAt</span>
+                                                    @* <a href="#leave-reply">Reply</a> *@
+                                                </div>
+                                            </article>
+                                        </li>
+                                    }
+                                    
+                                    <!-- /parent item -->
+                                    @* <li>
                                         <ul class="discussion-child">
                                             <li class="author-block">
-                                                @* <figure class="author-picture"><img src="assets/img/discussion-author-03.jpg"></figure> *@
+                                                <figure class="author-picture"><img src="assets/img/discussion-author-03.jpg"></figure>
                                                 <article class="paragraph-wrapper">
                                                     <div class="inner">
                                                         <header><h5>John Doe</h5></header>
@@ -92,45 +94,22 @@
                                                 </article>
                                             </li>
                                         </ul><!-- /.discussion-child -->
-                                    </li><!-- /parent item -->
-                                    <li class="author-block">
-                                        @* <figure class="author-picture"><img src="assets/img/discussion-author-02.jpg"></figure> *@
-                                        <article class="paragraph-wrapper">
-                                            <div class="inner">
-                                                <header><h5>Jane Mason</h5></header>
-                                                <div class="rating-individual" data-score="5"></div>
-                                                <p>
-                                                    Mauris elementum et libero ac pharetra. Proin tristique dapibus tellus,
-                                                    lacinia blandit mi tincidunt at. Vivamus vitae interdum felis.
-                                                    Pellentesque congue mollis erat in imperdiet.
-                                                </p>
-                                            </div>
-                                            <div class="comment-controls">
-                                                <span>08-24-2014</span>
-                                                <a href="#leave-reply">Reply</a>
-                                            </div>
-                                        </article>
-                                    </li><!-- /parent item -->
+                                    </li><!-- /parent item --> *@
                                 </ul><!-- /.discussion-list -->
                             </section><!-- /.comments -->
 
                             <section id="leave-reply">
                                 <header><h2>Leave a Comment</h2></header>
-                                <form class="reply-form" method="post">
+                                <form asp-action="CreateComment" asp-controller="Post" class="reply-form" method="post">
+                                    <input type="hidden" name="PostId" value="@Model.PostId">
+                                    <input type="hidden" name="UserId" value="@ViewBag.curUser.Id">
+                                    <input type="hidden" name="CreatedAt" id="CreatedAt">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="input-group">
                                                 <div class="controls">
-                                                    <label for="name">Your Name</label>
-                                                    <input type="text" id="name" name="name" required="required">
-                                                </div><!-- /.controls -->
-                                            </div><!-- /.control-group -->
-                                        </div><!-- /.col-md-4 -->
-                                        <div class="col-md-6">
-                                            <div class="input-group">
-                                                <div class="controls">
-                                                    <label for="email">Your Email</label>
-                                                    <input type="email"id="email" name="email" required="required">
+                                                    <label>Your Name</label>
+                                                    <input type="text" value="@ViewBag.curUser.FullName" disabled>
                                                 </div><!-- /.controls -->
                                             </div><!-- /.control-group -->
                                         </div><!-- /.col-md-4 -->
@@ -139,8 +118,8 @@
                                         <div class="col-md-12">
                                             <div class="input-group">
                                                 <div class="controls">
-                                                    <label for="message">Your Message</label>
-                                                    <textarea name="message" id="message" required="required"></textarea>
+                                                    <label for="Content">Your Message</label>
+                                                    <textarea name="Content" id="Content" required="required"></textarea>
                                                 </div><!-- /.controls -->
                                             </div><!-- /.control-group -->
                                         </div><!-- /.col-md-4 -->
@@ -158,3 +137,16 @@
     </div><!-- /.container -->
 </div>
 <!-- end Page Content -->
+<script>
+    // Get current local date and time
+    var now = new Date();
+
+    // Convert local time to UTC
+    var utcDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+
+    // Format the date to be used in input field
+    var formattedDate = utcDate.toISOString().slice(0, 16);
+
+    // Fill input field with the formatted date
+    document.getElementById('CreatedAt').value = formattedDate;
+</script>

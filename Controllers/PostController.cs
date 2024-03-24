@@ -10,6 +10,8 @@ using COMP1640.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Drawing.Printing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace COMP1640.Controllers
 {
@@ -31,6 +33,7 @@ namespace COMP1640.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             return user?.FullName; // This will return null if user is null.
         }
+        [Authorize]
         // GET: Post
         public async Task<IActionResult> Index()
         {
@@ -43,7 +46,7 @@ namespace COMP1640.Controllers
             return View(await comp1640Context.ToListAsync());
 
         }
-
+        [Authorize]
         // GET: Post/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -66,7 +69,7 @@ namespace COMP1640.Controllers
 
             return View(post);
         }
-
+        [Authorize]
         public async Task<IActionResult> PostList()
         {
             var userFullName = await GetUserFullName();
@@ -77,18 +80,19 @@ namespace COMP1640.Controllers
             var comp1640Context = _context.Posts.Include(p => p.User);
             return View(await comp1640Context.ToListAsync());
         }
-
+        [Authorize]
         public async Task<IActionResult> PostDetail(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            var userFullName = await GetUserFullName();
-            if (userFullName != null)
-            {
-                ViewBag.userFullName = userFullName;
-            }
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            ViewBag.curUser = user;
+
+            ViewBag.Comments = await _context.PostComments.Include(c => c.User).Where(c => c.PostId == id).ToListAsync();
+
             var post = await _context.Posts
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.PostId == id);
@@ -96,12 +100,13 @@ namespace COMP1640.Controllers
             {
                 return NotFound();
             }
-            var imagePath = post.ImagePath;
-            ViewBag.imagePath = imagePath;
+            // var imagePath = post.ImagePath;
+            // ViewBag.imagePath = imagePath;
 
             return View(post);
         }
 
+        [Authorize]
         // GET: Post/Create
         public IActionResult Create()
         {
@@ -112,6 +117,7 @@ namespace COMP1640.Controllers
         // POST: Post/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PostId,Title,Content,PostedAt,UserId")] Post post, IFormFile imageFile)
@@ -134,6 +140,7 @@ namespace COMP1640.Controllers
         }
 
         // GET: Post/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -153,41 +160,58 @@ namespace COMP1640.Controllers
         // POST: Post/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PostId,Title,Content,PostedAt,UserId")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("PostId,Title,Content,PostedAt,UserId")] Post post, IFormFile newImageFile)
         {
             if (id != post.PostId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+
+            try
             {
-                try
+                string oldFileName = post.ImagePath ?? "";
+                string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "postUpload", oldFileName);
+                if (System.IO.File.Exists(oldFilePath))
                 {
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
+                    System.IO.File.Delete(Path.Combine(oldFilePath));
                 }
-                catch (DbUpdateConcurrencyException)
+                post.ImagePath = "";
+
+                var uniqueFileName = GetUniqueFileName(newImageFile.FileName);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "postUpload", uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    if (!PostExists(post.PostId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    await newImageFile.CopyToAsync(fileStream);
                 }
-                return RedirectToAction(nameof(Index));
+                post.ImagePath = uniqueFileName;
+
+                _context.Update(post);
+                await _context.SaveChangesAsync();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PostExists(post.PostId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+
             ViewData["UserId"] = _userManager.GetUserId(User);
             return View(post);
         }
 
 
         // GET: Post/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -207,6 +231,7 @@ namespace COMP1640.Controllers
         }
 
         // POST: Post/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -233,6 +258,25 @@ namespace COMP1640.Controllers
                    + "_"
                    + Guid.NewGuid().ToString().Substring(0, 4)
                    + Path.GetExtension(fileName);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateComment(int PostId, string UserId, string Content, DateTime CreatedAt)
+        {
+            var PostComment = new PostComment
+            {
+                PostId = PostId,
+                Content = Content,
+                UserId = UserId,
+                CreatedAt = CreatedAt
+            };
+
+            _context.Add(PostComment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("PostDetail", new { id = PostId });
         }
     }
 }

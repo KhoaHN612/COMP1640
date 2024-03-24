@@ -570,7 +570,6 @@ namespace COMP1640.Controllers
             var comments = await _context.Comments
                                 .Where(c => c.ContributionId == id)
                                 .ToListAsync();
-
             var contributions = _context.Contributions.ToList();
             var userId = _userManager.GetUserId(User);
             var anotherUserId = userId;
@@ -581,15 +580,9 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-            if (contribution != null)
-            {
-                var submissionDate = contribution.SubmissionDate;
-                var deadline = submissionDate.AddDays(14);
-                if (deadline >= submissionDate)
-                {
-                    ViewBag.Deadline = deadline;
-                }
-            }
+           
+        //    điều kiện sao cho khi quá 14 ngày kể từ submissionDate, thẻ input sẽ có thêm 2 thuộc tính là disabled và readonly
+
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
@@ -600,10 +593,6 @@ namespace COMP1640.Controllers
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
             ViewBag.Comments = comments;
-
-
-
-
             return View("coordinators/create_comment", contribution);
         }
         //=============================== POSTS ====================================//
@@ -646,6 +635,7 @@ namespace COMP1640.Controllers
 
         // }
         //================================ MANAGERS ================================//
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> IndexManagers(string task, string year)
         {
             ViewData["Title"] = "Dashboard Managers";
@@ -788,7 +778,7 @@ namespace COMP1640.Controllers
         //     return Json(students);
         // }
 
-
+        [Authorize(Roles = "Manager")]
         public IActionResult StudentSubmissionManagers()
         {
             List<Contribution> contributions = _context.Contributions
@@ -799,6 +789,7 @@ namespace COMP1640.Controllers
             return View("head_managers/student_submission", contributions);
         }
         // DOWNLOAD EACH FILES
+        [Authorize(Roles = "Manager, Coordinator")]
         [HttpGet]
         public async Task<IActionResult> DownloadContributionFiles(int id)
         {
@@ -836,7 +827,6 @@ namespace COMP1640.Controllers
             return File(memoryStream.ToArray(), "application/zip", zipFileName);
         }
         //DOWNLOAD ALL FILES
-
         [HttpGet]
         public async Task<IActionResult> DownloadAllApproved()
         {
@@ -973,7 +963,7 @@ namespace COMP1640.Controllers
             return user?.FullName; // This will return null if user is null.
         }
 
-        [Authorize(Roles = "Coordinator")]
+        
         [HttpPost]
         public async Task<IActionResult> Publish(int id, bool isPublished)
         {
