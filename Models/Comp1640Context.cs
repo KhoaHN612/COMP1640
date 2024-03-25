@@ -32,17 +32,17 @@ public partial class Comp1640Context : IdentityDbContext<COMP1640User>
     // public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
 
     public virtual DbSet<Contribution> Contributions { get; set; }
-
     public virtual DbSet<Faculty> Faculties { get; set; }
-
     public virtual DbSet<FileDetail> FileDetails { get; set; }
     public virtual DbSet<Comment> Comments { get; set; }
-
     public virtual DbSet<Post> Posts {get; set;}
     public virtual DbSet<PostComment> PostComments {get; set;}
     public virtual DbSet<WebAccessLog> WebAccessLogs {get; set;}
     public object COMP1640Users { get; internal set; }
     public object VisitLogs { get; internal set; }
+    public virtual DbSet<Chat> Chats {get; set;}
+    public virtual DbSet<Message> Messages {get; set;}
+    public virtual DbSet<UserChat> UserChat {get;set;}
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=ConnectionStrings:MyConnect");
