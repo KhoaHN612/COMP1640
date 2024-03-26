@@ -29,35 +29,40 @@
     <!--end breadcrumb-->
   </main>
   <!--end page main-->
-  <div class="chat-box-wrapper">
+  <div class="chat-box-wrapper" id="chat-box-wrapper">
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-8 offset-md-2">
           <div id="chatBox">
             <style>
-              .message p#custom_test{
+              .message p#custom_test {
                 font-size: smaller !important;
                 font-style: italic !important;
+                margin-bottom: 0px;
               }
             </style>
-            @foreach (var message in Model.Messages)
+            @if (Model.Messages != null)
             {
-              if (message.UserId == @ViewBag.sender.Id)
+              @foreach (var message in Model.Messages)
               {
-                <div class="message my-message p-3 mb-2">
-                  <p class="italic" id="custom_test">@message.User.FullName - @message.SentAt</p>
-                  <h6>@message.Content</h6>
-                </div>
-              }
-              else
-              {
-                <div class="message other-message p-3 mb-2">
-                  <p class="italic" id="custom_test">@message.User.FullName - @message.SentAt</p>
-                  <h6>@message.Content</h6>
-                </div>
+                if (message.UserId == @ViewBag.sender.Id)
+                {
+                  <div class="message my-message p-3 mb-2">
+                    <h6>@message.Content</h6>
+                    <p class="italic" id="custom_test">@message.SentAt</p>
+                  </div>
+                }
+                else
+                {
+                  <div class="message other-message p-3 mb-2">
+                    <h6>@message.Content</h6>
+                    <p class="italic" id="custom_test">@message.SentAt</p>
+                  </div>
+                }
               }
             }
           </div>
+          <div style="height: 50px;"></div>
         </div>
       </div>
     </div>
@@ -82,9 +87,9 @@
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chatwith.js"></script>
 <script>
-    var chatBox = document.getElementById('chatBox');
-    var lastMessage = chatBox.lastElementChild;
-    lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  var chatBox = document.getElementById('chatBox');
+  var lastMessage = chatBox.lastElementChild;
+  lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
 </script>
 <style>
   /* Customize here */
@@ -108,7 +113,10 @@
     height: calc(100vh - 120px);
     /* Subtract the height of the footer */
     overflow-y: auto;
+    scroll-behavior: smooth;
   }
+
+
 
   @@media (max-width: 576px) {
     .back-to-previous {
@@ -124,10 +132,14 @@
       /* Ensure the button stays on top */
     }
 
-    #chatBox{
+    #chatBox {
       margin-bottom: 20vw;
     }
-    .chat-box-wrapper{
+
+    .chat-box-wrapper {
       margin-bottom: 10vw !important;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      max-height: 1000px;
     }
 </style>
