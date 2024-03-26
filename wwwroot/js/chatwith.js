@@ -17,19 +17,35 @@ var senderId = document.getElementById("senderId").value;
 var receiverId = document.getElementById("receiverId").value;
 var chatId = parseInt(document.getElementById("chatId").value);
 
+var messageWrapper = document.getElementById('chat-box-wrapper');
+
+// Cuộn xuống cuối cùng của khu vực tin nhắn
+function scrollToBottom() {
+  messageWrapper.scrollTop = messageWrapper.scrollHeight;
+}
+document.addEventListener("DOMContentLoaded", function() {
+    scrollToBottom();
+});
+
 //Disable the send button until connection is established.
 document.getElementById("buttonSend").disabled = true;
 
 connection.on("ReceiveMessageFrom", function (CchatId, CsenderId, Cmessage) {
     console.log(CchatId, CsenderId, Cmessage);
     if (CchatId = chatId){
+        var h6 = document.createElement("h6");
+        h6.textContent = Cmessage;
         var p = document.createElement("p");
-        p.textContent = Cmessage;
+        p.className = "italic";
+        p.id = "custom_test";
+        p.textContent = new Date();
         let isCurrentUserMessage = CsenderId == senderId;
         var div = document.createElement("div");
         div.className = isCurrentUserMessage ? "message my-message p-3 mb-2" : "message other-message p-3 mb-2";
+        div.appendChild(h6);
         div.appendChild(p);
         chat.appendChild(div);
+        scrollToBottom();
     }
 });
 
