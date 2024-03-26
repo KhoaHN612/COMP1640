@@ -83,7 +83,7 @@
                             <div class="form-group">
                                 <label class="form-label">Comment</label>
                                 <div>
-                                    <input asp-for="Comment" id="commentInput" class="form-control" />
+                                    <textarea asp-for="Comment" id="commentInput" class="form-control" cols="30" rows="5"></textarea>
                                 </div>
                                 <span asp-validation-for="Comment" class="text-danger"></span>
                             </div>
@@ -106,11 +106,11 @@
                         <form class="row g-3" method="post" asp-action="UpdateComment">
                             <input type="hidden" asp-for="ContributionId" />
                             <div class="col-6">
-                                <label class="form-label"> COORDINATORS NAME</label>
+                                <label class="form-label"> MANAGERS NAME</label>
                                 <input type="text" class="form-control" readonly value="@ViewBag.userFullName">
                             </div>
                             <div class="col-6">
-                                <label class="form-label">COORDINATORS EMAIL</label>
+                                <label class="form-label">MANAGERS EMAIL</label>
                                 <input type="email" class="form-control" readonly value="@ViewBag.userEmail">
                             </div>
                             
@@ -118,7 +118,8 @@
                             <div class="form-group">
                                 <label class="form-label">Comment</label>
                                 <div>
-                                    <input asp-for="Comment" id="commentInput" class="form-control" />
+                                    @* <input asp-for="Comment" id="commentInput" class="form-control" /> *@
+                                    <textarea asp-for="Comment" id="commentInput" class="form-control" cols="30" rows="5"></textarea>
                                 </div>
                                 <span asp-validation-for="Comment" class="text-danger"></span>
                             </div>
