@@ -1,4 +1,4 @@
-﻿using COMP1640.Controllers;
+using COMP1640.Controllers;
 using Microsoft.AspNetCore.SignalR;
 
 namespace COMP1640.Hubs

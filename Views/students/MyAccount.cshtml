@@ -19,6 +19,7 @@
                         <li class="active"><a href="#tab-profile" data-toggle="tab">My Submissions</a></li>
                         <li><a href="#tab-my-courses" data-toggle="tab">Profile</a></li>
                         <li><a href="#tab-change-password" data-toggle="tab">Change Password</a></li>
+                        <li><a href="#tab-chat" data-toggle="tab">Chat</a></li>
                     </ul><!-- /#my-profile-tabs -->
                     <div class="tab-content my-account-tab-content">
                         <div class="tab-pane" id="tab-my-courses">
@@ -130,10 +131,10 @@
                                                     @* <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th> *@
                                                     <th class="course-title">
                                                         @{
-                        var fileTypes = ViewBag.FileTypes[item.ContributionId] as List<string>;
-                        var uniqueFileTypes = string.Join(", ", fileTypes.Distinct());
-                    }
-                    @uniqueFileTypes
+                                                            var fileTypes = ViewBag.FileTypes[item.ContributionId] as List<string>;
+                                                            var uniqueFileTypes = string.Join(", ", fileTypes.Distinct());
+                                                        }
+                                                        @uniqueFileTypes
                                                     </th>
                                                     <th>@item.SubmissionDate</th>
                                                     <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
@@ -180,6 +181,35 @@
                                         </form>
                                     </div>
                                 </div>
+                            </section>
+                        </div>
+                        <div class="tab-pane" id="tab-chat">
+                            <section id="password">
+                                <header>
+                                    <h3>Chatting</h3>
+                                </header>
+                                <article>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover course-list-table tablesorter">
+                                            <thead>
+                                            <tr>
+                                                <th>Account Name</th>
+                                                <th>Course Type</th>
+                                                <th class="starts">Starts</th>
+                                                <th class="length">Chat</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <th class="course-title"><a href="course-detail-v1.html">Introduction to modo 701</a></th>
+                                                <th class="course-category"><a href="#">Graphic Design and 3D</a></th>
+                                                <th>01-03-2014</th>
+                                                <th><a asp-action="ChatWithStudent" asp-controller="Students">Chat</a></th>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </article>
                             </section>
                         </div>
                     </div><!-- /.tab-content -->

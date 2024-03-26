@@ -2337,7 +2337,7 @@ th.header:before {
 }
 
 .vertical-center {
-  bottom: 0;
+  /* bottom: 0; */
   margin: auto;
   top: 0;
   position: absolute;
@@ -4316,4 +4316,32 @@ label.error:before {
     right: -15px;
     top: inherit;
   }
+}
+
+.chat-wrapper {
+  display: flex;
+}
+.chat-sidebar.left-chat {
+  flex: 1;
+  padding-right: 200px;
+  overflow-y: auto;
+}
+.chat-sidebar.right-chat {
+  flex: 1;
+  padding-left: 200px;
+  overflow-y: auto;
+  text-align: end;
+  justify-content: end;
+}
+.comments {
+  flex: 2;
+  padding: 20px;
+  overflow-y: auto;
+}
+.message {
+  margin-bottom: 10px;
+  clear: both;
+}
+.message .author {
+  font-weight: bold;
 }

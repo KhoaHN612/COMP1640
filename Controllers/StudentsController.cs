@@ -610,5 +610,14 @@ namespace COMP1640.Controllers
             return View(contribution);
         }
 
+        public async Task<IActionResult> ChatWithStudent(){
+            ViewData["Title"] = "Chatting";
+            var userFullName = await GetUserFullName();
+            if (userFullName != null)
+            {
+                ViewBag.userFullName = userFullName;
+            }
+            return View();
+        }
     }
 }
