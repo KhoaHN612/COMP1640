@@ -145,7 +145,6 @@
                                     form</button>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
@@ -184,4 +183,15 @@
         }
         return isValid;
     }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var form = document.querySelector("form");
+        form.addEventListener("submit", function () {
+            var submitButton = document.getElementById("submitBtn");
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Submitting...";
+            return true;
+        });
+    });
 </script>
