@@ -267,27 +267,13 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-
-            // var fileTypes = new Dictionary<int, string>();
-            // foreach (var contribution in contributions)
-            // {
-            //     var fileDetail = _context.FileDetails.FirstOrDefault(fd => fd.ContributionId == contribution.ContributionId);
-            //     if (fileDetail != null)
-            //     {
-            //         fileTypes[contribution.ContributionId] = fileDetail.Type;
-            //     }
-            //     else
-            //     {
-            //         fileTypes[contribution.ContributionId] = "Unknown";
-            //     }
-            // }
             var fileTypes = new Dictionary<int, List<string>>();
             foreach (var contribution in contributions)
             {
                 var fileDetails = _context.FileDetails.Where(fd => fd.ContributionId == contribution.ContributionId).ToList();
 
                 var types = new List<string>();
-                if (fileDetails.Any())
+                if (fileDetails.Count != 0)
                 {
                     foreach (var fileDetail in fileDetails)
                     {
@@ -310,13 +296,6 @@ namespace COMP1640.Controllers
             ViewBag.userProfileImagePath = userProfileImagePath;
             return View();
         }
-
-        // // Action for the Login/Register page
-        // public IActionResult LoginRegister()
-        // {
-        //     ViewData["Title"] = "Login Or Register";
-        //     return View();
-        // }
 
         [Authorize(Roles = "Student")]
         public IActionResult FromCreateSubmission()
