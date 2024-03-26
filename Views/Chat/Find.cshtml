@@ -26,7 +26,8 @@
     <hr />
     <div class="row">
         <div class="col d-flex justify-content-end">
-            <a asp-action="FormCreateUser" asp-controller="Admins" type="button" class="btn btn-info px-5"><i class="bi bi-plus"></i> Create new</a>
+            <a asp-action="FormCreateUser" asp-controller="Admins" type="button" class="btn btn-info px-5"><i
+                    class="bi bi-plus"></i> Create new</a>
         </div>
     </div>
     <div class="card">
@@ -46,25 +47,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @{
-                        int index = 1;
-                    }
-                    @foreach (var user in Model)
-                    {
-                        <tr>
-                            <td>@index</td>
-                            <td>@user.FullName</td>
-                            <td>@user.Email</td>
-                            <td>@user.Faculty?.Name
-                            </td>
-                            <td class="text-ellipsis">@user.Address</td>
-                            <td>@user.DayOfBirth</td>
-                            <td>
-                                <a asp-controller="Chat" asp-action="Chatwith" asp-route-id="@user.Id">Chat</a>
-                            </td>
-                        </tr>
-                        index++;
-                    }
+                        @{
+                            int index = 1;
+                        }
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@user.FullName</td>
+                                <td>@user.Email</td>
+                                <td>@user.Faculty?.Name
+                                </td>
+                                <td class="text-ellipsis">@user.Address</td>
+                                <td>@user.DayOfBirth</td>
+                                <td>
+                                    <a asp-controller="Chat" asp-action="Chatwith" asp-route-id="@user.Id">Chat</a>
+                                </td>
+                            </tr>
+                            index++;
+                        }
                     </tbody>
                     <tfoot>
                         <tr>
@@ -84,9 +85,9 @@
 </main>
 <!--end page main-->
 <style>
-.text-ellipsis {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
+    .text-ellipsis {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 </style>

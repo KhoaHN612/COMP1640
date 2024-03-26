@@ -294,6 +294,7 @@ namespace COMP1640.Controllers
             ViewBag.userFullName = userFullName;
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
+            ViewBag.Users = _userManager.Users.Include(u => u.Faculty).ToList();
             return View();
         }
 
