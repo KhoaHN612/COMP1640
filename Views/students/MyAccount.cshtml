@@ -1,4 +1,6 @@
 ﻿@model COMP1640.Areas.Identity.Data.COMP1640User
+@using System.Linq
+
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 8px !important;
@@ -30,7 +32,8 @@
                                     <div class="my-profile">
                                         <figure class="profile-avatar">
                                             <div class="image-wrapper"><img
-                                                    src="~/profileImageUpload/@ViewBag.userProfileImagePath" alt="Profile Avatar">
+                                                    src="~/profileImageUpload/@ViewBag.userProfileImagePath"
+                                                    alt="Profile Avatar">
                                             </div>
                                         </figure>
                                         <article>
@@ -120,9 +123,18 @@
                                             if (item.UserId == ViewBag.userId)
                                             {
                                                 <tr class="status-not-started">
-                                                    <th class="course-title"><a asp-action="SubmissionDetail" asp-route-id="@item.ContributionId" asp-controller="Students">@item.Title</a>
+                                                    <th class="course-title"><a asp-action="SubmissionDetail"
+                                                            asp-route-id="@item.ContributionId"
+                                                            asp-controller="Students">@item.Title</a>
                                                     </th>
-                                                    <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th>
+                                                    @* <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th> *@
+                                                    <th class="course-title">
+                                                        @{
+                        var fileTypes = ViewBag.FileTypes[item.ContributionId] as List<string>;
+                        var uniqueFileTypes = string.Join(", ", fileTypes.Distinct());
+                    }
+                    @uniqueFileTypes
+                                                    </th>
                                                     <th>@item.SubmissionDate</th>
                                                     <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
                                                 </tr>
@@ -152,11 +164,13 @@
                                         <form role="form" class="clearfix" asp-action="UpdatePassword">
                                             <div class="form-group">
                                                 <label for="current-password">Current Password</label>
-                                                <input name="inputOldPassword"type="password" class="form-control" id="current-password">
+                                                <input name="inputOldPassword" type="password" class="form-control"
+                                                    id="current-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="new-password">New Password</label>
-                                                <input name="newPassword" type="password" class="form-control" id="new-password">
+                                                <input name="newPassword" type="password" class="form-control"
+                                                    id="new-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="repeat-new-password">Repeat New Password</label>
