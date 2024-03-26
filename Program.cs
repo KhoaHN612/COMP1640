@@ -22,6 +22,7 @@ var emailConfig = builder.Configuration
         .Get<EmailConfiguration>();
 builder.Services.AddSingleton(emailConfig);
 
+builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<IEmailSenderCustom, EmailSender>();
 builder.Services.AddSignalR();
 // Add services to the container.
