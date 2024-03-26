@@ -268,18 +268,37 @@ namespace COMP1640.Controllers
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
 
-            var fileTypes = new Dictionary<int, string>();
+            // var fileTypes = new Dictionary<int, string>();
+            // foreach (var contribution in contributions)
+            // {
+            //     var fileDetail = _context.FileDetails.FirstOrDefault(fd => fd.ContributionId == contribution.ContributionId);
+            //     if (fileDetail != null)
+            //     {
+            //         fileTypes[contribution.ContributionId] = fileDetail.Type;
+            //     }
+            //     else
+            //     {
+            //         fileTypes[contribution.ContributionId] = "Unknown";
+            //     }
+            // }
+            var fileTypes = new Dictionary<int, List<string>>();
             foreach (var contribution in contributions)
             {
-                var fileDetail = _context.FileDetails.FirstOrDefault(fd => fd.ContributionId == contribution.ContributionId);
-                if (fileDetail != null)
+                var fileDetails = _context.FileDetails.Where(fd => fd.ContributionId == contribution.ContributionId).ToList();
+
+                var types = new List<string>();
+                if (fileDetails.Any())
                 {
-                    fileTypes[contribution.ContributionId] = fileDetail.Type;
+                    foreach (var fileDetail in fileDetails)
+                    {
+                        types.Add(fileDetail.Type);
+                    }
                 }
                 else
                 {
-                    fileTypes[contribution.ContributionId] = "Unknown";
+                    types.Add("Unknown");
                 }
+                fileTypes[contribution.ContributionId] = types;
             }
             ViewBag.FileTypes = fileTypes;
             ViewBag.userEmail = userEmail;
@@ -454,7 +473,7 @@ namespace COMP1640.Controllers
 
             currentFile.FilePath = uniqueFileName;
             await _context.SaveChangesAsync();
-            
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -545,7 +564,7 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-            
+
             ViewBag.Deadline = contribution.CommentDeadline;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
