@@ -34,17 +34,26 @@
       <div class="row">
         <div class="col-md-8 offset-md-2">
           <div id="chatBox">
-            @foreach (var message in Model.Messages){
+            <style>
+              .message p#custom_test{
+                font-size: smaller !important;
+                font-style: italic !important;
+              }
+            </style>
+            @foreach (var message in Model.Messages)
+            {
               if (message.UserId == @ViewBag.sender.Id)
               {
                 <div class="message my-message p-3 mb-2">
-                  <p>@message.Content</p>
+                  <p class="italic" id="custom_test">@message.User.FullName - @message.SentAt</p>
+                  <h6>@message.Content</h6>
                 </div>
               }
               else
               {
                 <div class="message other-message p-3 mb-2">
-                  <p>@message.Content</p>
+                  <p class="italic" id="custom_test">@message.User.FullName - @message.SentAt</p>
+                  <h6>@message.Content</h6>
                 </div>
               }
             }
@@ -57,13 +66,13 @@
     <div class="container">
       <div class="row">
         <div class="col-md-8 offset-md-2">
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" id="messageInput" placeholder="Type your message here"
-                aria-label="Type your message here" aria-describedby="buttonSend">
-              <div class="input-group-append">
-                <button class="btn btn-outline-secondary" id="buttonSend"><i class="bx bx-send"></i></button>
-              </div>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="messageInput" placeholder="Type your message here"
+              aria-label="Type your message here" aria-describedby="buttonSend">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" id="buttonSend"><i class="bx bx-send"></i></button>
             </div>
+          </div>
         </div>
       </div>
     </div>
@@ -72,7 +81,11 @@
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chatwith.js"></script>
-
+<script>
+    var chatBox = document.getElementById('chatBox');
+    var lastMessage = chatBox.lastElementChild;
+    lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+</script>
 <style>
   /* Customize here */
   .message {
@@ -110,5 +123,11 @@
       z-index: 1000;
       /* Ensure the button stays on top */
     }
-  }
+
+    #chatBox{
+      margin-bottom: 20vw;
+    }
+    .chat-box-wrapper{
+      margin-bottom: 10vw !important;
+    }
 </style>
