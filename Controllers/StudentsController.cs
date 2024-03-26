@@ -60,6 +60,59 @@ namespace COMP1640.Controllers
             return View();
         }
 
+        [Authorize]
+        public async Task<IActionResult> ChatWithStudent(string Id)
+        {
+            var OrUserId = Id;
+            if (OrUserId == null)
+            {
+                return RedirectToAction("Find");
+            }
+            var curUserId = _userManager.GetUserId(User);
+
+            ViewBag.receiver = await _userManager.FindByIdAsync(OrUserId); 
+            ViewBag.sender = await _userManager.FindByIdAsync(curUserId);
+
+            var chatId = await _context.UserChat
+                .AsNoTracking()
+                .Where(uc => uc.UserId == curUserId || uc.UserId == OrUserId)
+                .GroupBy(uc => uc.ChatId)
+                .Where(g => g.Count() == 2)
+                .Select(g => g.Key)
+                .FirstOrDefaultAsync();
+
+            if (chatId != 0)
+            {
+                // If a chat is found, return it
+                var chat = await _context.Chats
+                    .Include(c => c.Users)
+                    .ThenInclude(uc => uc.User)
+                    .Include(c => c.Messages)
+                    .ThenInclude(m => m.User)
+                    .FirstOrDefaultAsync(c => c.Id == chatId);
+
+                return View(chat);
+            }
+            else
+            {
+                // No chat found, create a new one
+                var newChat = new Chat
+                {
+                    UpdateAt = DateTime.Now,
+                    Users = new List<UserChat>
+                {
+                    new UserChat { UserId = curUserId },
+                    new UserChat { UserId = OrUserId }
+                }
+                };
+
+                _context.Chats.Add(newChat);
+                await _context.SaveChangesAsync();
+
+                return View(newChat);
+            }
+        }
+
         public async Task<IActionResult> IndexGuest(string task, string year)
         {
             ViewData["Title"] = "Dashboard Guest";
@@ -609,16 +662,6 @@ namespace COMP1640.Controllers
                 return RedirectToAction("SubmissionDetail", "Students", new { id = contribution.ContributionId });
             }
             return View(contribution);
-        }
-
-        public async Task<IActionResult> ChatWithStudent(){
-            ViewData["Title"] = "Chatting";
-            var userFullName = await GetUserFullName();
-            if (userFullName != null)
-            {
-                ViewBag.userFullName = userFullName;
-            }
-            return View();
         }
     }
 }
