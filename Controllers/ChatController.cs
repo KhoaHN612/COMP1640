@@ -1,4 +1,3 @@
-
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Models;
 using Microsoft.AspNetCore.Authorization;
