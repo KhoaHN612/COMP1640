@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -6,16 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-=======
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
->>>>>>> a21ee76 (Create original chat version)
 
 namespace COMP1640.Controllers
 {
     public class ChatController : Controller
     {
-<<<<<<< HEAD
         private readonly Comp1640Context _context;
         private readonly UserManager<COMP1640User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -111,13 +106,6 @@ namespace COMP1640.Controllers
 
         //     return Ok();
         // }
-=======
-        // GET: ChatController
-        public ActionResult Index()
-        {
-            return View();
-        }
->>>>>>> a21ee76 (Create original chat version)
 
         // GET: ChatController/Details/5
         public ActionResult Details(int id)
