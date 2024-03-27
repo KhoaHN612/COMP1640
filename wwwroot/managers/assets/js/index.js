@@ -1117,7 +1117,11 @@ function SelectedYearInCoordinators(year) {
 
 function SelectedYearUser(year) {
 	var url = '/Managers?task=ContributionUser&year=' + year;
-	//redirect to url
+	window.location.href = url;
+}
+
+function SelectedYear(year) {
+	var url = '/Managers?task=ContributionYear&year=' + year;
 	window.location.href = url;
 }
 
