@@ -36,6 +36,7 @@
         <!--end sidebar -->
         @RenderBody()
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Bootstrap bundle JS -->
     <script src="~/managers/assets/js/bootstrap.bundle.min.js"></script>
     <!--plugins-->
@@ -54,6 +55,19 @@
     <script src="~/managers/assets/js/index.js"></script>
     <script>
         new PerfectScrollbar(".best-product")
+    </script>
+    <script>
+        window.onload = function() {
+            var showWelcomeMessage = '@TempData["ShowWelcomeMessage"]';
+            var WelcomeMessage = '@TempData["WelcomeMessage"]';
+            if (showWelcomeMessage === 'True') {
+                Swal.fire({
+                    title: 'Welcome!',
+                    text: WelcomeMessage,
+                    type: 'success',
+                });
+            }
+        };
     </script>
 </body>
 </html>

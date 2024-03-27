@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using COMP1640.Areas.Identity.Data;
+using System.Diagnostics;
 
 namespace COMP1640.Areas.Identity.Pages.Account
 {
@@ -22,11 +23,13 @@ namespace COMP1640.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<COMP1640User> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<COMP1640User> _userManager;
 
-        public LoginModel(SignInManager<COMP1640User> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<COMP1640User> signInManager, ILogger<LoginModel> logger, UserManager<COMP1640User> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -116,6 +119,17 @@ namespace COMP1640.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    TempData["ShowWelcomeMessage"] = true;
+                    var user = await _userManager.GetUserAsync(User);
+                    if (user.LastLogin == DateTime.MinValue){
+                        TempData["WelcomeMessage"] = "Welcome new User";
+                    } else {
+                        TempData["WelcomeMessage"] = "Welcome back " + user.FullName  + " from " + user.LastLogin;
+                    }
+                    user.LastLogin = DateTime.Now;
+                    await _userManager.UpdateAsync(user);
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

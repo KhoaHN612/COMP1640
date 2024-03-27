@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="~/students/assets/css/owl.carousel.css" type="text/css">
     <link rel="stylesheet" href="~/students/assets/css/vanillabox/vanillabox.css" type="text/css">
     <link rel="stylesheet" href="~/students/assets/css/vanillabox/vanillabox.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <link rel="stylesheet" href="~/students/assets/css/style.css" type="text/css">
 
@@ -170,7 +172,19 @@
 
     </div>
     <!-- end Wrapper -->
-
+    <script>
+    window.onload = function() {
+        var showWelcomeMessage = '@TempData["ShowWelcomeMessage"]';
+        var WelcomeMessage = '@TempData["WelcomeMessage"]';
+        if (showWelcomeMessage === 'True') {
+            Swal.fire({
+                title: 'Welcome!',
+                text: WelcomeMessage,
+                type: 'success',
+            });
+        }
+    };
+    </script>
     <script type="text/javascript" src="~/students/assets/js/jquery-2.1.0.min.js"></script>
     <script type="text/javascript" src="~/students/assets/js/jquery-migrate-1.2.1.min.js"></script>
     <script type="text/javascript" src="~/students/assets/bootstrap/js/bootstrap.min.js"></script>

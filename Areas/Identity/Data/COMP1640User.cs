@@ -15,7 +15,7 @@ public class COMP1640User : IdentityUser
 
     [StringLength(100)]
     public string? ProfileImagePath { get; set; }
-
+    public DateTime LastLogin { get; set; }
     public int? FacultyId { get; set; }
 
     [ForeignKey("FacultyId")]
@@ -23,4 +23,8 @@ public class COMP1640User : IdentityUser
     public virtual Faculty? Faculty { get; set; }
     [NotMapped]
     public IFormFile? ProfileImageFile { get; set; }
+
+    public COMP1640User() {
+        LastLogin = DateTime.MinValue;
+    }
 }
