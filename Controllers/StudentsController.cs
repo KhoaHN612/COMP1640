@@ -308,6 +308,17 @@ namespace COMP1640.Controllers
             ViewBag.annualMagazines = annualMagazines;
             return View("~/Views/managers/student/student_submission.cshtml");
         }
+        [Authorize(Roles = "Student")]
+        public IActionResult FromCreateSubmissionWithError()
+        {
+            ViewData["Title"] = "From Submission";
+            ViewBag.ErrorMessage = "The submission date for the annual publication has passed.";
+            var annualMagazines = _context.AnnualMagazines
+                            .Where(m => m.IsActive == true)
+                            .ToList();
+            ViewBag.annualMagazines = annualMagazines;
+            return View("~/Views/managers/student/student_submission.cshtml");
+        }
 
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> FromEditSubmission(int id)
@@ -348,42 +359,40 @@ namespace COMP1640.Controllers
             contribution.ContributionId = currentContributionId + 1;
             int maxId = 0;
             maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
-
-            foreach (var file in fileDetails.ContributionFile)
-            {
-                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-                fileDetails.FileId = maxId + 1;
-                maxId++;
-
-                string uniqueFileName = GetUniqueFileName(file.FileName);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
-                string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
-
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(fileStream);
-                }
-                fileDetails.FilePath = uniqueFileName;
-
-                var documentExtensions = new List<string> { ".doc", ".docx" };
-                var imageExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
-                fileDetails.Type = documentExtensions.Any(e => e == fileExtension) ? "Document" :
-                   imageExtensions.Any(e => e == fileExtension) ? "Image" : "Unknown";
-
-                fileDetails.ContributionId = contribution.ContributionId;
-                _context.Add(fileDetails);
-                await _context.SaveChangesAsync();
-            }
-
-            maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-            contribution.SubmissionDate = DateTime.Now;
-
             var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
+            contribution.SubmissionDate = DateTime.Now;
             if (annualMagazine.SubmissionClosureDate.HasValue &&
-            DateOnly.FromDateTime(contribution.SubmissionDate.Date) <= annualMagazine.SubmissionClosureDate.Value)
+            DateOnly.FromDateTime(contribution.SubmissionDate.Date) > annualMagazine.SubmissionClosureDate)
             {
+                return RedirectToAction(nameof(FromCreateSubmissionWithError));
+            }
+            else
+            {
+                foreach (var file in fileDetails.ContributionFile)
+                {
+                    var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                    fileDetails.FileId = maxId + 1;
+                    maxId++;
+
+                    string uniqueFileName = GetUniqueFileName(file.FileName);
+                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName);
+                    string fileExtension = Path.GetExtension(uniqueFileName).ToLowerInvariant();
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                    fileDetails.FilePath = uniqueFileName;
+
+                    var documentExtensions = new List<string> { ".doc", ".docx" };
+                    var imageExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
+                    fileDetails.Type = documentExtensions.Any(e => e == fileExtension) ? "Document" :
+                       imageExtensions.Any(e => e == fileExtension) ? "Image" : "Unknown";
+
+                    fileDetails.ContributionId = contribution.ContributionId;
+                    _context.Add(fileDetails);
+                    await _context.SaveChangesAsync();
+                }
+                maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
                 contribution.AnnualMagazineId = AnnualMagazineId; var userId = _userManager.GetUserId(User);
                 contribution.Comment = null;
                 contribution.Status = "Pending";
@@ -392,11 +401,6 @@ namespace COMP1640.Controllers
                 _context.Add(contribution);
                 var result = await _context.SaveChangesAsync();
                 await SendNotificationEmails(AnnualMagazineId, contribution);
-                return RedirectToAction(nameof(MyAccount));
-            }
-            else
-            {
-                ViewBag.ErrorMessage = "The submission date for the annual publication has passed.";
                 return RedirectToAction(nameof(MyAccount));
             }
         }
@@ -458,7 +462,6 @@ namespace COMP1640.Controllers
             {
                 await newFile.CopyToAsync(fileStream);
             }
-
             currentFile.FilePath = uniqueFileName;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
