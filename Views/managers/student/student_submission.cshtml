@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_Layout_Students_Submission.cshtml";
 }
 
+
 <main class="page-content student">
     <!--breadcrumb-->
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
@@ -26,8 +27,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="p-4 border rounded">
-                        <form asp-action='Create' enctype='multipart/form-data' class="row g-3"
-                            onsubmit="return validateForm();">
+                        <form asp-controller="Students" asp-action='Create' enctype='multipart/form-data'
+                            class="row g-3" onsubmit="return validateForm();">
                             <div class="col-md-6">
                                 <label asp-for='Title' for="annualMagazineId" class="form-label">Title</label>
                                 <input asp-for='Title' type="text" class="form-control" id="validationDefault02"
@@ -54,14 +55,6 @@
                                 <input asp-for="SubmissionDate" readonly type="date" class="form-control"
                                     id="submissionDate" required>
                             </div>
-                            @* <div class="col-12">
-                            <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="invalidCheck2"
-                            onchange="validateCheckbox()" required>
-                            <label class="form-check-label" for="invalidCheck2">Agree to terms and
-                            conditions</label>
-                            </div>
-                            </div> *@
                             <div class="col-lg-3">
                                 <button type="button" class="btn btn-info" data-bs-toggle="modal"
                                     data-bs-target="#termsModal">
@@ -150,7 +143,6 @@
             </div>
         </div>
     </div>
-    <!--end row-->
 </main>
 <script>
     function validateCheckbox() {
@@ -165,8 +157,7 @@
     }
     var currentDate = new Date().toISOString().slice(0, 10);
     document.getElementById('submissionDate').value = currentDate;
-</script>
-<script>
+
     function validateForm() {
         var files = document.getElementById('inputGroupFile01').files;
         var isValid = true;
@@ -183,8 +174,7 @@
         }
         return isValid;
     }
-</script>
-<script>
+
     document.addEventListener("DOMContentLoaded", function () {
         var form = document.querySelector("form");
         form.addEventListener("submit", function () {
@@ -193,5 +183,13 @@
             submitButton.innerHTML = "Submitting...";
             return true;
         });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        var errorMessage = "@ViewBag.ErrorMessage";
+        if (errorMessage !== "") {
+            swal("Error!", errorMessage, "error");
+        }
     });
 </script>
