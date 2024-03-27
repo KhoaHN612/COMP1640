@@ -7,7 +7,7 @@ var senderId = document.getElementById("senderId").value;
 var receiverId = document.getElementById("receiverId").value;
 var chatId = parseInt(document.getElementById("chatId").value);
 
-var messageWrapper = document.getElementById('chat-box-wrapper');
+var messageWrapper = document.getElementById('chatBox');
 
 // Cuộn xuống cuối cùng của khu vực tin nhắn
 function scrollToBottom() {
@@ -43,19 +43,36 @@ document.getElementById("buttonSend").disabled = true;
 
 connection.on("ReceiveMessageFrom", function (CchatId, CsenderId, Cmessage) {
     console.log(CchatId, CsenderId, Cmessage);
+
     if (CchatId = chatId){
-        var h6 = document.createElement("h6");
-        h6.textContent = Cmessage;
-        var p = document.createElement("p");
-        p.className = "italic";
-        p.id = "custom_test";
-        p.textContent = formatDateTimeNow();
         let isCurrentUserMessage = CsenderId == senderId;
-        var div = document.createElement("div");
-        div.className = isCurrentUserMessage ? "message my-message p-3 mb-2" : "message other-message p-3 mb-2";
-        div.appendChild(h6);
-        div.appendChild(p);
-        chat.appendChild(div);
+
+        let className = isCurrentUserMessage ? "right-chat" : "left-chat";
+
+        let html = `
+        <div class="col-md-12 chat-main chat-sidebar right-chat">
+            <div id="chat-messages">
+                <ul class="discussion-list">
+                    <li class="author-block ${className}">
+                        <article class="paragraph-wrapper">
+                            <div class="inner">
+                                <div class="rating-individual" data-score="5"></div>
+                                <p>
+                                    ${Cmessage}
+                                </p>
+                            </div>
+                            <div class="comment-controls">
+                                <span>${formatDateTimeNow()}</span>
+                            </div>
+                        </article>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        `;
+
+
+        chat.innerHTML += html;
         scrollToBottom();
     }
 });

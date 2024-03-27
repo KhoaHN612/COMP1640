@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Migrations;
-using COMP1640.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using COMP1640.Models.MultiModels;
+using COMP1640.Models;
 using Humanizer;
 using Microsoft.VisualBasic;
 
@@ -58,6 +58,59 @@ namespace COMP1640.Controllers
                 ViewBag.userFullName = userFullName;
             }
             return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ChatWithStudent(string Id)
+        {
+            var OrUserId = Id;
+            if (OrUserId == null)
+            {
+                return RedirectToAction("Find");
+            }
+            var curUserId = _userManager.GetUserId(User);
+
+            ViewBag.receiver = await _userManager.FindByIdAsync(OrUserId); 
+            ViewBag.sender = await _userManager.FindByIdAsync(curUserId);
+
+            var chatId = await _context.UserChat
+                .AsNoTracking()
+                .Where(uc => uc.UserId == curUserId || uc.UserId == OrUserId)
+                .GroupBy(uc => uc.ChatId)
+                .Where(g => g.Count() == 2)
+                .Select(g => g.Key)
+                .FirstOrDefaultAsync();
+
+            if (chatId != 0)
+            {
+                // If a chat is found, return it
+                var chat = await _context.Chats
+                    .Include(c => c.Users)
+                    .ThenInclude(uc => uc.User)
+                    .Include(c => c.Messages)
+                    .ThenInclude(m => m.User)
+                    .FirstOrDefaultAsync(c => c.Id == chatId);
+
+                return View(chat);
+            }
+            else
+            {
+                // No chat found, create a new one
+                var newChat = new Chat
+                {
+                    UpdateAt = DateTime.Now,
+                    Users = new List<UserChat>
+                {
+                    new UserChat { UserId = curUserId },
+                    new UserChat { UserId = OrUserId }
+                }
+                };
+
+                _context.Chats.Add(newChat);
+                await _context.SaveChangesAsync();
+
+                return View(newChat);
+            }
         }
 
         public async Task<IActionResult> IndexGuest(string task, string year)
@@ -320,7 +373,7 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> FromEditSubmission(int id)
         {
 
@@ -349,7 +402,7 @@ namespace COMP1640.Controllers
 
         }
 
-        [Authorize(Roles = "Student")]
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title")] Contribution contribution, FileDetail fileDetails)
@@ -467,7 +520,7 @@ namespace COMP1640.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Student")]
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
@@ -531,7 +584,7 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> SubmissionDetail(int id)
         {
             ViewData["Title"] = "Submission Detail";
@@ -570,7 +623,7 @@ namespace COMP1640.Controllers
 
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> PostLists()
         {
             ViewData["Title"] = "Post Lists";
@@ -582,7 +635,7 @@ namespace COMP1640.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> PostDetail()
         {
             ViewData["Title"] = "Post Detail";
@@ -619,17 +672,6 @@ namespace COMP1640.Controllers
                 return RedirectToAction("SubmissionDetail", "Students", new { id = contribution.ContributionId });
             }
             return View(contribution);
-        }
-
-        public async Task<IActionResult> ChatWithStudent()
-        {
-            ViewData["Title"] = "Chatting";
-            var userFullName = await GetUserFullName();
-            if (userFullName != null)
-            {
-                ViewBag.userFullName = userFullName;
-            }
-            return View();
         }
     }
 }
