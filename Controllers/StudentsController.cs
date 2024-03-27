@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Migrations;
-using COMP1640.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using COMP1640.Models.MultiModels;
+using COMP1640.Models;
 using Humanizer;
 using Microsoft.VisualBasic;
 
@@ -362,7 +362,7 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> FromEditSubmission(int id)
         {
             ViewData["Title"] = "From Submission";
@@ -379,7 +379,7 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_edit_submission.cshtml", uploadedFiles);
         }
 
-        [Authorize(Roles = "Student")]
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title")] Contribution contribution, FileDetail fileDetails)
@@ -510,7 +510,7 @@ namespace COMP1640.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Student")]
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
@@ -574,7 +574,7 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> SubmissionDetail(int id)
         {
             ViewData["Title"] = "Submission Detail";
@@ -613,7 +613,7 @@ namespace COMP1640.Controllers
 
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> PostLists()
         {
             ViewData["Title"] = "Post Lists";
@@ -625,7 +625,7 @@ namespace COMP1640.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> PostDetail()
         {
             ViewData["Title"] = "Post Detail";
