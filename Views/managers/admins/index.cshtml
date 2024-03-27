@@ -6,7 +6,7 @@
 
 <main class="page-content">
     <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl ps-3">
+        <div class="row row-cols-1 row-cols-lg row-cols-xl row-cols-xxl">
             <div class="col">
                 <div class="card overflow-hidden radius-10">
                     <div class="card-body">
@@ -49,22 +49,31 @@
             <div class="col-md-6">
                 <div class="card radius-10 w-100">
                     <div class="card-body">
-                        @foreach (var item in ViewBag.RoleStatistics)
-                        {
-                            <div class="card radius-10 border shadow-none mb-3">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-1">@item.Role Accounts</p>
-                                            <h4 class="mb-0 text-primary">@item.Total</h4>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Analyze number access by browser</h6>
+                            <div class="dropdown ms-auto">
+                                @* <select class="form-select" id="year" aria-label="Default select example" onchange="GetBrowserByYear(this.value)">
+                                    @foreach (var item in ViewBag.Years)
+                                    {
+                                        <option value="@item" >@item</option>
+                                    }
+                                </select> *@
                             </div>
-                        }
+                        </div>
+                        <div class="row m-2 align-items-center justify-content-center my-3">
+                            <div class="by-device-container mb-3" id="browerCount">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div id="chartBrowser"></div>
+                                </div>
+                            </div> 
+                            <div id="contributionFaculty"
+                                    data-contributionfaculty='@Html.Raw(Json.Serialize(ViewData["ContributionFaculty"]))'>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
                 <div class="card radius-10 w-100">
                     <div class="card-body">
@@ -103,6 +112,22 @@
             </div>
         </div>
         <!--end row-->
+
+        <div class="row ps-3">
+            @foreach (var item in ViewBag.RoleStatistics)
+            {
+                <div class="col-md-6 card radius-10 border shadow-none mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-1">@item.Role Accounts</p>
+                                <h4 class="mb-0 text-primary">@item.Total</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
 
         <div class="row">
             <div class="col">
