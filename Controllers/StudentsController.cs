@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Migrations;
-using COMP1640.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using COMP1640.Models.MultiModels;
+using COMP1640.Models;
 using Humanizer;
 using Microsoft.VisualBasic;
 
@@ -60,7 +60,59 @@ namespace COMP1640.Controllers
             return View();
         }
 
-        
+        [Authorize]
+        public async Task<IActionResult> ChatWithStudent(string Id)
+        {
+            var OrUserId = Id;
+            if (OrUserId == null)
+            {
+                return RedirectToAction("Find");
+            }
+            var curUserId = _userManager.GetUserId(User);
+
+            ViewBag.receiver = await _userManager.FindByIdAsync(OrUserId); 
+            ViewBag.sender = await _userManager.FindByIdAsync(curUserId);
+
+            var chatId = await _context.UserChat
+                .AsNoTracking()
+                .Where(uc => uc.UserId == curUserId || uc.UserId == OrUserId)
+                .GroupBy(uc => uc.ChatId)
+                .Where(g => g.Count() == 2)
+                .Select(g => g.Key)
+                .FirstOrDefaultAsync();
+
+            if (chatId != 0)
+            {
+                // If a chat is found, return it
+                var chat = await _context.Chats
+                    .Include(c => c.Users)
+                    .ThenInclude(uc => uc.User)
+                    .Include(c => c.Messages)
+                    .ThenInclude(m => m.User)
+                    .FirstOrDefaultAsync(c => c.Id == chatId);
+
+                return View(chat);
+            }
+            else
+            {
+                // No chat found, create a new one
+                var newChat = new Chat
+                {
+                    UpdateAt = DateTime.Now,
+                    Users = new List<UserChat>
+                {
+                    new UserChat { UserId = curUserId },
+                    new UserChat { UserId = OrUserId }
+                }
+                };
+
+                _context.Chats.Add(newChat);
+                await _context.SaveChangesAsync();
+
+                return View(newChat);
+            }
+        }
+
         public async Task<IActionResult> IndexGuest(string task, string year)
         {
             ViewData["Title"] = "Dashboard Guest";
@@ -268,19 +320,24 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-
-            var fileTypes = new Dictionary<int, string>();
+            var fileTypes = new Dictionary<int, List<string>>();
             foreach (var contribution in contributions)
             {
-                var fileDetail = _context.FileDetails.FirstOrDefault(fd => fd.ContributionId == contribution.ContributionId);
-                if (fileDetail != null)
+                var fileDetails = _context.FileDetails.Where(fd => fd.ContributionId == contribution.ContributionId).ToList();
+
+                var types = new List<string>();
+                if (fileDetails.Count != 0)
                 {
-                    fileTypes[contribution.ContributionId] = fileDetail.Type;
+                    foreach (var fileDetail in fileDetails)
+                    {
+                        types.Add(fileDetail.Type);
+                    }
                 }
                 else
                 {
-                    fileTypes[contribution.ContributionId] = "Unknown";
+                    types.Add("Unknown");
                 }
+                fileTypes[contribution.ContributionId] = types;
             }
             ViewBag.FileTypes = fileTypes;
             ViewBag.userEmail = userEmail;
@@ -290,17 +347,11 @@ namespace COMP1640.Controllers
             ViewBag.userFullName = userFullName;
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
+            ViewBag.Users = _userManager.Users.Include(u => u.Faculty).ToList();
             return View();
         }
 
-        // // Action for the Login/Register page
-        // public IActionResult LoginRegister()
-        // {
-        //     ViewData["Title"] = "Login Or Register";
-        //     return View();
-        // }
-
-        
+        [Authorize(Roles = "Student")]
         public IActionResult FromCreateSubmission()
         {
             ViewData["Title"] = "From Submission";
@@ -455,7 +506,7 @@ namespace COMP1640.Controllers
 
             currentFile.FilePath = uniqueFileName;
             await _context.SaveChangesAsync();
-            
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -546,15 +597,8 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-            if (contribution != null)
-            {
-                var submissionDate = contribution.SubmissionDate;
-                var deadline = submissionDate.AddDays(14);
-                if (deadline >= submissionDate)
-                {
-                    ViewBag.Deadline = deadline;
-                }
-            }
+
+            ViewBag.Deadline = contribution.CommentDeadline;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
@@ -619,6 +663,5 @@ namespace COMP1640.Controllers
             }
             return View(contribution);
         }
-
     }
 }

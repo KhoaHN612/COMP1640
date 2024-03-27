@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using COMP1640.Models;
 using COMP1640.Areas.Identity.Data;
+using COMP1640.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MyConnect");
@@ -21,8 +22,9 @@ var emailConfig = builder.Configuration
         .Get<EmailConfiguration>();
 builder.Services.AddSingleton(emailConfig);
 
+builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<IEmailSenderCustom, EmailSender>();
-
+builder.Services.AddSignalR();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -48,4 +50,7 @@ app.MapControllerRoute(
     pattern: "{controller=Students}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+app.MapHub<ChatHub>("/chatHub");
+
 app.Run();

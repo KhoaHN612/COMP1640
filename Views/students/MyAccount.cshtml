@@ -1,4 +1,13 @@
 ﻿@model COMP1640.Areas.Identity.Data.COMP1640User
+@using System.Linq
+<script src="~/managers/assets/js/jquery.min.js"></script>
+<script src="~/managers/assets/plugins/simplebar/js/simplebar.min.js"></script>
+<script src="~/managers/assets/plugins/metismenu/js/metisMenu.min.js"></script>
+<script src="~/managers/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+<script src="~/managers/assets/js/pace.min.js"></script>
+<script src="~/managers/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+<script src="~/managers/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+<script src="~/managers/assets/js/table-datatable.js"></script>
 <style>
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 8px !important;
@@ -17,6 +26,7 @@
                         <li class="active"><a href="#tab-profile" data-toggle="tab">My Submissions</a></li>
                         <li><a href="#tab-my-courses" data-toggle="tab">Profile</a></li>
                         <li><a href="#tab-change-password" data-toggle="tab">Change Password</a></li>
+                        <li><a href="#tab-chat" data-toggle="tab">Chat</a></li>
                     </ul><!-- /#my-profile-tabs -->
                     <div class="tab-content my-account-tab-content">
                         <div class="tab-pane" id="tab-my-courses">
@@ -30,7 +40,8 @@
                                     <div class="my-profile">
                                         <figure class="profile-avatar">
                                             <div class="image-wrapper"><img
-                                                    src="~/profileImageUpload/@ViewBag.userProfileImagePath" alt="Profile Avatar">
+                                                    src="~/profileImageUpload/@ViewBag.userProfileImagePath"
+                                                    alt="Profile Avatar">
                                             </div>
                                         </figure>
                                         <article>
@@ -120,9 +131,18 @@
                                             if (item.UserId == ViewBag.userId)
                                             {
                                                 <tr class="status-not-started">
-                                                    <th class="course-title"><a asp-action="SubmissionDetail" asp-route-id="@item.ContributionId" asp-controller="Students">@item.Title</a>
+                                                    <th class="course-title"><a asp-action="SubmissionDetail"
+                                                            asp-route-id="@item.ContributionId"
+                                                            asp-controller="Students">@item.Title</a>
                                                     </th>
-                                                    <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th>
+                                                    @* <th class="course-title">@ViewBag.FileTypes[item.ContributionId]</th> *@
+                                                    <th class="course-title">
+                                                        @{
+                                                            var fileTypes = ViewBag.FileTypes[item.ContributionId] as List<string>;
+                                                            var uniqueFileTypes = string.Join(", ", fileTypes.Distinct());
+                                                        }
+                                                        @uniqueFileTypes
+                                                    </th>
                                                     <th>@item.SubmissionDate</th>
                                                     <th class="status"><i class="fa fa-calendar-o"></i>@item.Status</th>
                                                 </tr>
@@ -152,11 +172,13 @@
                                         <form role="form" class="clearfix" asp-action="UpdatePassword">
                                             <div class="form-group">
                                                 <label for="current-password">Current Password</label>
-                                                <input name="inputOldPassword"type="password" class="form-control" id="current-password">
+                                                <input name="inputOldPassword" type="password" class="form-control"
+                                                    id="current-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="new-password">New Password</label>
-                                                <input name="newPassword" type="password" class="form-control" id="new-password">
+                                                <input name="newPassword" type="password" class="form-control"
+                                                    id="new-password">
                                             </div>
                                             <div class="form-group">
                                                 <label for="repeat-new-password">Repeat New Password</label>
@@ -168,6 +190,67 @@
                                 </div>
                             </section>
                         </div>
+                        <div class="tab-pane" id="tab-chat">
+                            <section id="password">
+                                <header>
+                                    <h3>Chatting</h3>
+                                </header>
+                                <article>
+                                    <div class="table-responsive">
+                                        <label for="searchInput">Search:</label>
+                                        <input type="text" id="searchInput" class="form-control"
+                                            placeholder="Enter search term...">
+                                        <br>
+                                        <table id="example2" class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Faculty</th>
+                                                    <th>Address</th>
+                                                    <th>Date Of Birth</th>
+                                                    <th>Chat</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    int index = 1;
+                                                }
+                                                @foreach (var user in ViewBag.Users)
+                                                {
+                                                    <tr>
+                                                        <td>@index</td>
+                                                        <td>@user.FullName</td>
+                                                        <td>@user.Email</td>
+                                                        <td>@user.Faculty?.Name
+                                                        </td>
+                                                        <td class="text-ellipsis">@user.Address</td>
+                                                        <td>@user.DayOfBirth</td>
+                                                        <td>
+                                                            <a asp-controller="Students" asp-action="ChatWithStudent"
+                                                                asp-route-id="@user.Id">Chat</a>
+                                                        </td>
+                                                    </tr>
+                                                    index++;
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Faculty</th>
+                                                    <th>Address</th>
+                                                    <th>Date Of Birth</th>
+                                                    <th>Chat</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </article>
+                            </section>
+                        </div>
                     </div><!-- /.tab-content -->
                 </section>
             </div>
@@ -175,3 +258,24 @@
     </div><!-- /.container -->
 </div>
 <!-- end Page Content -->
+<script>
+    $(document).ready(function () {
+        $('#searchInput').on('keyup', function () {
+            var searchTerm = $(this).val().toLowerCase();
+            $('#example2 tbody tr').each(function () {
+                var found = false;
+                $(this).find('td').each(function () {
+                    if ($(this).text().toLowerCase().includes(searchTerm)) {
+                        found = true;
+                        return false;
+                    }
+                });
+                if (found) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+    });
+</script>

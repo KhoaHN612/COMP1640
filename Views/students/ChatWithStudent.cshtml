@@ -1,0 +1,87 @@
+@model COMP1640.Models.Chat;
+<style>
+    .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
+        height: 10px !important;
+        }
+</style>
+<div id="page-content">
+    <div class="container">
+        <div class="row">
+            <section id="chatBox">
+                <header><h2>Chatting</h2></header>
+                <br>
+                <h1 class="active" id="userName">@ViewBag.receiver.FullName</h1>
+                <input type="hidden" name="chatId" id="chatId" value="@Model.Id" disabled>
+                <input type="hidden" name="senderId" id="senderId" value="@ViewBag.sender.Id" disabled>
+                <input type="hidden" name="receiverId" id="receiverId" value="@ViewBag.receiver.Id" disabled>
+                <br>
+                @if (Model.Messages != null)
+                {
+                @foreach (var message in Model.Messages)
+                {
+                    if (message.UserId == @ViewBag.sender.Id)
+                    {
+                        <div class="col-md-12 chat-main chat-sidebar right-chat">
+                            <div id="chat-messages">
+                                <ul class="discussion-list">
+                                    <li class="author-block right-chat">
+                                        <article class="paragraph-wrapper">
+                                            <div class="inner">
+                                                <div class="rating-individual" data-score="5"></div>
+                                                <p>
+                                                    @message.Content
+                                                </p>
+                                            </div>
+                                            <div class="comment-controls">
+                                                <span>@message.SentAt</span>
+                                            </div>
+                                        </article>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-12 chat-sidebar left-chat">
+                            <div id="user-chats left-chat">
+                                <ul class="discussion-list">
+                                    <li class="author-block left-chat">
+                                        <article class="paragraph-wrapper">
+                                            <div class="inner">
+                                                <div class="rating-individual" data-score="5"></div>
+                                                <p>
+                                                    @message.Content
+                                                </p>
+                                            </div>
+                                            <div class="comment-controls">
+                                                <span>@message.SentAt</span>
+                                            </div>
+                                        </article>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                }
+                }
+            </section>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                            <div class="form-row align-items-center">
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control" id="messageInput" placeholder="Type your message...">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary" id="buttonSend">Send</button>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/ChatWithStudent.js"></script>

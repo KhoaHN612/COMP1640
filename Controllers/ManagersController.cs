@@ -66,7 +66,13 @@ namespace COMP1640.Controllers
 
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
+            foreach (var i in roleStatistics)
+            {
+                Console.WriteLine(i.Role + " - " + i.Total);
+            }if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
+            if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
             
+
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
             ViewData["ContributionByYear"] = ContributionByYear;
@@ -534,6 +540,7 @@ namespace COMP1640.Controllers
             return contributions;
         }
 
+        [Authorize(Roles = "Coordinator, Manager")]
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
             ViewData["Title"] = "List Submission";
@@ -558,6 +565,8 @@ namespace COMP1640.Controllers
             return View("coordinators/student_submission", contributions);
         }
 
+
+        [Authorize(Roles = "Coordinator, Student, Manager")]
         public async Task<IActionResult> CoordinatorComment(int? id)
         {
             ViewData["Title"] = "Create Comment";
@@ -575,8 +584,7 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-           
-        //    điều kiện sao cho khi quá 14 ngày kể từ submissionDate, thẻ input sẽ có thêm 2 thuộc tính là disabled và readonly
+   
 
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
