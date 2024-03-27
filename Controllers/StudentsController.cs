@@ -605,7 +605,7 @@ namespace COMP1640.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Student")]
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
@@ -681,7 +681,7 @@ namespace COMP1640.Controllers
                    + Path.GetExtension(fileName);
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> SubmissionDetail(int id)
         {   
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -732,7 +732,7 @@ namespace COMP1640.Controllers
 
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> PostLists()
         {   
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -756,7 +756,7 @@ namespace COMP1640.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> PostDetail()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
