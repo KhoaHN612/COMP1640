@@ -442,16 +442,27 @@ namespace COMP1640.Controllers
             await _context.SaveChangesAsync();
             ViewData["Title"] = "From Submission";
             var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
-            var academicYear = await _context.Contributions
+            var annualMagazine = await _context.AnnualMagazines.FindAsync(contribution.AnnualMagazineId);
+            DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+            if (now <= annualMagazine.FinalClosureDate)
+            {
+                var academicYear = await _context.Contributions
                 .Where(c => c.ContributionId == id)
                 .Select(c => c.AnnualMagazine.AcademicYear)
                 .FirstOrDefaultAsync();
-            if (academicYear != null)
-            {
-                ViewBag.academicYear = academicYear;
+                if (academicYear != null)
+                {
+                    ViewBag.academicYear = academicYear;
+                }
+                var uploadedFiles = await _context.FileDetails.Where(f => f.ContributionId == id).ToListAsync();
+                return View("~/Views/managers/student/student_edit_submission.cshtml", uploadedFiles);
             }
-            var uploadedFiles = await _context.FileDetails.Where(f => f.ContributionId == id).ToListAsync();
-            return View("~/Views/managers/student/student_edit_submission.cshtml", uploadedFiles);
+            else
+            {
+                TempData["ErrorMessage"] = "The contribution edit date has passed";
+                return RedirectToAction(nameof(MyAccount));
+            }
+
         }
 
         [Authorize(Roles = "Student")]
@@ -494,47 +505,43 @@ namespace COMP1640.Controllers
             }
 
             maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-            contribution.AnnualMagazineId = AnnualMagazineId;
-
-            var userId = _userManager.GetUserId(User);
             contribution.SubmissionDate = DateTime.Now;
-            contribution.Comment = null;
-            contribution.Status = "Pending";
-            contribution.UserId = userId ?? "Unknown";
-            contribution.CommentDeadline = contribution.SubmissionDate.AddDays(14).AddHours(23).AddMinutes(59).AddSeconds(59);
-            _context.Add(contribution);
-            var result = await _context.SaveChangesAsync();
 
-            if (result > 0)
+            var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
+            if (annualMagazine.SubmissionClosureDate.HasValue &&
+            DateOnly.FromDateTime(contribution.SubmissionDate.Date) <= annualMagazine.SubmissionClosureDate.Value)
             {
-                var currentUser = await _userManager.GetUserAsync(User);
+                contribution.AnnualMagazineId = AnnualMagazineId; var userId = _userManager.GetUserId(User);
+                contribution.Comment = null;
+                contribution.Status = "Pending";
+                contribution.UserId = userId ?? "Unknown";
+                contribution.CommentDeadline = contribution.SubmissionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
+                _context.Add(contribution);
+                var result = await _context.SaveChangesAsync();
+                await SendNotificationEmails(AnnualMagazineId, contribution);
+                return RedirectToAction(nameof(MyAccount));
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "The submission date for the annual publication has passed.";
+                return RedirectToAction(nameof(MyAccount));
+            }
+        }
 
-                if (currentUser == null)
-                {
-                    return NotFound("User not found.");
-                }
-
-                // Get the Faculty ID of the current user
+        private async Task SendNotificationEmails(int AnnualMagazineId, Contribution contribution)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser != null)
+            {
                 var facultyId = currentUser.FacultyId;
-
-                // Get the role ID for "Coordinator"
                 var coordinatorRole = await _roleManager.FindByNameAsync("Coordinator");
 
                 if (facultyId != null && coordinatorRole != null)
                 {
-                    // // Retrieve users with the same Faculty and "Coordinator" role
-                    // var coordinators = await _userManager.Users
-                    //     .Include(u => u.Faculty) // Eager load the Faculty navigation property
-                    //     .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
-                    //     .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result) // Check if user has the "Coordinator" role
-                    //     .ToListAsync();
-
                     var sameFacultyUsers = await _userManager.Users
-                        .Include(u => u.Faculty) // Eager load the Faculty navigation property
-                        .Where(u => u.FacultyId == currentUser.FacultyId) // Match faculty ID
+                        .Include(u => u.Faculty)
+                        .Where(u => u.FacultyId == currentUser.FacultyId)
                         .ToListAsync();
-
-                    // Filter users who have the "Coordinator" role
                     var coordinators = sameFacultyUsers
                         .Where(u => _userManager.IsInRoleAsync(u, coordinatorRole.Name).Result)
                         .ToList();
@@ -543,18 +550,17 @@ namespace COMP1640.Controllers
                     var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
 
                     string body = "Title: New Contribution\n" +
-                    "Dear sir/madam, \n" +
-                    "There are new contribution(s) for the annual magazine.\n" +
-                    "- Name Contribution: " + contribution.Title + "\n" +
-                    "- Annual Magazine name:" + annualMagazine.Title + "\n" +
-                    "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
-                    "Sincerely, \n" +
-                    "Developer team";
+                                  "Dear sir/madam, \n" +
+                                  "There are new contribution(s) for the annual magazine.\n" +
+                                  "- Name Contribution: " + contribution.Title + "\n" +
+                                  "- Annual Magazine name:" + annualMagazine.Title + "\n" +
+                                  "- Academic Year: " + annualMagazine.AcademicYear + "\n\n" +
+                                  "Sincerely, \n" +
+                                  "Developer team";
                     var message = new Message(coordinatorEmails, "New Contribution", body);
                     await _emailSender.SendEmailAsync(message);
                 }
             }
-            return RedirectToAction(nameof(MyAccount));
         }
 
         // POST: StudentsController/Edit/5
@@ -593,7 +599,6 @@ namespace COMP1640.Controllers
 
             currentFile.FilePath = uniqueFileName;
             await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
 
