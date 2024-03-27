@@ -836,8 +836,8 @@ a {
 
 .piechart-legend {
 	position: absolute;
-    top: 53%;
-    left: 45%;
+    top: 50%;
+    left: 32%;
 	transform: translate(-50%, -50%);
 	text-align: center;
 }
