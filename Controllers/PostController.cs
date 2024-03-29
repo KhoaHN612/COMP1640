@@ -71,7 +71,19 @@ namespace COMP1640.Controllers
         }
         [Authorize]
         public async Task<IActionResult> PostList()
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             var userFullName = await GetUserFullName();
             if (userFullName != null)
             {
