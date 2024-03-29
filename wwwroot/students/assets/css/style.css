@@ -143,7 +143,7 @@ ul.list-links a:hover {
 .author-block {
   background-color: whitesmoke;
   clear: both;
-  display: table;
+  /* display: table; */
   margin: 20px 0;
   padding: 20px;
 }

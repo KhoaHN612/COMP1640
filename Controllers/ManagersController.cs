@@ -395,7 +395,7 @@ namespace COMP1640.Controllers
         }
 
         // [Authorize(Roles="Coordinator")]
-        public async Task<IActionResult> IndexCooridinators(string task, string year)
+        public async Task<IActionResult> IndexCoordinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
             List<TotalContribution> TotalContribution = new List<TotalContribution>();
@@ -625,17 +625,23 @@ namespace COMP1640.Controllers
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
 
+            var commentDeadline = contribution.CommentDeadline;
+                // Lấy thông tin của user tạo contribution
+            var contributionUser = await _userManager.FindByIdAsync(contribution.UserId);
+            var contributionUserFullName = contributionUser.FullName;
 
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
             ViewBag.userId = anotherUserId;
             ViewBag.contributionUserId = contribution.UserId;
+            ViewBag.contributionUserName = contributionUserFullName;
             ViewBag.contributionsTile = contribution.Title;
             ViewBag.userFullName = userFullName;
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
             ViewBag.Comments = comments;
+            ViewBag.Deadline = commentDeadline;
             return View("coordinators/create_comment", contribution);
         }
         //=============================== POSTS ====================================//

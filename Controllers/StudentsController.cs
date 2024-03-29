@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics.Eventing.Reader;
 using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Migrations;
