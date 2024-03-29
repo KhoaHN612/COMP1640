@@ -1,8 +1,7 @@
-﻿using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics.Eventing.Reader;
 using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Migrations;
-using COMP1640.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using COMP1640.Models.MultiModels;
+using COMP1640.Models;
 using Humanizer;
 using Microsoft.VisualBasic;
 
@@ -436,7 +436,7 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
-        [Authorize(Roles = "Student")]
+        
         public async Task<IActionResult> FromEditSubmission(int id)
         {   
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -476,7 +476,7 @@ namespace COMP1640.Controllers
 
         }
 
-        [Authorize(Roles = "Student")]
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title")] Contribution contribution, FileDetail fileDetails)
