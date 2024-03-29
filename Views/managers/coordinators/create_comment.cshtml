@@ -6,7 +6,7 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCooridinators"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Managers" asp-action="IndexCoordinators"><i class="bx bx-home-alt"></i></a></li>
                     <li class="breadcrumb-item active"><a asp-controller="Managers" asp-action="StudentSubmissionCoordinators">List submission</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Make Comments</li>
                 </ol>
@@ -22,8 +22,8 @@
                         <hr />
                         <form class="row g-3" method="post">
                             <div class="col-6">
-                                <label class="form-label"> Student ID</label>
-                                <input type="text" class="form-control" readonly value="@ViewBag.contributionUserId">
+                                <label class="form-label"> Student Name</label>
+                                <input type="text" class="form-control" readonly value="@ViewBag.contributionUserName">
                             </div>
                             <div class="col-6">
                                 <label class="form-label"> Title</label>
