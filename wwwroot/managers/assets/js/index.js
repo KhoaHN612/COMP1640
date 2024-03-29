@@ -1,3 +1,88 @@
+
+// onload
+window.onload = function () {
+	// Call API to AddVisitLog() in WebAccessLogController by POST method
+	var browerCount = document.getElementById("browerCount");
+
+	if(browerCount){
+		fetch('/WebAccessLog/AddVisitLog', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({}),
+		})
+		.then(response => response.json())
+		.then(data => {
+			var arrSeries = [[], [], []];
+			
+			arrSeries[0] = data.edge;
+			arrSeries[1] = data.chrome;
+			arrSeries[2] = data.firefox;
+
+			var options = {
+				series: arrSeries,
+				chart: {
+					width: 460,
+					height: 500,
+					type: 'pie',
+				},
+			  labels: ['Microsoft Edge', 'Chrome', 'Firefox'],
+			  plotOptions: {
+				pie: {
+					dataLabels: {
+						formatter: function(val, opts) {
+							return val + " views";
+						}
+					}
+				}
+			},
+			  responsive: [{
+				breakpoint: 480,
+				options: {
+				  chart: {
+					width: 200
+				  },
+				  legend: {
+					position: 'bottom'
+				  }
+				}
+			  }]
+			  };
+		
+			  var chart = new ApexCharts(document.querySelector("#chartBrowser"), options);
+			  chart.render();
+		})
+	}
+}
+
+function GetBrowserByYear(year) {
+	var data = {
+		year: year
+	};
+
+	fetch('/WebAccessLog/AddVisitLog', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(data),	
+	}).then(response => {
+		if (!response.ok) {
+			throw new Error('Network response was not ok');
+		}
+
+		return response.json();
+	})
+	.then(data => {
+		console.log('Received data:', data);
+	})
+	.catch(error => {
+		console.error('There was a problem with the fetch operation:', error);
+	});
+	
+}
+
 function GetTotalContributionsData() {
 	//Retrieve the data from the HTML data attribute
 	var contriDataElement = document.getElementById("ContributionsTotalData");
@@ -620,8 +705,6 @@ function GetContributionByFaculty() {
 	var contributionDataElement = document.getElementById("contributionFaculty");
 	if (contributionDataElement) {
 		var contributionsData = JSON.parse(contributionDataElement.dataset.contributionfaculty);
-		console.log(contributionsData);
-
 		var arrDataChart6 = [[], []];
 
 		for (var i = 0; i < contributionsData.length; i++) {
@@ -2078,3 +2161,4 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("totalContributors").textContent = totalContributions + " contributors";
 });
+

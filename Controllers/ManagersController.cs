@@ -31,7 +31,7 @@ namespace COMP1640.Controllers
             _emailSender = EmailSender;
         }
 
-        [Authorize]
+        
         public async Task<IActionResult> Index(string task, string year)
         {
             ViewData["Title"] = "Dashboard";
@@ -41,6 +41,7 @@ namespace COMP1640.Controllers
 
             if (task == "ContributionFaculty" && !string.IsNullOrEmpty(year)) { currentDate = new DateTime(Convert.ToInt32(year), 1, 1); }
             List<ContributionFaculty> contributionFaculty = await GetContributionByFaculty(currentDate);
+            if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
 
             //GET ALL YEARS
             List<int> years = await _context.Contributions
@@ -54,13 +55,14 @@ namespace COMP1640.Controllers
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
             List<ContributionDate> ContributionByYear = await GetContributionByYear(selectedYear);
-
+            if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
 
             //GET CONTRIBUTIONS BY USER
             int selectedYearUser = DateTime.Now.Year;
 
             if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
             List<ContributionUser> ContributionUser = await GetContributionByUser(selectedYearUser);
+
 
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
@@ -676,7 +678,6 @@ namespace COMP1640.Controllers
 
         // }
         //================================ MANAGERS ================================//
-        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> IndexManagers(string task, string year)
         {
             ViewData["Title"] = "Dashboard Managers";
@@ -842,7 +843,6 @@ namespace COMP1640.Controllers
             return View("head_managers/student_submission", contributions);
         }
         // DOWNLOAD EACH FILES
-        [Authorize(Roles = "Manager, Coordinator")]
         [HttpGet]
         public async Task<IActionResult> DownloadContributionFiles(int id)
         {
@@ -939,7 +939,6 @@ namespace COMP1640.Controllers
             return View("profile_managers", curUser);
         }
 
-        [Authorize(Roles = "Coordinator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status)
