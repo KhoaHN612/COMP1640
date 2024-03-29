@@ -67,9 +67,10 @@ namespace COMP1640.Controllers
             foreach (var i in roleStatistics)
             {
                 Console.WriteLine(i.Role + " - " + i.Total);
-            }if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
+            }
+            if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
             if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
-            
+
 
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
@@ -219,8 +220,20 @@ namespace COMP1640.Controllers
             return roleStatistics;
         }
 
-        public IActionResult TableFaculty()
+        public async Task<IActionResult> TableFaculty()
         {
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             List<Faculty> faculty = _context.Faculties.OrderBy(f => f.FacultyId).ToList();
             ViewData["Title"] = "Faculty Table page";
             return View("admins/table_faculty", faculty);
@@ -286,8 +299,20 @@ namespace COMP1640.Controllers
         //     return RedirectToAction("TableFaculty");
         // }
 
-        public IActionResult TableSubmissionDate()
+        public async Task<IActionResult> TableSubmissionDate()
         {
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             List<AnnualMagazine> annualMagazine = _context.AnnualMagazines.OrderBy(f => f.AnnualMagazineId).ToList();
             ViewData["Title"] = "Submission Date Table page";
             return View("admins/table_submission_date", annualMagazine);
@@ -378,22 +403,22 @@ namespace COMP1640.Controllers
             List<ContributionWithoutComment> contributions = new List<ContributionWithoutComment>();
             List<ContributionWithoutComment> contributionWithoutComments = new List<ContributionWithoutComment>();
             List<ContributionWithoutComment> contributionWithoutCommentsAfter14Days = new List<ContributionWithoutComment>();
-             List<ContributionUser> contributionUser = new List<ContributionUser>();
+            List<ContributionUser> contributionUser = new List<ContributionUser>();
             //Total Contributions
             DateTime currentDate = DateTime.Now;
-            if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { currentDate = new DateTime(Convert.ToInt32(year), 1, 1); }            
-                //get current faculty of current user
+            if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { currentDate = new DateTime(Convert.ToInt32(year), 1, 1); }
+            //get current faculty of current user
             var currentUser = await _userManager.GetUserAsync(User);
-                //get faculty id of current user
+            //get faculty id of current user
             if (currentUser == null || currentUser.FacultyId == null)
             {
                 return null;
             }
             else
-            { 
-                
-                int currentFacultyId = currentUser.FacultyId ?? 0;;
-                        
+            {
+
+                int currentFacultyId = currentUser.FacultyId ?? 0; ;
+
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
 
                 //Total Contributions Accepted
@@ -404,8 +429,8 @@ namespace COMP1640.Controllers
 
                 //Total Contributions Pending
                 TotalContributionsPending = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPending");
-                        
-                                    
+
+
                 //GET ALL CONTRIBUTIONS
                 contributions = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
@@ -417,11 +442,11 @@ namespace COMP1640.Controllers
                         Quantity = g.Count()
                     })
                     .ToListAsync();
-        
-                contributionWithoutComments =  await _context.Contributions
+
+                contributionWithoutComments = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
-                    .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year 
-                                && c.Contribution.Comment == null 
+                    .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year
+                                && c.Contribution.Comment == null
                                 && c.Contribution.Status == "Approved"
                                 && c.User.FacultyId == currentFacultyId)
                     .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
@@ -448,14 +473,14 @@ namespace COMP1640.Controllers
                     })
                     .ToListAsync();
 
-                    
-                    //GET CONTRIBUTIONS BY USER
-                    int selectedYearUser = DateTime.Now.Year;
 
-                    if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
-                    contributionUser = await GetContributors(currentFacultyId, selectedYearUser);
+                //GET CONTRIBUTIONS BY USER
+                int selectedYearUser = DateTime.Now.Year;
 
-                }
+                if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
+                contributionUser = await GetContributors(currentFacultyId, selectedYearUser);
+
+            }
 
 
             //GET ALL YEARS
@@ -505,9 +530,9 @@ namespace COMP1640.Controllers
 
 
             var query = from c in _context.Contributions
-            join u in _context.Users on c.UserId equals u.Id
-            where c.SubmissionDate.Year == year
-            select new { Contribution = c, User = u };
+                        join u in _context.Users on c.UserId equals u.Id
+                        where c.SubmissionDate.Year == year
+                        select new { Contribution = c, User = u };
 
             switch (action)
             {
@@ -522,7 +547,7 @@ namespace COMP1640.Controllers
                     break;
             }
 
-            List<TotalContribution> contributions =  await query
+            List<TotalContribution> contributions = await query
             .Where(uc => uc.User.FacultyId == facultyID)
             .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
             .Select(g => new TotalContribution
@@ -541,12 +566,27 @@ namespace COMP1640.Controllers
         [Authorize(Roles = "Coordinator, Manager")]
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
+
             ViewData["Title"] = "List Submission";
+
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
+
 
             var currentUser = await _userManager.GetUserAsync(User);
 
             if (currentUser == null || currentUser.FacultyId == null)
-            {   
+            {
                 return NotFound();
             }
             var currentFacultyId = currentUser.FacultyId;
@@ -582,7 +622,7 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-   
+
 
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
@@ -780,8 +820,20 @@ namespace COMP1640.Controllers
         // }
 
         [Authorize(Roles = "Manager")]
-        public IActionResult StudentSubmissionManagers()
+        public async Task<IActionResult> StudentSubmissionManagers()
         {
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             List<Contribution> contributions = _context.Contributions
                                             .Include(c => c.AnnualMagazine)
                                             .Where(c => c.Status == "Approved")
@@ -919,7 +971,7 @@ namespace COMP1640.Controllers
             return RedirectToAction("StudentSubmissionCoordinators", "Managers");
         }
 
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateComment(Contribution contribution, string userId)
@@ -964,7 +1016,7 @@ namespace COMP1640.Controllers
             return user?.FullName; // This will return null if user is null.
         }
 
-        
+
         [HttpPost]
         public async Task<IActionResult> Publish(int id, bool isPublished)
         {
@@ -986,5 +1038,10 @@ namespace COMP1640.Controllers
                 return View();
             }
         }
+
+  
+
+
+
     }
 }
