@@ -49,7 +49,6 @@ namespace COMP1640.Controllers
                 .Distinct()
                 .ToListAsync();
 
-
             //GET CONTRIBUTIONS BY YEAR
             int selectedYear = DateTime.Now.Year;
 
@@ -63,13 +62,9 @@ namespace COMP1640.Controllers
             if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
             List<ContributionUser> ContributionUser = await GetContributionByUser(selectedYearUser);
 
-
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
-            foreach (var i in roleStatistics)
-            {
-                Console.WriteLine(i.Role + " - " + i.Total);
-            }
+           
             if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
             if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
 
@@ -186,6 +181,7 @@ namespace COMP1640.Controllers
                     TotalPending = g.Where(c => c.Contributions.Status == "Pending").Count(),
                     Year = year
                 })
+                .OrderByDescending(c => c.TotalContribution) 
                 .ToListAsync();
 
             return contributions;

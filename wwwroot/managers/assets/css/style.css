@@ -1825,10 +1825,13 @@ a {
 
 }
 
-
 #chartColumnContributions, #chartPieContributions {
     min-width: 300px; 
     max-width: 100%;
     height: auto; 
     margin: auto;
+}
+
+.empty{
+	margin: auto;
 }
