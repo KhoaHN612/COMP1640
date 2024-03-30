@@ -121,6 +121,7 @@
                         <div class="d-flex align-items-center">
                             <div>
                                 <p class="mb-1">@item.Role Accounts</p>
+                                
                                 <h4 class="mb-0 text-primary">@item.Total</h4>
                             </div>
                         </div>
@@ -129,8 +130,26 @@
             }
         </div>
 
+        <div class="row ps-3">
+            <div class="col-12 card radius-10 border shadow-none mb-3">
+                <div class="card-body">
+                    <div class="align-items-center">
+                        <div class="d-flex">
+                            <h5>Page Visit Rankings</h5>
+                            <div class="w-5 ms-auto d-flex">
+                                <h6 class="me-3">Sort By</h6>
+                                <div id="sort-by"></div>
+                            </div>
+                        </div>                          
+                        
+                        <div id="chartPageVisit"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
-            <div class="col">
+            <div class="col pe-0">
                 <div class="card radius-10 w-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">

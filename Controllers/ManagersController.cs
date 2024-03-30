@@ -68,7 +68,6 @@ namespace COMP1640.Controllers
             if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
             if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
 
-
             ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
             ViewData["ContributionByYear"] = ContributionByYear;
