@@ -9,16 +9,17 @@ $(window).on('load', function () {
 	GetPendingContributionData();
 	//======================================================= MANAGER END =======================================================
 
-		
+
 	//=======================================================COORDINATOR DASHBOARD=======================================================
 	StatisticContributionsByYear();
 	ContributionAnalysisChart();
 	//=======================================================COORDINATORS END=======================================================
-	
+
 
 	//=======================================================ADMIN DASHBOARD=======================================================
 	GetContributionByFaculty();
 	GetBrowserByYear(new Date().getFullYear());
+	GetPageVisitData("desc");
 	//=======================================================ADMIN END=======================================================
 
 	//=======================================================GUEST DASHBOARD=======================================================
@@ -26,9 +27,85 @@ $(window).on('load', function () {
 	//=======================================================GUEST END=======================================================
 });
 
+function GetPageVisitData(action) {
+	if (action == "desc") {
+		document.getElementById("sort-by").innerHTML = '<i class="bi bi-sort-up" onclick="GetPageVisitData(\'asc\')"></i>';
+	} else {	
+		document.getElementById("sort-by").innerHTML = '<i class="bi bi-sort-down" onclick="GetPageVisitData(\'desc\')"></i>';
+	}
+	//Method POST sent desc to server
+	fetch('/WebAccessLog/PageVisitData', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(action)
+	})
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+			if (data.length > 0) {
+				//Get data from server
+				var arrData = [];
+
+				// Lặp qua mỗi phần tử trong object data
+				for (var key in data) {
+					// Kiểm tra xem phần tử hiện tại có thuộc tính visitCount không
+					if (data[key].visitCount !== undefined) {
+						// Nếu có, thêm một đối tượng mới vào mảng cleanedData
+						arrData.push({
+							x: data[key].pageName,
+							y: data[key].visitCount
+						});
+					}
+				}
+
+				//Create chart column
+				var options = {
+					series: [{
+						name: "sales",
+						data: arrData
+					}],
+					chart: {
+						type: 'bar',
+						height: 380,
+						toolbar: {
+							show: false
+						}
+					},
+					xaxis: {
+						type: 'category',
+						group: {
+							style: {
+								fontSize: '10px',
+								fontWeight: 700
+							}
+						}
+					},
+					tooltip: {
+						x: {
+							formatter: function (val) {
+								return "Q" + dayjs(val).quarter() + " " + dayjs(val).format("YYYY")
+							}
+						}
+					},
+				};
+
+				var chart = new ApexCharts(document.querySelector("#chartPageVisit"), options);
+				chart.render();
+			} else {
+				//If no data, display gif empty
+				document.getElementById("chartColumnVisitPage").innerHTML = GetGifEmpty();
+			}
+		})
+		.catch(error => {
+			console.error('Error fetching data:', error);
+		}
+		);
+}
 
 function GetGifEmpty() {
-    return `
+	return `
     <div class="empty d-flex flex-column align-items-center position-relative">
         <img src="./gif/empty.gif" class="img-fluid w-75" alt="browser" />
         <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No data here!</p>
@@ -36,66 +113,66 @@ function GetGifEmpty() {
 }
 
 function GetBrowserByYear(year) {
-    fetch('/WebAccessLog/AddVisitLog', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(year),    
-    })
-    .then(response => response.json())
-    .then(data => {
-		console.log(Object.entries(data).length);
-	
-		if (Object.entries(data).length > 1) {
-			document.getElementById("yearBrowser").value = Object.values(data)[0];   
+	fetch('/WebAccessLog/AddVisitLog', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(year),
+	})
+		.then(response => response.json())
+		.then(data => {
+			console.log(Object.entries(data).length);
 
-			var options = {
-				series: Object.values(data).slice(1),
-				chart: {
-					width: 460,
-					height: 500,
-					type: 'pie',
-				},
-				labels: Object.keys(data).slice(1),
-				plotOptions: {
-					pie: {
-						dataLabels: {
-							formatter: function(val, opts) {
-								return val + " views";
+			if (Object.entries(data).length > 1) {
+				document.getElementById("yearBrowser").value = Object.values(data)[0];
+
+				var options = {
+					series: Object.values(data).slice(1),
+					chart: {
+						width: 460,
+						height: 500,
+						type: 'pie'
+					},
+					labels: Object.keys(data).slice(1),
+					plotOptions: {
+						pie: {
+							dataLabels: {
+								formatter: function (val, opts) {
+									return val + " views";
+								}
 							}
 						}
-					}
-				},
-				responsive: [{
-					breakpoint: 480,
-					options: {
-						chart: {
-							width: 200
-						},
-						legend: {
-							position: 'bottom'
+					},
+					responsive: [{
+						breakpoint: 480,
+						options: {
+							chart: {
+								width: 200
+							},
+							legend: {
+								position: 'bottom'
+							}
 						}
-					}
-				}]
-			};
-			document.getElementById("chartBrowser").innerHTML = "";
-			var chart = new ApexCharts(document.querySelector("#chartBrowser"), options);
-			chart.render();
-		}else{
-			document.getElementById("yearBrowser").value = Object.values(data)[0];   
+					}]
+				};
+				document.getElementById("chartBrowser").innerHTML = "";
+				var chart = new ApexCharts(document.querySelector("#chartBrowser"), options);
+				chart.render();
+			} else {
+				document.getElementById("yearBrowser").value = Object.values(data)[0];
 
-			var resizeTriggers = document.getElementsByClassName("resize-triggers");
-			while (resizeTriggers.length > 0) {
-				resizeTriggers[0].parentNode.removeChild(resizeTriggers[0]);
+				var resizeTriggers = document.getElementsByClassName("resize-triggers");
+				while (resizeTriggers.length > 0) {
+					resizeTriggers[0].parentNode.removeChild(resizeTriggers[0]);
+				}
+
+				document.getElementById("chartBrowser").innerHTML = GetGifEmpty();
 			}
-			
-			document.getElementById("chartBrowser").innerHTML = GetGifEmpty();
-		}
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
+		})
+		.catch(error => {
+			console.error('Error fetching data:', error);
+		});
 }
 
 function GetTotalContributionsData() {
@@ -175,75 +252,78 @@ function GetTotalContributionsData() {
 		};
 
 		// Dữ liệu mẫu cho biểu đồ cột
-		var optionsColumn =  {
+		var optionsColumn = {
 			series: [{
-			name: 'Inflation',
-			data: dataTotalColumn[1]
-		}],
+				name: 'Inflation',
+				data: dataTotalColumn[1]
+			}],
 			chart: {
-			height: 350,
-			type: 'bar',
-		},
-		plotOptions: {
-			bar: {
-			borderRadius: 10,
-			dataLabels: {
-				position: 'top', // top, center, bottom
-			},
-			}
-		},
-		dataLabels: {
-			enabled: true,
-			formatter: function (val) {
-			return val + "";
-			},
-			offsetY: -20,
-			style: {
-			fontSize: '12px',
-			colors: ["#304758"]
-			}
-		},
-		
-		xaxis: {
-			categories: dataTotalColumn[0],
-			position: 'top',
-			axisBorder: {
-			show: false
-			},
-			axisTicks: {
-			show: false
-			},
-			crosshairs: {
-			fill: {
-				type: 'gradient',
-				gradient: {
-				colorFrom: '#D8E3F0',
-				colorTo: '#BED1E6',
-				stops: [0, 100],
-				opacityFrom: 0.4,
-				opacityTo: 0.5,
+				height: 350,
+				type: 'bar',
+				toolbar: {
+					show: false
 				}
-			}
 			},
-			tooltip: {
-			enabled: true,
-			}
-		},
-		yaxis: {
-			axisBorder: {
-			show: false
+			plotOptions: {
+				bar: {
+					borderRadius: 10,
+					dataLabels: {
+						position: 'top', // top, center, bottom
+					},
+				}
 			},
-			axisTicks: {
-			show: false,
+			dataLabels: {
+				enabled: true,
+				formatter: function (val) {
+					return val + "";
+				},
+				offsetY: -20,
+				style: {
+					fontSize: '12px',
+					colors: ["#304758"]
+				}
 			},
-			labels: {
-			show: false,
-			formatter: function (val) {
-				return val + "";
+
+			xaxis: {
+				categories: dataTotalColumn[0],
+				position: 'top',
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false
+				},
+				crosshairs: {
+					fill: {
+						type: 'gradient',
+						gradient: {
+							colorFrom: '#D8E3F0',
+							colorTo: '#BED1E6',
+							stops: [0, 100],
+							opacityFrom: 0.4,
+							opacityTo: 0.5,
+						}
+					}
+				},
+				tooltip: {
+					enabled: true,
+				}
+			},
+			yaxis: {
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false,
+				},
+				labels: {
+					show: false,
+					formatter: function (val) {
+						return val + "";
+					}
+				}
+
 			}
-			}
-		
-		}
 		};
 
 		// tổng contributions
@@ -330,75 +410,78 @@ function GetApprovedContributionData() {
 			}]
 		};
 
-		var optionsColumn =  {
+		var optionsColumn = {
 			series: [{
-			name: 'Inflation',
-			data: dataApprovedColumn[1]
-		}],
+				name: 'Inflation',
+				data: dataApprovedColumn[1]
+			}],
 			chart: {
-			height: 350,
-			type: 'bar',
-		},
-		plotOptions: {
-			bar: {
-			borderRadius: 10,
-			dataLabels: {
-				position: 'top', // top, center, bottom
-			},
-			}
-		},
-		dataLabels: {
-			enabled: true,
-			formatter: function (val) {
-			return val + "";
-			},
-			offsetY: -20,
-			style: {
-			fontSize: '12px',
-			colors: ["#304758"]
-			}
-		},
-
-		xaxis: {
-			categories: dataApprovedColumn[0],
-			position: 'top',
-			axisBorder: {
-			show: false
-			},
-			axisTicks: {
-			show: false
-			},
-			crosshairs: {
-			fill: {
-				type: 'gradient',
-				gradient: {
-				colorFrom: '#D8E3F0',
-				colorTo: '#BED1E6',
-				stops: [0, 100],
-				opacityFrom: 0.4,
-				opacityTo: 0.5,
+				height: 350,
+				type: 'bar',
+				toolbar: {
+					show: false
 				}
-			}
 			},
-			tooltip: {
-			enabled: true,
-			}
-		},
-		yaxis: {
-			axisBorder: {
-			show: false
+			plotOptions: {
+				bar: {
+					borderRadius: 10,
+					dataLabels: {
+						position: 'top', // top, center, bottom
+					},
+				}
 			},
-			axisTicks: {
-			show: false,
+			dataLabels: {
+				enabled: true,
+				formatter: function (val) {
+					return val + "";
+				},
+				offsetY: -20,
+				style: {
+					fontSize: '12px',
+					colors: ["#304758"]
+				}
 			},
-			labels: {
-			show: false,
-			formatter: function (val) {
-				return val + "";
-			}
-			}
 
-		}
+			xaxis: {
+				categories: dataApprovedColumn[0],
+				position: 'top',
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false
+				},
+				crosshairs: {
+					fill: {
+						type: 'gradient',
+						gradient: {
+							colorFrom: '#D8E3F0',
+							colorTo: '#BED1E6',
+							stops: [0, 100],
+							opacityFrom: 0.4,
+							opacityTo: 0.5,
+						}
+					}
+				},
+				tooltip: {
+					enabled: true,
+				}
+			},
+			yaxis: {
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false,
+				},
+				labels: {
+					show: false,
+					formatter: function (val) {
+						return val + "";
+					}
+				}
+
+			}
 		};
 
 		var sum = dataApprovedPie[1].reduce((a, b) => a + b, 0);
@@ -467,7 +550,7 @@ function GetRejectedContributionData() {
 			series: dataRejectedPie[1],
 			chart: {
 				type: 'pie',
-			},	
+			},
 			labels: arrLabelPie,
 			responsive: [{
 				breakpoint: 480,
@@ -482,75 +565,78 @@ function GetRejectedContributionData() {
 			}]
 		};
 
-		var optionsColumn =  {
+		var optionsColumn = {
 			series: [{
-			name: 'Inflation',
-			data: dataRejectedColumn[1]
-		}],
+				name: 'Inflation',
+				data: dataRejectedColumn[1]
+			}],
 			chart: {
-			height: 450,
-			type: 'bar',
-		},
-		plotOptions: {
-			bar: {
-			borderRadius: 10,
-			dataLabels: {
-				position: 'top', // top, center, bottom
-			},
-			}
-		},
-		dataLabels: {
-			enabled: true,
-			formatter: function (val) {
-			return val + "";
-			},
-			offsetY: -20,
-			style: {
-			fontSize: '12px',
-			colors: ["#304758"]
-			}
-		},
-
-		xaxis: {
-			categories: dataRejectedColumn[0],
-			position: 'top',
-			axisBorder: {
-			show: false
-			},
-			axisTicks: {
-			show: false
-			},
-			crosshairs: {
-			fill: {
-				type: 'gradient',
-				gradient: {
-				colorFrom: '#D8E3F0',
-				colorTo: '#BED1E6',
-				stops: [0, 100],
-				opacityFrom: 0.4,
-				opacityTo: 0.5,
+				height: 450,
+				type: 'bar',
+				toolbar: {
+					show: false
 				}
-			}
 			},
-			tooltip: {
-			enabled: true,
-			}
-		},
-		yaxis: {
-			axisBorder: {
-			show: false
+			plotOptions: {
+				bar: {
+					borderRadius: 10,
+					dataLabels: {
+						position: 'top', // top, center, bottom
+					},
+				}
 			},
-			axisTicks: {
-			show: false,
+			dataLabels: {
+				enabled: true,
+				formatter: function (val) {
+					return val + "";
+				},
+				offsetY: -20,
+				style: {
+					fontSize: '12px',
+					colors: ["#304758"]
+				}
 			},
-			labels: {
-			show: false,
-			formatter: function (val) {
-				return val + "";
-			}
-			}
 
-		}
+			xaxis: {
+				categories: dataRejectedColumn[0],
+				position: 'top',
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false
+				},
+				crosshairs: {
+					fill: {
+						type: 'gradient',
+						gradient: {
+							colorFrom: '#D8E3F0',
+							colorTo: '#BED1E6',
+							stops: [0, 100],
+							opacityFrom: 0.4,
+							opacityTo: 0.5,
+						}
+					}
+				},
+				tooltip: {
+					enabled: true,
+				}
+			},
+			yaxis: {
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false,
+				},
+				labels: {
+					show: false,
+					formatter: function (val) {
+						return val + "";
+					}
+				}
+
+			}
 		};
 
 		var sum = dataRejectedPie[1].reduce((a, b) => a + b, 0);
@@ -560,7 +646,7 @@ function GetRejectedContributionData() {
 		chartPie.render();
 
 		var chartColumn = new ApexCharts(document.querySelector("#chartColumnRejected"), optionsColumn);
-		chartColumn.render();	
+		chartColumn.render();
 	}
 }
 
@@ -634,74 +720,77 @@ function GetPendingContributionData() {
 			}]
 		};
 
-		var optionsColumn =  {
+		var optionsColumn = {
 			series: [{
-			name: 'Inflation',
-			data: dataPendingColumn[1]
-		}],
+				name: 'Inflation',
+				data: dataPendingColumn[1]
+			}],
 			chart: {
-			height: 350,
-			type: 'bar',
-		},
-		plotOptions: {
-			bar: {
-			borderRadius: 10,
-			dataLabels: {
-				position: 'top', // top, center, bottom
-			},
-			}
-		},
-		dataLabels: {
-			enabled: true,
-			formatter: function (val) {
-			return val + "";
-			},
-			offsetY: -20,
-			style: {
-			fontSize: '12px',
-			colors: ["#304758"]
-			}
-		},
-		xaxis: {
-			categories: dataPendingColumn[0],
-			position: 'top',
-			axisBorder: {
-			show: false
-			},
-			axisTicks: {
-			show: false
-			},
-			crosshairs: {
-			fill: {
-				type: 'gradient',
-				gradient: {
-				colorFrom: '#D8E3F0',
-				colorTo: '#BED1E6',
-				stops: [0, 100],
-				opacityFrom: 0.4,
-				opacityTo: 0.5,
+				height: 350,
+				type: 'bar',
+				toolbar: {
+					show: false
 				}
-			}
 			},
-			tooltip: {
-			enabled: true,
-			}
-		},
-		yaxis: {
-			axisBorder: {
-			show: false
+			plotOptions: {
+				bar: {
+					borderRadius: 10,
+					dataLabels: {
+						position: 'top', // top, center, bottom
+					},
+				}
 			},
-			axisTicks: {
-			show: false,
+			dataLabels: {
+				enabled: true,
+				formatter: function (val) {
+					return val + "";
+				},
+				offsetY: -20,
+				style: {
+					fontSize: '12px',
+					colors: ["#304758"]
+				}
 			},
-			labels: {
-			show: false,
-			formatter: function (val) {	
-				return val + "";
-			}
-			}
+			xaxis: {
+				categories: dataPendingColumn[0],
+				position: 'top',
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false
+				},
+				crosshairs: {
+					fill: {
+						type: 'gradient',
+						gradient: {
+							colorFrom: '#D8E3F0',
+							colorTo: '#BED1E6',
+							stops: [0, 100],
+							opacityFrom: 0.4,
+							opacityTo: 0.5,
+						}
+					}
+				},
+				tooltip: {
+					enabled: true,
+				}
+			},
+			yaxis: {
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false,
+				},
+				labels: {
+					show: false,
+					formatter: function (val) {
+						return val + "";
+					}
+				}
 
-		}
+			}
 		};
 
 		var sum = dataPendingPie[1].reduce((a, b) => a + b, 0);
@@ -713,7 +802,7 @@ function GetPendingContributionData() {
 		var chartColumn = new ApexCharts(document.querySelector("#chartColumnPending"), optionsColumn);
 		chartColumn.render();
 	}
-}	
+}
 
 function GetContributionByFaculty() {
 	// Retrieve the data from the HTML data attribute
@@ -753,31 +842,31 @@ function GetContributionByFaculty() {
 					backgroundColor: backgroundColors,
 					data: arrDataChart6[1]
 				}]
-			  },
+			},
 			options: {
 				maintainAspectRatio: false,
 				cutoutPercentage: 85,
 				responsive: true,
-			  legend: {
-				display: true,
-				position: 'right'
-			  },
-			  onHover: function (event, chartElement) {
-				if (chartElement.length > 0) {
-					var index = chartElement[0]._index; // Lấy chỉ mục của phần tử được nhấp
-					//check index in lstLabels after that display percent at this index
-					document.getElementById('falcuty').innerText = arrDataChart6[0][index];
-					document.getElementById('percent').innerText = lstPercent[index] + '%';
+				legend: {
+					display: true,
+					position: 'right'
+				},
+				onHover: function (event, chartElement) {
+					if (chartElement.length > 0) {
+						var index = chartElement[0]._index; // Lấy chỉ mục của phần tử được nhấp
+						//check index in lstLabels after that display percent at this index
+						document.getElementById('falcuty').innerText = arrDataChart6[0][index];
+						document.getElementById('percent').innerText = lstPercent[index] + '%';
+					}
 				}
-			  }
 			},
 			with: 500,
 			height: 500
-	  });
+		});
 
 		// Display chart 
 		chart.render();
-	} 
+	}
 }
 
 function GetContributionForGuest() {
@@ -786,7 +875,7 @@ function GetContributionForGuest() {
 	if (contributionDataElement) {
 		var contributionsData = JSON.parse(contributionDataElement.dataset.contributionguest);
 		console.log(contributionsData);
-		
+
 		var contributionWithoutCommentsDataElement = document.getElementById("contributionWithoutCommentsGuest");
 		var contributionWithoutCommentsData = JSON.parse(contributionWithoutCommentsDataElement.dataset.contributionwithoutcommentsguest);
 		console.log(contributionWithoutCommentsData);
@@ -801,7 +890,7 @@ function GetContributionForGuest() {
 		// get to current month
 		var currentMonth = new Date().getMonth();
 		month = month.slice(0, currentMonth + 1);
-			
+
 		var totalArticles = RecursiveCleanData(contributionsData, contributionsData.length - 1);
 		var totalWithoutComments = RecursiveCleanData(contributionWithoutCommentsData, contributionWithoutCommentsData.length - 1);
 		var totalComment = RecursiveCleanData(contributiomCommentData, contributiomCommentData.length - 1);
@@ -810,120 +899,120 @@ function GetContributionForGuest() {
 
 		var options = {
 			series: [{
-			name: 'Without Comments',
-			type: 'column',
-			data: arrDataChartGuest[1]
-		  }, {
-			name: 'Comments',
-			type: 'column',
-			data: arrDataChartGuest[2]
-		  }, {
-			name: 'Total Articles',
-			type: 'line',
-			data: arrDataChartGuest[0]
-		  }],
+				name: 'Without Comments',
+				type: 'column',
+				data: arrDataChartGuest[1]
+			}, {
+				name: 'Comments',
+				type: 'column',
+				data: arrDataChartGuest[2]
+			}, {
+				name: 'Total Articles',
+				type: 'line',
+				data: arrDataChartGuest[0]
+			}],
 			chart: {
-			height: 350,
-			type: 'line',
-			stacked: false
-		  },
-		  dataLabels: {
-			enabled: false
-		  },
-		  stroke: {
-			width: [1, 1, 4]
-		  },
-		  xaxis: {
-			categories: arrDataChartGuest[3],
-		  },
-		  yaxis: [
-			{
-			  axisTicks: {
-				show: true,
-			  },
-			  axisBorder: {
-				show: true,
-				color: '#008FFB'
-			  },
-			  labels: {
-				style: {
-				  colors: '#008FFB',
-				}
-			  },
-			  title: {
-				text: "Approved articles have no comments",
-				style: {
-				  color: '#008FFB',
-				}
-			  },
-			  tooltip: {
-				enabled: true
-			  }
+				height: 350,
+				type: 'line',
+				stacked: false
 			},
-			{
-			  seriesName: 'Without Comments',
-			  opposite: true,
-			  axisTicks: {
-				show: true,
-			  },
-			  axisBorder: {
-				show: true,
-				color: '#00E396',
-				formatter: function (value) {
-				  return value + " articles";
-				}
-			  },
-			  labels: {
-				style: {
-				  colors: '#00E396',
-				}
-			  },
-			  title: {
-				text: "Approved article with comments",
-				style: {
-				  color: '#00E396',
-				}
-			  },
+			dataLabels: {
+				enabled: false
 			},
-			{
-			  seriesName: 'Comments',
-			  opposite: true,
-			  axisTicks: {
-				show: true,
-			  },
-			  axisBorder: {
-				show: true,
-				color: '#FEB019'
-			  },
-			  labels: {
-				style: {
-				  colors: '#FEB019',
+			stroke: {
+				width: [1, 1, 4]
+			},
+			xaxis: {
+				categories: arrDataChartGuest[3],
+			},
+			yaxis: [
+				{
+					axisTicks: {
+						show: true,
+					},
+					axisBorder: {
+						show: true,
+						color: '#008FFB'
+					},
+					labels: {
+						style: {
+							colors: '#008FFB',
+						}
+					},
+					title: {
+						text: "Approved articles have no comments",
+						style: {
+							color: '#008FFB',
+						}
+					},
+					tooltip: {
+						enabled: true
+					}
 				},
-			  },
-			  title: {
-				text: "Total articles in this year",
-				style: {
-				  color: '#FEB019',
-				}
-			  }
+				{
+					seriesName: 'Without Comments',
+					opposite: true,
+					axisTicks: {
+						show: true,
+					},
+					axisBorder: {
+						show: true,
+						color: '#00E396',
+						formatter: function (value) {
+							return value + " articles";
+						}
+					},
+					labels: {
+						style: {
+							colors: '#00E396',
+						}
+					},
+					title: {
+						text: "Approved article with comments",
+						style: {
+							color: '#00E396',
+						}
+					},
+				},
+				{
+					seriesName: 'Comments',
+					opposite: true,
+					axisTicks: {
+						show: true,
+					},
+					axisBorder: {
+						show: true,
+						color: '#FEB019'
+					},
+					labels: {
+						style: {
+							colors: '#FEB019',
+						},
+					},
+					title: {
+						text: "Total articles in this year",
+						style: {
+							color: '#FEB019',
+						}
+					}
+				},
+			],
+			tooltip: {
+				fixed: {
+					enabled: true,
+					position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+					offsetY: 30,
+					offsetX: 60
+				},
 			},
-		  ],
-		  tooltip: {
-			fixed: {
-			  enabled: true,
-			  position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
-			  offsetY: 30,
-			  offsetX: 60
-			},
-		  },
-		  legend: {
-			horizontalAlign: 'center',
-			offsetX: 40
-		  }
-		  };
-  
-		  var chart = new ApexCharts(document.querySelector("#chartStudent"), options);
-		  chart.render();
+			legend: {
+				horizontalAlign: 'center',
+				offsetX: 40
+			}
+		};
+
+		var chart = new ApexCharts(document.querySelector("#chartStudent"), options);
+		chart.render();
 	}
 }
 
@@ -934,38 +1023,38 @@ function RecursiveCleanData(contributionsData, i) {
 
 	var month = new Date(contributionsData[i].date).getMonth() + 1;
 	if (i > 0) {
-        var previousMonth = new Date(contributionsData[i - 1].date).getMonth() + 1;
-        if(month == previousMonth) {
-            contributionsData[i - 1].quantity += contributionsData[i].quantity;
+		var previousMonth = new Date(contributionsData[i - 1].date).getMonth() + 1;
+		if (month == previousMonth) {
+			contributionsData[i - 1].quantity += contributionsData[i].quantity;
 			contributionsData.splice(i, 1);
-        }
-    }
+		}
+	}
 	return RecursiveCleanData(contributionsData, i - 1);
 }
 
 function FillData(month, totalArticles, totalWithoutComments, totalComment) {
 	var arrDataChartGuest = [[], [], [], []];
-	
+
 	for (var i = 0; i < month.length; i++) {
 		arrDataChartGuest[3].push(month[i]);
-		arrDataChartGuest[0].push(0);	
+		arrDataChartGuest[0].push(0);
 		arrDataChartGuest[1].push(0);
 		arrDataChartGuest[2].push(0);
-		
+
 		for (let j = 0; j < totalArticles.length; j++) {
 			console.log(j);
 
 			if ((i + 1) == new Date(totalArticles[j].date).getMonth() + 1) {
 				arrDataChartGuest[0][i] = totalArticles[j].quantity;
 			}
-			
-			if (totalWithoutComments.length > j){
+
+			if (totalWithoutComments.length > j) {
 				if ((i + 1) == new Date(totalWithoutComments[j].date).getMonth() + 1) {
 					arrDataChartGuest[1][i] = totalWithoutComments[j].quantity;
 				}
 			}
 
-			if (totalComment.length > j){
+			if (totalComment.length > j) {
 				if ((i + 1) == new Date(totalComment[j].date).getMonth() + 1) {
 					console.log(totalComment[j]);
 					arrDataChartGuest[2][i] = totalComment[j].quantity;
@@ -974,8 +1063,8 @@ function FillData(month, totalArticles, totalWithoutComments, totalComment) {
 		}
 	}
 
-	console.log(arrDataChartGuest);	
-	
+	console.log(arrDataChartGuest);
+
 	return arrDataChartGuest;
 }
 
@@ -1018,114 +1107,114 @@ function StatisticContributionsByYear() {
 		var totalPendingData = JSON.parse(totalPendingDataElement.dataset.totalpending);
 
 		var sumPending = totalPendingData.reduce((a, b) => a + b.total, 0);
-		document.getElementById('totalPending').innerText = sumPending + ' articles';		
+		document.getElementById('totalPending').innerText = sumPending + ' articles';
 	}
 }
 
 function ContributionAnalysisChart() {
 	//Retrieve the data from the HTML data attribute
 	try {
-        const contributionDataElement = document.getElementById("totalContributionsData");
+		const contributionDataElement = document.getElementById("totalContributionsData");
 		var contributionsData = JSON.parse(contributionDataElement.dataset.totalcontributions);
 
 		var totalContributionDataElement = document.getElementById("contributionWithoutCommentsData");
 		var totalContributionData = JSON.parse(totalContributionDataElement.dataset.contributionwithoutcomments);
-	
+
 		var totalContributionAfter14DaysDataElement = document.getElementById("contributionWithoutCommentsAfter14DaysData");
 		var totalContributionAfter14DaysData = JSON.parse(totalContributionAfter14DaysDataElement.dataset.contributionwithoutcommentsafter14days);
-		
+
 		//Lấy tất tháng hiện tại
 		const today = new Date();
 		const startOfYear = new Date(today.getFullYear(), 0, 1);
-	
+
 		const formattedStartDate = `${startOfYear.getFullYear()}-${(startOfYear.getMonth() + 1).toString().padStart(2, '0')}-${startOfYear.getDate().toString().padStart(2, '0')}`;
 		const formattedDate = new Date().toISOString().slice(0, 10);
-	
+
 		//Lấy dữ liệu từ totalContributionData và totalContributionAfter14DaysData
 		var data = GetData(formattedStartDate, formattedDate, contributionsData, totalContributionData, totalContributionAfter14DaysData);
-		
+
 		console.log(data);
-	
+
 		var arrLabelDate = data[0];
 		var arrData1 = data[1];
 		var arrData2 = data[2];
 		var arrData3 = data[3];
-	
+
 		var options = {
 			series: [{
-			name: 'All Contributions',
-			type: 'column',
-			data: arrData1
-		  }, {
-			name: 'Approved contributions don\'t have comment',
-			type: 'area',
-			data: arrData2
-		  }, {
-			name: 'Approved contributions don\'t have comment after 14 days',
-			type: 'line',
-			data: arrData3
-		  }],
+				name: 'All Contributions',
+				type: 'column',
+				data: arrData1
+			}, {
+				name: 'Approved contributions don\'t have comment',
+				type: 'area',
+				data: arrData2
+			}, {
+				name: 'Approved contributions don\'t have comment after 14 days',
+				type: 'line',
+				data: arrData3
+			}],
 			chart: {
-			height: 350,
-			type: 'line',
-			stacked: false,
-		  },
-		  stroke: {
-			width: [0, 2, 5],
-			curve: 'smooth'
-		  },
-		  plotOptions: {
-			bar: {
-			  columnWidth: '70%'
-			}
-		  },
-		  
-		  fill: {
-			opacity: [0.85, 0.25, 1],
-			gradient: {
-			  inverseColors: false,
-			  shade: 'light',
-			  type: "vertical",
-			  opacityFrom: 0.85,
-			  opacityTo: 0.55,
-			  stops: [0, 100, 100, 100]
-			}
-		  },
-		  labels: arrLabelDate,
-		  markers: {
-			size: 0
-		  },
-		  xaxis: {
-			type: 'datetime'
-		  },
-		  yaxis: {
-			title: {
-			  text: 'Articles',
+				height: 350,
+				type: 'line',
+				stacked: false,
 			},
-			min: 0
-		  },
-		  tooltip: {
-			shared: true,
-			intersect: false,
-			y: {
-			  formatter: function (y) {
-				if (typeof y !== "undefined") {
-				  return y.toFixed(0) + " aricles";
+			stroke: {
+				width: [0, 2, 5],
+				curve: 'smooth'
+			},
+			plotOptions: {
+				bar: {
+					columnWidth: '70%'
 				}
-				return y;
-		  
-			  }
+			},
+
+			fill: {
+				opacity: [0.85, 0.25, 1],
+				gradient: {
+					inverseColors: false,
+					shade: 'light',
+					type: "vertical",
+					opacityFrom: 0.85,
+					opacityTo: 0.55,
+					stops: [0, 100, 100, 100]
+				}
+			},
+			labels: arrLabelDate,
+			markers: {
+				size: 0
+			},
+			xaxis: {
+				type: 'datetime'
+			},
+			yaxis: {
+				title: {
+					text: 'Articles',
+				},
+				min: 0
+			},
+			tooltip: {
+				shared: true,
+				intersect: false,
+				y: {
+					formatter: function (y) {
+						if (typeof y !== "undefined") {
+							return y.toFixed(0) + " aricles";
+						}
+						return y;
+
+					}
+				}
 			}
-		  }
-		  };
-	
+		};
+
 		var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
 		chart.render();
 
 	} catch (error) {
-        console.error("An error occurred while fetching data and rendering chart:", error);
-        // Display error message to the user or handle it appropriately
-    }
+		console.error("An error occurred while fetching data and rendering chart:", error);
+		// Display error message to the user or handle it appropriately
+	}
 }
 
 function GetData(startDate, endDate, contributionsData, totalContributionData, totalContributionAfter14DaysData) {
@@ -1155,7 +1244,7 @@ function GetData(startDate, endDate, contributionsData, totalContributionData, t
 		for (var i = 0; i < totalContributionData.length; i++) {
 			var formatDate = new Date(totalContributionData[i].date + 'Z').toISOString().slice(0, 10);
 
-			if (formatDate == currentDate.toISOString().slice(0, 10)){
+			if (formatDate == currentDate.toISOString().slice(0, 10)) {
 				total1 = totalContributionData[i].quantity;
 				break;
 			}
@@ -1169,14 +1258,14 @@ function GetData(startDate, endDate, contributionsData, totalContributionData, t
 				break;
 			}
 		}
-		
+
 		totalcontributions.push(total);
 		totalContributionAfter14Days.push(total2);
 		totalContributionWithoutComment.push(total1);
 
 		currentDate.setDate(currentDate.getDate() + 1);
 	}
-	
+
 	return [dates, totalcontributions, totalContributionWithoutComment, totalContributionAfter14Days];
 }
 
@@ -1198,30 +1287,30 @@ function SelectedYear(year) {
 }
 
 function SelectedYearContributions(year) {
-    var url = '/Managers/IndexManagers?task=TotalContribution&year=' + year;
-    //redirect to url
-    window.location.href = url;
+	var url = '/Managers/IndexManagers?task=TotalContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
 }
 
 function SelectedYearApproved(year) {
-    var url = '/Managers/IndexManagers?task=ApprovedContribution&year=' + year;
-    //redirect to url
-    window.location.href = url;
+	var url = '/Managers/IndexManagers?task=ApprovedContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
 }
 
 function SelectedYearRejected(year) {
-    var url = '/Managers/IndexManagers?task=RejectedContribution&year=' + year;
-    //redirect to url
-    window.location.href = url;
+	var url = '/Managers/IndexManagers?task=RejectedContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
 }
 
 function SelectedYearPending(year) {
-    var url = '/Managers/IndexManagers?task=PendingContribution&year=' + year;
-    //redirect to url
-    window.location.href = url;
+	var url = '/Managers/IndexManagers?task=PendingContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
 }
 
-function GetContributionByYear(year){
+function GetContributionByYear(year) {
 	var url = '/Managers?task=ContributionFaculty&year=' + year;
 	//redirect to url
 	window.location.href = url;
@@ -1255,7 +1344,7 @@ $(function () {
 	//Total Articles by sum of arrData
 	var sum = arrData.reduce((a, b) => parseInt(a) + parseInt(b), 0);
 	document.getElementById('totalArticles').innerText = sum + ' articles';
-	
+
 
 	var options = {
 		series: [{
@@ -1342,6 +1431,9 @@ $(function () {
 						type: "area",
 						// width: 130,
 						stacked: true,
+						toolbar: {
+							show: false
+						}
 					}
 				}
 			}
@@ -1527,7 +1619,7 @@ $(function () {
 
 
 
-	
+
 
 
 	var arrCategoriesDate = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -1712,7 +1804,7 @@ $(function () {
 	chart.render();
 	//COORDINATORS END
 
-	
+
 
 	// chart 7
 
@@ -2138,16 +2230,16 @@ for (var i = 0; i < icons.length; i++) {
 }
 
 //total totalContributors
-document.addEventListener("DOMContentLoaded", function() {
-    var totalContributions = 0;
+document.addEventListener("DOMContentLoaded", function () {
+	var totalContributions = 0;
 
-    var contributionCells = document.querySelectorAll("#qtyContribution .totalContributionCell");
-    contributionCells.forEach(function(cell) {
-        if (!isNaN(parseInt(cell.textContent))) {
-            totalContributions += parseInt(cell.textContent);
-        }
-    });
+	var contributionCells = document.querySelectorAll("#qtyContribution .totalContributionCell");
+	contributionCells.forEach(function (cell) {
+		if (!isNaN(parseInt(cell.textContent))) {
+			totalContributions += parseInt(cell.textContent);
+		}
+	});
 
-    document.getElementById("totalContributors").textContent = totalContributions + " contributors";
+	document.getElementById("totalContributors").textContent = totalContributions + " contributors";
 });
 

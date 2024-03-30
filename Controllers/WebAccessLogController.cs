@@ -62,5 +62,24 @@ namespace COMP1640.Controllers
 
             return Ok(browserCount);
         } 
+    
+        [HttpPost]
+        public IActionResult PageVisitData([FromBody] string action)
+        {
+            Console.WriteLine("Action: " + action);
+            List<PageVisit> pageVisits = new List<PageVisit>();
+
+            if (action == "asc")
+            {
+                pageVisits = _context.PageVisits.OrderBy(p => p.VisitCount).ToList();
+            }
+            else
+            {
+                pageVisits = _context.PageVisits.OrderByDescending(p => p.VisitCount).ToList();
+            }
+
+            return Ok(pageVisits);
+            
+        }
     }
 }
