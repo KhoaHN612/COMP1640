@@ -1,86 +1,101 @@
 
-// onload
-window.onload = function () {
-	// Call API to AddVisitLog() in WebAccessLogController by POST method
-	var browerCount = document.getElementById("browerCount");
+//sk onload
+$(window).on('load', function () {
 
-	if(browerCount){
-		fetch('/WebAccessLog/AddVisitLog', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({}),
-		})
-		.then(response => response.json())
-		.then(data => {
-			var arrSeries = [[], [], []];
-			
-			arrSeries[0] = data.edge;
-			arrSeries[1] = data.chrome;
-			arrSeries[2] = data.firefox;
+	//======================================================= MANAGER DASHBOARD =======================================================
+	GetTotalContributionsData();
+	GetApprovedContributionData();
+	GetRejectedContributionData();
+	GetPendingContributionData();
+	//======================================================= MANAGER END =======================================================
+
+		
+	//=======================================================COORDINATOR DASHBOARD=======================================================
+	StatisticContributionsByYear();
+	ContributionAnalysisChart();
+	//=======================================================COORDINATORS END=======================================================
+	
+
+	//=======================================================ADMIN DASHBOARD=======================================================
+	GetContributionByFaculty();
+	GetBrowserByYear(new Date().getFullYear());
+	//=======================================================ADMIN END=======================================================
+
+	//=======================================================GUEST DASHBOARD=======================================================
+	GetContributionForGuest();
+	//=======================================================GUEST END=======================================================
+});
+
+
+function GetGifEmpty() {
+    return `
+    <div class="empty d-flex flex-column align-items-center position-relative">
+        <img src="./gif/empty.gif" class="img-fluid w-75" alt="browser" />
+        <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No data here!</p>
+    </div>`;
+}
+
+function GetBrowserByYear(year) {
+    fetch('/WebAccessLog/AddVisitLog', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(year),    
+    })
+    .then(response => response.json())
+    .then(data => {
+		console.log(Object.entries(data).length);
+	
+		if (Object.entries(data).length > 1) {
+			document.getElementById("yearBrowser").value = Object.values(data)[0];   
 
 			var options = {
-				series: arrSeries,
+				series: Object.values(data).slice(1),
 				chart: {
 					width: 460,
 					height: 500,
 					type: 'pie',
 				},
-			  labels: ['Microsoft Edge', 'Chrome', 'Firefox'],
-			  plotOptions: {
-				pie: {
-					dataLabels: {
-						formatter: function(val, opts) {
-							return val + " views";
+				labels: Object.keys(data).slice(1),
+				plotOptions: {
+					pie: {
+						dataLabels: {
+							formatter: function(val, opts) {
+								return val + " views";
+							}
 						}
 					}
-				}
-			},
-			  responsive: [{
-				breakpoint: 480,
-				options: {
-				  chart: {
-					width: 200
-				  },
-				  legend: {
-					position: 'bottom'
-				  }
-				}
-			  }]
-			  };
-		
-			  var chart = new ApexCharts(document.querySelector("#chartBrowser"), options);
-			  chart.render();
-		})
-	}
-}
+				},
+				responsive: [{
+					breakpoint: 480,
+					options: {
+						chart: {
+							width: 200
+						},
+						legend: {
+							position: 'bottom'
+						}
+					}
+				}]
+			};
+			document.getElementById("chartBrowser").innerHTML = "";
+			var chart = new ApexCharts(document.querySelector("#chartBrowser"), options);
+			chart.render();
+		}else{
+			document.getElementById("yearBrowser").value = Object.values(data)[0];   
 
-function GetBrowserByYear(year) {
-	var data = {
-		year: year
-	};
-
-	fetch('/WebAccessLog/AddVisitLog', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(data),	
-	}).then(response => {
-		if (!response.ok) {
-			throw new Error('Network response was not ok');
+			var resizeTriggers = document.getElementsByClassName("resize-triggers");
+			while (resizeTriggers.length > 0) {
+				resizeTriggers[0].parentNode.removeChild(resizeTriggers[0]);
+			}
+			
+			document.getElementById("chartBrowser").innerHTML = GetGifEmpty();
 		}
-
-		return response.json();
-	})
-	.then(data => {
-		console.log('Received data:', data);
-	})
-	.catch(error => {
-		console.error('There was a problem with the fetch operation:', error);
-	});
-	
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
 }
 
 function GetTotalContributionsData() {
@@ -764,32 +779,6 @@ function GetContributionByFaculty() {
 		chart.render();
 	} 
 }
-
-//sk onload
-$(window).on('load', function () {
-
-	//======================================================= MANAGER DASHBOARD =======================================================
-	GetTotalContributionsData();
-	GetApprovedContributionData();
-	GetRejectedContributionData();
-	GetPendingContributionData();
-	//======================================================= MANAGER END =======================================================
-
-		
-	//=======================================================COORDINATOR DASHBOARD=======================================================
-	StatisticContributionsByYear();
-	ContributionAnalysisChart();
-	//=======================================================COORDINATORS END=======================================================
-	
-
-	//=======================================================ADMIN DASHBOARD=======================================================
-	GetContributionByFaculty();
-	//=======================================================ADMIN END=======================================================
-
-	//=======================================================GUEST DASHBOARD=======================================================
-	GetContributionForGuest();
-	//=======================================================GUEST END=======================================================
-});
 
 function GetContributionForGuest() {
 	//Retrieve the data from the HTML data attribute

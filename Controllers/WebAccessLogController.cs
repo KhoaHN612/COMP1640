@@ -14,9 +14,8 @@ namespace COMP1640.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddVisitLog(int year)
+        public IActionResult AddVisitLog([FromBody] int year)
         {
-            
             // Lấy thông tin trình duyệt của người dùng từ User-Agent header
             var browserName = Request.Headers["User-Agent"].ToString();
 
@@ -36,16 +35,32 @@ namespace COMP1640.Controllers
                 selectedYear = year;
             }
 
+            //crete dictionary to store browser name and count
+            var browserCount = new Dictionary<string, int>();
+            browserCount.Add(key: "Year", selectedYear);
+
             //get access count contain Edge
             var Edge = _context.WebAccessLogs.Count(x => x.BrowserName.Contains("Edg") && x.AccessDate.Year == selectedYear);
+            if (Edge != 0)
+            {
+                browserCount.Add("Microsoft Edge", Edge);
+            }
             //get access count contain Firefox
             var Firefox = _context.WebAccessLogs.Count(x => x.BrowserName.Contains("Firefox") && x.AccessDate.Year == selectedYear);
+            if (Firefox != 0)
+            {
+                browserCount.Add("Mozilla Firefox", Firefox);
+            }
             //get access all browser
             var accessCount = _context.WebAccessLogs.Count(x => x.AccessDate.Year == selectedYear);
             //get access count contain Chrome
-            var Chrome = accessCount - Edge - Firefox;           
+            var Chrome = accessCount - Edge - Firefox;   
+            if (Chrome != 0)
+            {
+                browserCount.Add("Google Chrome", Chrome);
+            }
 
-            return Ok(new { Edge, Firefox, Chrome});
+            return Ok(browserCount);
         } 
     }
 }
