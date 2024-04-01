@@ -837,13 +837,13 @@ a {
 .piechart-legend {
 	position: absolute;
     top: 50%;
-    left: 32%;
+    left: 43%;
 	transform: translate(-50%, -50%);
 	text-align: center;
 }
 @media (max-aspect-ratio: 16/9) {
     .piechart-legend {
-        left: 38%;
+        left: 32%;
     }
 }
 
