@@ -619,6 +619,7 @@ namespace COMP1640.Controllers
             ViewBag.userAddress = userAddress;
             ViewBag.userProfileImagePath = userProfileImagePath;
             ViewBag.Comments = comments;
+            ViewBag.Deadline = contribution.CommentDeadline;
             return View(contribution);
 
         }
