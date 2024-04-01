@@ -43,6 +43,7 @@ public partial class Comp1640Context : IdentityDbContext<COMP1640User>
     public virtual DbSet<Chat> Chats {get; set;}
     public virtual DbSet<Message> Messages {get; set;}
     public virtual DbSet<UserChat> UserChat {get;set;}
+    public virtual DbSet<PageVisit> PageVisits { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=ConnectionStrings:MyConnect");

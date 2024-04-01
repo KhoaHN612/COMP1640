@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics.Eventing.Reader;
 using System.Security.Claims;
 using COMP1640.Areas.Identity.Data;
 using COMP1640.Migrations;
@@ -50,7 +50,21 @@ namespace COMP1640.Controllers
 
         // GET: StudentsController
         public async Task<IActionResult> Index()
-        {
+        {   
+            
+            string controllerName = ControllerContext.ActionDescriptor.ControllerName;
+            string actionName = ControllerContext.ActionDescriptor.ActionName;
+            string pageName = String.Join(controllerName, "~",actionName);
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "Home Page";
             var userFullName = await GetUserFullName();
             if (userFullName != null)
@@ -283,7 +297,19 @@ namespace COMP1640.Controllers
 
         // Action for the About Us page
         public async Task<IActionResult> AboutUs()
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "About Us";
             var userFullName = await GetUserFullName();
             if (userFullName != null)
@@ -295,7 +321,19 @@ namespace COMP1640.Controllers
 
         // Action for the Contact Us page
         public async Task<IActionResult> ContactUs()
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "Contact Us";
             var userFullName = await GetUserFullName();
             if (userFullName != null)
@@ -309,6 +347,19 @@ namespace COMP1640.Controllers
         [Authorize(Roles = "Student, Guest")]
         public async Task<IActionResult> MyAccount()
         {
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
+
             ViewData["Title"] = "My Account";
             var contributions = _context.Contributions.ToList();
             var userId = _userManager.GetUserId(User);
@@ -352,8 +403,20 @@ namespace COMP1640.Controllers
         }
 
         [Authorize(Roles = "Student")]
-        public IActionResult FromCreateSubmission()
-        {
+        public async Task<IActionResult> FromCreateSubmission()
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "From Submission";
             var annualMagazines = _context.AnnualMagazines
                             .Where(m => m.IsActive == true)
@@ -375,8 +438,19 @@ namespace COMP1640.Controllers
 
         
         public async Task<IActionResult> FromEditSubmission(int id)
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
 
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "From Submission";
             var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.ContributionId == id);
             var annualMagazine = await _context.AnnualMagazines.FindAsync(contribution.AnnualMagazineId);
@@ -497,8 +571,19 @@ namespace COMP1640.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditSubmission(int id, IFormFile newFile)
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
 
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             var currentFile = await _context.FileDetails
                 .FirstOrDefaultAsync(fd => fd.FileId == id);
 
@@ -524,7 +609,19 @@ namespace COMP1640.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateProfile(IFormFile ProfileImageFile, COMP1640User user)
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             var userToUpdate = await _context.FindAsync<COMP1640User>(user.Id);
             var profileImageFile = ProfileImageFile;
             if (user.ProfileImageFile == null)
@@ -586,7 +683,19 @@ namespace COMP1640.Controllers
 
         
         public async Task<IActionResult> SubmissionDetail(int id)
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "Submission Detail";
             var userFullName = await GetUserFullName();
             if (userFullName != null)
@@ -626,7 +735,19 @@ namespace COMP1640.Controllers
 
         
         public async Task<IActionResult> PostLists()
-        {
+        {   
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "Post Lists";
             var userFullName = await GetUserFullName();
             if (userFullName != null)
@@ -639,6 +760,18 @@ namespace COMP1640.Controllers
         
         public async Task<IActionResult> PostDetail()
         {
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++; 
+
+            await _context.SaveChangesAsync();
             ViewData["Title"] = "Post Detail";
             var userFullName = await GetUserFullName();
             if (userFullName != null)

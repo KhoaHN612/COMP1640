@@ -28,7 +28,6 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Contribution ID</th>
                             <th>Full Name</th>
                             <th>Title</th>
                             <th>Submission Date</th>
@@ -44,7 +43,6 @@
                         {
                             <tr>
                                 <td>@index</td>
-                                <td>@contributions.ContributionId</td>
                                 @{
                                     string userId = contributions.UserId;
                                     var user = await _userManager.FindByIdAsync(userId);
@@ -108,7 +106,6 @@
                     <tfoot>
                         <tr>
                             <th>No</th>
-                            <th>Contribution ID</th>
                             <th>Full Name</th>
                             <th>Title</th>
                             <th>Submission Date</th>

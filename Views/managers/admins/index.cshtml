@@ -52,12 +52,12 @@
                         <div class="d-flex align-items-center">
                             <h6 class="mb-0">Analyze number access by browser</h6>
                             <div class="dropdown ms-auto">
-                                @* <select class="form-select" id="year" aria-label="Default select example" onchange="GetBrowserByYear(this.value)">
+                                <select class="form-select" id="yearBrowser" aria-label="Default select example" onchange="GetBrowserByYear(this.value)">
                                     @foreach (var item in ViewBag.Years)
                                     {
                                         <option value="@item" >@item</option>
                                     }
-                                </select> *@
+                                </select>
                             </div>
                         </div>
                         <div class="row m-2 align-items-center justify-content-center my-3">
@@ -121,6 +121,7 @@
                         <div class="d-flex align-items-center">
                             <div>
                                 <p class="mb-1">@item.Role Accounts</p>
+                                
                                 <h4 class="mb-0 text-primary">@item.Total</h4>
                             </div>
                         </div>
@@ -129,8 +130,26 @@
             }
         </div>
 
+        <div class="row ps-3">
+            <div class="col-12 card radius-10 border shadow-none mb-3">
+                <div class="card-body">
+                    <div class="align-items-center">
+                        <div class="d-flex">
+                            <h5>Page Visit Rankings</h5>
+                            <div class="w-5 ms-auto d-flex">
+                                <h6 class="me-3">Sort By</h6>
+                                <div id="sort-by"></div>
+                            </div>
+                        </div>                          
+                        
+                        <div id="chartPageVisit"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
-            <div class="col">
+            <div class="col pe-0">
                 <div class="card radius-10 w-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
@@ -142,7 +161,7 @@
                                 <select class="form-select" id="yearUser" aria-label="Default select example" onchange="SelectedYearUser(this.value)">
                                     @foreach (var item in ViewBag.Years)
                                     {
-                                        if (item == ViewBag.ContributionUser[0].Year)
+                                        if (item == ViewBag.Year)
                                         {
                                             <option value="@item" selected>@item</option>
                                         }
@@ -167,16 +186,23 @@
                                     </tr>
                                 </thead>
                                 <tbody id="qtyContribution">
-                                    @foreach (var item in ViewBag.ContributionUser)
-                                    {
-                                        <tr>
-                                            <td>@item.FullName</td>
-                                            <td>@item.Faculty</td>
-                                            <td class="totalContributionCell">@item.TotalContribution</td>
-                                            <td>@item.TotalAccept</td>
-                                            <td>@item.TotalReject</td>
-                                            <td>@item.TotalPending</td>
-                                        </tr>
+                                    @if(ViewBag.ContributionUser.Count > 0){
+                                        @foreach (var item in ViewBag.ContributionUser)
+                                        {
+                                            <tr>
+                                                <td>@item.FullName</td>
+                                                <td>@item.Faculty</td>
+                                                <td class="totalContributionCell">@item.TotalContribution</td>
+                                                <td>@item.TotalAccept</td>
+                                                <td>@item.TotalReject</td>
+                                                <td>@item.TotalPending</td>
+                                            </tr>
+                                        }
+                                    }else{
+                                        <div class="empty d-flex flex-column align-items-center position-relative">
+                                            <img src="./gif/empty.gif" class="img-fluid w-75" alt="browser" />
+                                            <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
+                                        </div>
                                     }
                                 </tbody>
                             </table>
