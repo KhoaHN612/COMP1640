@@ -698,6 +698,10 @@ namespace COMP1640.Controllers
             List<ContributionDate> rejectedResults = new List<ContributionDate>();
             List<ContributionDate> pendingResults = new List<ContributionDate>();
 
+            List<ContributionDate> approvedResults = new List<ContributionDate>();
+            List<ContributionDate> rejectedResults = new List<ContributionDate>();
+            List<ContributionDate> pendingResults = new List<ContributionDate>();
+
             if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { selectedYearAll = Convert.ToInt32(year); }
             List<ContributionDate> allResults = await GetContributionsByStatus(selectedYearAll, "All");
 
@@ -710,10 +714,15 @@ namespace COMP1640.Controllers
             if (task == "PendingContribution" && !string.IsNullOrEmpty(year)) { selectedYearPending = Convert.ToInt32(year); }
             pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
 
+            if (year == null)
+            {
+                year = DateTime.Now.Year.ToString();
+            }
+            
             if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
-            if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = int.Parse(year) }); }
-            if (rejectedResults.Count == 0) { rejectedResults.Add(new ContributionDate { Year = int.Parse(year) }); }
-            if (pendingResults.Count == 0) { pendingResults.Add(new ContributionDate { Year = int.Parse(year) }); }
+            if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
+            if (rejectedResults.Count == 0) { rejectedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
+            if (pendingResults.Count == 0) { pendingResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
 
             ViewData["Years"] = years;
             ViewData["Contributions"] = allResults;
