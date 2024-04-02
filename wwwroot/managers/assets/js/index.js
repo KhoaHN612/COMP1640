@@ -108,7 +108,7 @@ function GetGifEmpty(size) {
 	var width = 'w-' + size;
 	return `
     <div class="empty d-flex flex-column align-items-center position-relative">
-        <img src="./gif/empty.gif" class="img-fluid ` + width + `" alt="browser" />
+        <img src=".././gif/empty.gif" class="img-fluid ` + width + `" alt="browser" />
         <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No data here!</p>
     </div>`;
 }
@@ -123,8 +123,6 @@ function GetBrowserByYear(year) {
 	})
 		.then(response => response.json())
 		.then(data => {
-			console.log(Object.entries(data).length);
-
 			if (Object.entries(data).length > 1) {
 				document.getElementById("yearBrowser").value = Object.values(data)[0];
 
@@ -877,10 +875,8 @@ function GetContributionByFaculty() {
 function GetContributionForGuest() {
 	//Retrieve the data from the HTML data attribute
 	var contributionDataElement = document.getElementById("contributionGuest");
-	if (contributionDataElement) {
-		var contributionsData = JSON.parse(contributionDataElement.dataset.contributionguest);
-		console.log(contributionsData);
-
+	var contributionsData = JSON.parse(contributionDataElement.dataset.contributionguest);
+	if (contributionsData) {
 		var contributionWithoutCommentsDataElement = document.getElementById("contributionWithoutCommentsGuest");
 		var contributionWithoutCommentsData = JSON.parse(contributionWithoutCommentsDataElement.dataset.contributionwithoutcommentsguest);
 		console.log(contributionWithoutCommentsData);
@@ -1018,6 +1014,8 @@ function GetContributionForGuest() {
 
 		var chart = new ApexCharts(document.querySelector("#chartStudent"), options);
 		chart.render();
+	}else{
+		document.getElementById('chartStudent').innerHTML = GetGifEmpty(75);
 	}
 }
 
@@ -1217,8 +1215,7 @@ function ContributionAnalysisChart() {
 		chart.render();
 
 	} catch (error) {
-		console.error("An error occurred while fetching data and rendering chart:", error);
-		// Display error message to the user or handle it appropriately
+		document.getElementById('chartCoordinators1').innerHTML = GetGifEmpty(50);
 	}
 }
 
