@@ -694,18 +694,21 @@ namespace COMP1640.Controllers
             int selectedYearApproved = DateTime.Now.Year;
             int selectedYearRejected = DateTime.Now.Year;
             int selectedYearPending = DateTime.Now.Year;
+            List<ContributionDate> approvedResults = new List<ContributionDate>();
+            List<ContributionDate> rejectedResults = new List<ContributionDate>();
+            List<ContributionDate> pendingResults = new List<ContributionDate>();
 
             if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { selectedYearAll = Convert.ToInt32(year); }
             List<ContributionDate> allResults = await GetContributionsByStatus(selectedYearAll, "All");
 
             if (task == "ApprovedContribution" && !string.IsNullOrEmpty(year)) { selectedYearApproved = Convert.ToInt32(year); }
-            var approvedResults = await GetContributionsByStatus(selectedYearApproved, "Approved");
+            approvedResults = await GetContributionsByStatus(selectedYearApproved, "Approved");
 
             if (task == "RejectedContribution" && !string.IsNullOrEmpty(year)) { selectedYearRejected = Convert.ToInt32(year); }
-            var rejectedResults = await GetContributionsByStatus(selectedYearRejected, "Rejected");
+            rejectedResults = await GetContributionsByStatus(selectedYearRejected, "Rejected");
 
             if (task == "PendingContribution" && !string.IsNullOrEmpty(year)) { selectedYearPending = Convert.ToInt32(year); }
-            var pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
+            pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
 
             if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
             if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = int.Parse(year) }); }

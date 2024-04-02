@@ -95,7 +95,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row m-2 align-items-center justify-content-center my-3">
+                        <div class="row m-2 align-items-center justify-content-center my-3" id="PieChartPercent">
                             <div class="by-device-container">
                                 <div class="piechart-legend" id="piechart">
                                     <h2 class="mb-1" id="percent">0%</h2>
@@ -173,40 +173,40 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="table-responsive mt-2">
-                            <table class="table align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Student Name</th>
-                                        <th>Faculty</th>
-                                        <th>Total contributions</th>
-                                        <th>Accepted</th>
-                                        <th>Rejected</th>
-                                        <th>Pending</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="qtyContribution">
-                                    @if(ViewBag.ContributionUser.Count > 0){
-                                        @foreach (var item in ViewBag.ContributionUser)
-                                        {
-                                            <tr>
-                                                <td>@item.FullName</td>
-                                                <td>@item.Faculty</td>
-                                                <td class="totalContributionCell">@item.TotalContribution</td>
-                                                <td>@item.TotalAccept</td>
-                                                <td>@item.TotalReject</td>
-                                                <td>@item.TotalPending</td>
-                                            </tr>
-                                        }
-                                    }else{
-                                        <div class="empty d-flex flex-column align-items-center position-relative">
-                                            <img src="./gif/empty.gif" class="img-fluid w-75" alt="browser" />
-                                            <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
-                                        </div>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                        @if(ViewBag.ContributionUser.Count > 0){
+                            <div class="table-responsive mt-2">
+                                <table class="table align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Faculty</th>
+                                            <th>Total contributions</th>
+                                            <th>Accepted</th>
+                                            <th>Rejected</th>
+                                            <th>Pending</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="qtyContribution">                                    
+                                            @foreach (var item in ViewBag.ContributionUser)
+                                            {
+                                                <tr>
+                                                    <td>@item.FullName</td>
+                                                    <td>@item.Faculty</td>
+                                                    <td class="totalContributionCell">@item.TotalContribution</td>
+                                                    <td>@item.TotalAccept</td>
+                                                    <td>@item.TotalReject</td>
+                                                    <td>@item.TotalPending</td>
+                                                </tr>
+                                            }
+                                    </tbody>
+                                </table>
+                            </div>                        
+                        }else{
+                            <div class="empty d-flex flex-column align-items-center position-relative">
+                                <img src="./gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                                <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
