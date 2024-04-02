@@ -68,9 +68,14 @@
                                 <li>
                                     <a asp-controller="Post" asp-action="PostList">Post List</a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Managers" asp-action="Index">Admin</a>
-                                </li>
+                                @if(User.Identity.IsAuthenticated && !User.IsInRole("Student")){
+    <li>
+        <a asp-controller="Managers" asp-action="Index">Admin</a>
+    </li>
+
+
+                                }
+                                
                                 @if (SignInManager.IsSignedIn(User))
                                 {
                                     <li class="nav-item">

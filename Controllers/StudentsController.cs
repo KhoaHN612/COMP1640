@@ -55,7 +55,7 @@ namespace COMP1640.Controllers
 
             string controllerName = ControllerContext.ActionDescriptor.ControllerName;
             string actionName = ControllerContext.ActionDescriptor.ActionName;
-            string pageName = String.Join(controllerName, "~", actionName);
+            string pageName = string.Join(controllerName, "~", actionName);
             var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
 
             if (pageVisit == null)
