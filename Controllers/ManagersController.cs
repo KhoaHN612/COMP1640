@@ -338,6 +338,7 @@ namespace COMP1640.Controllers
                 int? maxAnnualMagazineId = _context.AnnualMagazines.Max(f => (int?)f.AnnualMagazineId);
                 int newFacultyId = (maxAnnualMagazineId ?? 0) + 1;
                 annualMagazine.AnnualMagazineId = newFacultyId;
+                annualMagazine.IsActive = true;
                 _context.AnnualMagazines.Add(annualMagazine);
                 _context.SaveChanges();
                 return RedirectToAction("TableSubmissionDate");
