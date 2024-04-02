@@ -31,7 +31,7 @@ namespace COMP1640.Controllers
             _emailSender = EmailSender;
         }
 
-
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Index(string task, string year)
         {
             ViewData["Title"] = "Dashboard";
@@ -216,7 +216,7 @@ namespace COMP1640.Controllers
 
             return roleStatistics;
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TableFaculty()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -295,7 +295,7 @@ namespace COMP1640.Controllers
 
         //     return RedirectToAction("TableFaculty");
         // }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TableSubmissionDate()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -314,6 +314,7 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "Submission Date Table page";
             return View("admins/table_submission_date", annualMagazine);
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult FormCreateSubmissionDate(int? id)
         {
             if (id != null)
@@ -390,7 +391,7 @@ namespace COMP1640.Controllers
             return Ok();
         }
 
-        // [Authorize(Roles="Coordinator")]
+        [Authorize(Roles="Coordinator")]
         public async Task<IActionResult> IndexCoordinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
@@ -651,46 +652,9 @@ namespace COMP1640.Controllers
             ViewBag.Deadline = contribution.CommentDeadline;
             return View("coordinators/create_comment", contribution);
         }
-        //=============================== POSTS ====================================//
-        public IActionResult TablePost()
-        {
-            ViewData["Title"] = "List of Posts";
-            return View("coordinators/table_post");
-        }
 
-        public IActionResult FormCreatePost(int? id)
-        {
-            if (id != null)
-            {
-                ViewData["Title"] = "Edit Post";
-                ViewData["ButtonLabel"] = "Update";
-            }
-            else
-            {
-                ViewData["Title"] = "Create Post";
-                ViewData["ButtonLabel"] = "Submit";
-            }
-            Contribution contribution = id != null ? _context.Contributions.Find(id) : new Contribution();
-            return View("coordinators/form_create_post", contribution);
-        }
-
-        // [HttpPost]
-        // public IActionResult CreatePost()
-        // {
-
-        // }
-        // [HttpPost]
-        // public IActionResult UpdatePost()
-        // {
-
-        // }
-
-        // [HttpDelete]
-        // public IActionResult DeletePost()
-        // {
-
-        // }
         //================================ MANAGERS ================================//
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> IndexManagers(string task, string year)
         {
             ViewData["Title"] = "Dashboard Managers";
@@ -949,6 +913,7 @@ namespace COMP1640.Controllers
             }
         }
         //================================ PROFILES ================================//
+        [Authorize(Roles = "Manager,Admin,Coordinator")]
         public async Task<IActionResult> ShowProfileAsync()
         {
             ViewData["Title"] = "Profiles";
@@ -959,7 +924,7 @@ namespace COMP1640.Controllers
             }
             ViewBag.roles = await _userManager.GetRolesAsync(curUser);
             var faculty = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == curUser.FacultyId);
-            ViewBag.facultyName = faculty.Name;
+            ViewBag.facultyName = faculty?.Name;
             return View("profile_managers", curUser);
         }
 

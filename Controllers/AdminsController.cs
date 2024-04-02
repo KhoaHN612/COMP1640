@@ -10,6 +10,7 @@ using COMP1640.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP1640
 {
@@ -44,7 +45,7 @@ namespace COMP1640
             }
             return (IUserEmailStore<COMP1640User>)_userStore;
         }
-        //================================ ADMIN ================================//
+        //================================ ADMIN ================================//       
         public async Task<IActionResult> CreateRole()
         {
             string[] roleNames = { "Guest", "Manager", "Coordinator", "Student", "Admin" };
@@ -68,6 +69,7 @@ namespace COMP1640
             return RedirectToAction("TableUser");
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TableUser()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -88,6 +90,7 @@ namespace COMP1640
             ViewBag.Context = _context;
             return View("table_user", users);
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult FormCreateUser()
         {
             ViewData["Title"] = "Create User page";

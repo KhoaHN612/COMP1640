@@ -48,7 +48,7 @@ namespace COMP1640.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             return user?.FullName; // This will return null if user is null.
         }
-
+        [Authorize]
         // GET: StudentsController
         public async Task<IActionResult> Index()
         {
@@ -128,6 +128,7 @@ namespace COMP1640.Controllers
             }
         }
 
+        [Authorize(Roles = "Guest")]
         public async Task<IActionResult> IndexGuest(string task, string year)
         {
             ViewData["Title"] = "Dashboard Guest";
@@ -437,7 +438,7 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
-
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> FromEditSubmission(int id)
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -712,7 +713,7 @@ namespace COMP1640.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> SubmissionDetail(int id)
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -765,7 +766,6 @@ namespace COMP1640.Controllers
 
         }
 
-
         public async Task<IActionResult> PostLists()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -788,7 +788,6 @@ namespace COMP1640.Controllers
             }
             return View();
         }
-
 
         public async Task<IActionResult> PostDetail()
         {
