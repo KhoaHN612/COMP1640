@@ -695,6 +695,9 @@ namespace COMP1640.Controllers
             int selectedYearApproved = DateTime.Now.Year;
             int selectedYearRejected = DateTime.Now.Year;
             int selectedYearPending = DateTime.Now.Year;
+            List<ContributionDate> approvedResults = new List<ContributionDate>();
+            List<ContributionDate> rejectedResults = new List<ContributionDate>();
+            List<ContributionDate> pendingResults = new List<ContributionDate>();
 
             List<ContributionDate> approvedResults = new List<ContributionDate>();
             List<ContributionDate> rejectedResults = new List<ContributionDate>();
@@ -711,11 +714,14 @@ namespace COMP1640.Controllers
 
             if (task == "PendingContribution" && !string.IsNullOrEmpty(year)) { selectedYearPending = Convert.ToInt32(year); }
             pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
+<<<<<<< HEAD
 
             if (year == null)
             {
                 year = DateTime.Now.Year.ToString();
             }
+=======
+>>>>>>> a6a1188 (Dasboard admin, empty gif)
 
             if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
             if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
