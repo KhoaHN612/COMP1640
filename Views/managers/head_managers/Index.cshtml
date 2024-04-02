@@ -27,15 +27,22 @@
                         </select>
                     </div>
                 </div>
-                <div id="ContributionsTotalData" data-total='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'></div>
-                <div class="row d-flex justify-content-center">
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartColumnContributions"></div>
+                @if (ViewBag.Contributions[0].FacultyName != null){
+                    <div id="ContributionsTotalData" data-total='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'></div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartColumnContributions"></div>
+                        </div>
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartPieContributions"></div>
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartPieContributions"></div>
+                }else{
+                    <div class="empty d-flex flex-column align-items-center position-relative">
+                        <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                        <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
                     </div>
-                </div>
+                }  
             </div>
         </div>
 
@@ -63,15 +70,23 @@
                         </select>
                     </div>
                 </div>
-                <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))'></div>
-                <div class="row d-flex justify-content-center">
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartColumnApproved"></div>
+                
+                @if(ViewBag.ApprovedContribution[0].FacultyName != null){
+                    <div id="ContributionsApprovedData" data-approved= '@Html.Raw(Json.Serialize(ViewData["ApprovedContribution"]))'></div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartColumnApproved"></div>
+                        </div>
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartPieApproved"></div>
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartPieApproved"></div>
+                }else{
+                    <div class="empty d-flex flex-column align-items-center position-relative">
+                        <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                        <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
                     </div>
-                </div>
+                }                
             </div>
         </div>
 
@@ -99,15 +114,22 @@
                         </select>
                     </div>
                 </div>
-                <div id="ContributionsRejectedData" data-rejected= '@Html.Raw(Json.Serialize(ViewData["RejectedContribution"]))'></div>
-                <div class="row d-flex justify-content-center">
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartColumnRejected"></div>
+                @if(ViewBag.RejectedContribution[0].FacultyName != null){
+                    <div id="ContributionsRejectedData" data-rejected= '@Html.Raw(Json.Serialize(ViewData["RejectedContribution"]))'></div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartColumnRejected"></div>
+                        </div>
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartPieRejected"></div>
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartPieRejected"></div>
+                }else{
+                    <div class="empty d-flex flex-column align-items-center position-relative">
+                        <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                        <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
                     </div>
-                </div>
+                }  
             </div>
         </div>
 
@@ -135,15 +157,22 @@
                         </select>
                     </div>
                 </div>
-                <div id="ContributionsPendingData" data-pending= '@Html.Raw(Json.Serialize(ViewData["PendingContribution"]))'></div>
-                <div class="row d-flex justify-content-center">
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartColumnPending"></div>
+                @if(ViewBag.PendingContribution[0].FacultyName != null){
+                    <div id="ContributionsPendingData" data-pending= '@Html.Raw(Json.Serialize(ViewData["PendingContribution"]))'></div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartColumnPending"></div>
+                        </div>
+                        <div class="col-lg-6 col-md-8 col-sm-10">
+                            <div id="chartPiePending"></div>
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-md-8 col-sm-10">
-                        <div id="chartPiePending"></div>
+                }else{
+                    <div class="empty d-flex flex-column align-items-center position-relative">
+                        <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                        <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
                     </div>
-                </div>
+                }  
             </div>
         </div>
     <!--end row-->

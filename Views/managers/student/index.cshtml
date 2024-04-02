@@ -84,17 +84,24 @@
                                 }
                             </select>
                         </div>
-                    </div>                    
-                     <div id="contributionGuest"
+                    </div>        
+                    @if(ViewBag.Contributions[0].Quantity > 0){
+                        <div id="contributionGuest"
                             data-contributionguest='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'>
-                    </div>
-                     <div id="contributionWithoutCommentsGuest"
-                            data-contributionwithoutcommentsguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutComments"]))'>
-                    </div>
-                     <div id="contributionCommentGuest"
-                            data-contributioncommentguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutCommentsAfter14Days"]))'>
-                    </div>
-                    <div id="chartStudent"></div>
+                        </div>
+                        <div id="contributionWithoutCommentsGuest"
+                                data-contributionwithoutcommentsguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutComments"]))'>
+                        </div>
+                        <div id="contributionCommentGuest"
+                                data-contributioncommentguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutCommentsAfter14Days"]))'>
+                        </div>
+                        <div id="chartStudent"></div>
+                    }else{
+                        <div class="empty d-flex flex-column align-items-center position-relative">
+                            <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                            <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
+                        </div>
+                    }                      
                 </div>
         </div>
     </div><!--end row-->

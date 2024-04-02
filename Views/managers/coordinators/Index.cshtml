@@ -110,38 +110,45 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="table-responsive mt-2">
-                            <table class="table align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>No </th>
-                                        <th>Student Name</th>
-                                        <th>Total contributions</th>
-                                        <th>Accepted</th>
-                                        <th>Rejected</th>
-                                        <th>Pending</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="qtyContribution">
-                                    @{
-                                        var i = 1;
-                                    }
-                                    
-                                    @foreach (var item in ViewBag.ContributionUser)
-                                    {
+                        @if(ViewBag.ContributionUser[0].FullName != null){
+                            <div class="table-responsive mt-2">
+                                <table class="table align-middle mb-0">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td>@i</td>
-                                            <td>@item.FullName</td>
-                                            <td class="totalContributionCell">@item.TotalContribution</td>
-                                            <td>@item.TotalAccept</td>
-                                            <td>@item.TotalReject</td>
-                                            <td>@item.TotalPending</td>
+                                            <th>No </th>
+                                            <th>Student Name</th>
+                                            <th>Total contributions</th>
+                                            <th>Accepted</th>
+                                            <th>Rejected</th>
+                                            <th>Pending</th>
                                         </tr>
-                                        i++;
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody id="qtyContribution">
+                                        @{
+                                            var i = 1;
+                                        }
+                                        
+                                        @foreach (var item in ViewBag.ContributionUser)
+                                        {
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>@item.FullName</td>
+                                                <td class="totalContributionCell">@item.TotalContribution</td>
+                                                <td>@item.TotalAccept</td>
+                                                <td>@item.TotalReject</td>
+                                                <td>@item.TotalPending</td>
+                                            </tr>
+                                            i++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }else{
+                            <div class="empty d-flex flex-column align-items-center position-relative">
+                                <img src=".././gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                                <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
