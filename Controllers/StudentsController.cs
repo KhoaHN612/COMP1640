@@ -54,8 +54,7 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "Dashboard Guest";
 
             List<TotalContribution> TotalContribution = new List<TotalContribution>();
-            List<TotalContribution> TotalContributionsPushlished = new List<TotalContribution>();
-            List<TotalContribution> TotalContributionsApproved = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsPublished = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsRejected = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsPending = new List<TotalContribution>();
             List<ContributionWithoutComment> contributions = new List<ContributionWithoutComment>();
@@ -94,11 +93,8 @@ namespace COMP1640.Controllers
 
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
 
-                //Total Contributions Approved
-                TotalContributionsApproved = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsApproved");
-
                 //Total Contributions Puslished
-                TotalContributionsPushlished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
+                TotalContributionsPublished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
 
                 //Total Contributions Rejected
                 TotalContributionsRejected = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsRejected");
@@ -116,8 +112,7 @@ namespace COMP1640.Controllers
                 contributionComments = await GetComments(currentFacultyId, date.Year, "ContributionComments");
             }
 
-            ViewData["TotalContributionsApproved"] = TotalContributionsApproved;
-            ViewData["TotalContributionsPushlished"] = TotalContributionsPushlished;
+            ViewData["TotalContributionsPublished"] = TotalContributionsPublished;
             ViewData["TotalContributionsRejected"] = TotalContributionsRejected;
             ViewData["TotalContributionsPending"] = TotalContributionsPending;
             ViewData["TotalContribution"] = TotalContribution;
@@ -158,7 +153,7 @@ namespace COMP1640.Controllers
                 .OrderBy(c => c.Date)
                 .ToListAsync();
 
-            if (contributions.Count < 0)
+            if (contributions.Count <= 0)
             {
                 contributions.Add(new ContributionWithoutComment{Year = year});
             }
@@ -177,9 +172,6 @@ namespace COMP1640.Controllers
             {
                 case "TotalContributionsPuslished":
                     query = query.Where(c => c.Contribution.IsPublished == true);
-                    break;
-                case "TotalContributionsApproved":
-                    query = query.Where(c => c.Contribution.Status == "Approved");
                     break;
                 case "TotalContributionsRejected":
                     query = query.Where(c => c.Contribution.Status == "Rejected");
@@ -203,7 +195,7 @@ namespace COMP1640.Controllers
             .ThenBy(c => c.Month)
             .ToListAsync();
 
-            if (contributions.Count < 0)
+            if (contributions.Count <= 0)
             {
                 contributions.Add(new TotalContribution{Year = year});
             }
