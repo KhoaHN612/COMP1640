@@ -53,7 +53,7 @@
                             <h6 class="mb-0">Analyze number access by browser</h6>
                             <div class="dropdown ms-auto">
                                 <select class="form-select" id="yearBrowser" aria-label="Default select example" onchange="GetBrowserByYear(this.value)">
-                                    @foreach (var item in ViewBag.Years)
+                                    @foreach (var item in ViewBag.YearBrower)
                                     {
                                         <option value="@item" >@item</option>
                                     }
@@ -173,7 +173,7 @@
                                 </select>
                             </div>
                         </div>
-                        @if(ViewBag.ContributionUser.Count > 0){
+                        @if(ViewBag.ContributionUser[0].TotalContribution > 0){
                             <div class="table-responsive mt-2">
                                 <table class="table align-middle mb-0">
                                     <thead class="table-light">

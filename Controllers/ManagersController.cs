@@ -48,13 +48,18 @@ namespace COMP1640.Controllers
                 .Select(c => c.SubmissionDate.Year)
                 .Distinct()
                 .ToListAsync();
+            
+            // GET ALL YEARS IN BROWERS
+            List<int> YearBrower = await _context.WebAccessLogs
+                .Select(a => a.AccessDate.Year)
+                .Distinct()
+                .ToListAsync();
 
             //GET CONTRIBUTIONS BY YEAR
             int selectedYear = DateTime.Now.Year;
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
             List<ContributionDate> ContributionByYear = await GetContributionByYear(selectedYear);
-            if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
 
             //GET CONTRIBUTIONS BY USER
             int selectedYearUser = DateTime.Now.Year;
@@ -64,12 +69,9 @@ namespace COMP1640.Controllers
 
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
-
-            if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
-            if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
-
-            ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["Years"] = years;
+            ViewData["YearBrower"] = YearBrower;
+            ViewData["ContributionFaculty"] = contributionFaculty;
             ViewData["ContributionByYear"] = ContributionByYear;
             ViewData["ContributionUser"] = ContributionUser;
             ViewData["RoleStatistics"] = roleStatistics;
@@ -93,7 +95,7 @@ namespace COMP1640.Controllers
             List<ContributionFaculty> contributions = await _context.Users
                 .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
                 .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
-                .Where(uc => uc.Contributions.SubmissionDate.Year == date.Year && uc.Contributions.Status == "Approved")
+                .Where(uc => uc.Contributions.SubmissionDate.Year == date.Year)
                 .GroupBy(uc => uc.UserFaculty.Faculty.Name)
                 .Select(g => new ContributionFaculty
                 {
@@ -102,6 +104,11 @@ namespace COMP1640.Controllers
                     SubmissionDate = date
                 })
                 .ToListAsync();
+
+            if (contributions.Count <= 0)
+            {
+                contributions.Add(new ContributionFaculty{SubmissionDate = date});
+            }
 
             return contributions;
         }
@@ -136,6 +143,11 @@ namespace COMP1640.Controllers
                 .OrderBy(c => c.Year)
                 .ThenBy(c => c.Month)
                 .ToListAsync();
+
+            if (contributions.Count <= 0)
+            {
+                contributions.Add(new ContributionDate{Year = year});
+            }
 
             return contributions;
         }
@@ -182,6 +194,11 @@ namespace COMP1640.Controllers
                 })
                 .OrderByDescending(c => c.TotalContribution)
                 .ToListAsync();
+            
+            if (contributions.Count <= 0)
+            {
+                contributions.Add(new ContributionUser{Year = year});
+            }
 
             return contributions;
         }
@@ -483,6 +500,7 @@ namespace COMP1640.Controllers
                 int selectedYearUser = DateTime.Now.Year;
 
                 if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
+                Console.WriteLine(year);
                 contributionUser = await GetContributors(currentFacultyId, selectedYearUser);
             }
 
@@ -530,10 +548,9 @@ namespace COMP1640.Controllers
 
                 if (contributions.Count == 0)
                 {
-                    //Get Faculty Name
                     var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == currentFacultyId);
                     var faculty = facultyName != null ? facultyName.Name : null;
-                    contributions.Add(new ContributionUser { Faculty = faculty});
+                    contributions.Add(new ContributionUser { Faculty = faculty, Year = year});
                 }
 
             return contributions;
@@ -682,43 +699,33 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "Dashboard Managers";
 
-            //GET ALL YEARS
-            List<int> years = await _context.Contributions
-                .Select(c => c.SubmissionDate.Year)
-                .Distinct()
-                .ToListAsync();
-
             //GET CONTRIBUTIONS BY YEAR
             int selectedYearAll = DateTime.Now.Year;
             int selectedYearApproved = DateTime.Now.Year;
             int selectedYearRejected = DateTime.Now.Year;
             int selectedYearPending = DateTime.Now.Year;
-            List<ContributionDate> approvedResults = new List<ContributionDate>();
-            List<ContributionDate> rejectedResults = new List<ContributionDate>();
-            List<ContributionDate> pendingResults = new List<ContributionDate>();
 
-            if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { selectedYearAll = Convert.ToInt32(year); }
+            int yearConvert = Convert.ToInt32(year);
+
+            //GET ALL YEARS
+            List<int> years = await _context.Contributions
+                .Select(c => c.SubmissionDate.Year)
+                .Distinct()
+                .ToListAsync();
+                
+            
+            if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { selectedYearAll = yearConvert; }
             List<ContributionDate> allResults = await GetContributionsByStatus(selectedYearAll, "All");
 
-            if (task == "ApprovedContribution" && !string.IsNullOrEmpty(year)) { selectedYearApproved = Convert.ToInt32(year); }
-            approvedResults = await GetContributionsByStatus(selectedYearApproved, "Approved");
+            if (task == "ApprovedContribution" && !string.IsNullOrEmpty(year)) { selectedYearApproved = yearConvert; }
+            List<ContributionDate> approvedResults = await GetContributionsByStatus(selectedYearApproved, "Approved");
 
-            if (task == "RejectedContribution" && !string.IsNullOrEmpty(year)) { selectedYearRejected = Convert.ToInt32(year); }
-            rejectedResults = await GetContributionsByStatus(selectedYearRejected, "Rejected");
+            if (task == "RejectedContribution" && !string.IsNullOrEmpty(year)) { selectedYearRejected = yearConvert; }
+            List<ContributionDate> rejectedResults = await GetContributionsByStatus(selectedYearRejected, "Rejected");
 
-            if (task == "PendingContribution" && !string.IsNullOrEmpty(year)) { selectedYearPending = Convert.ToInt32(year); }
-            pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
-
-            if (year == null)
-            {
-                year = DateTime.Now.Year.ToString();
-            }
-            
-            if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
-            if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
-            if (rejectedResults.Count == 0) { rejectedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
-            if (pendingResults.Count == 0) { pendingResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
-
+            if (task == "PendingContribution" && !string.IsNullOrEmpty(year)) { selectedYearPending = yearConvert; }
+            List<ContributionDate> pendingResults = await GetContributionsByStatus(selectedYearPending, "Pending");
+  
             ViewData["Years"] = years;
             ViewData["Contributions"] = allResults;
             ViewData["ApprovedContribution"] = approvedResults;
@@ -787,6 +794,12 @@ namespace COMP1640.Controllers
                 .ThenBy(c => c.Month)
                 .ToListAsync();
             }
+
+            if (contributions.Count <= 0)
+            { 
+                contributions.Add(new ContributionDate{Year = year});
+            }
+
             return contributions;
         }
 

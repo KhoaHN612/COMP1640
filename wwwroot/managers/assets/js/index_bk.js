@@ -254,45 +254,7 @@ function SelectedYearInCoordinators(year) {
 	window.location.href = url;
 }
 
-function SelectedYearUser(year) {
-	var url = '/Managers?task=ContributionUser&year=' + year;
-	window.location.href = url;
 
-}
-function SelectedYear(year) {
-	var url = '/Managers?task=ContributionYear&year=' + year;
-	window.location.href = url;
-}
-
-function SelectedYearContributions(year) {
-	var url = '/Managers/IndexManagers?task=TotalContribution&year=' + year;
-	//redirect to url
-	window.location.href = url;
-}
-
-function SelectedYearApproved(year) {
-	var url = '/Managers/IndexManagers?task=ApprovedContribution&year=' + year;
-	//redirect to url
-	window.location.href = url;
-}
-
-function SelectedYearRejected(year) {
-	var url = '/Managers/IndexManagers?task=RejectedContribution&year=' + year;
-	//redirect to url
-	window.location.href = url;
-}
-
-function SelectedYearPending(year) {
-	var url = '/Managers/IndexManagers?task=PendingContribution&year=' + year;
-	//redirect to url
-	window.location.href = url;
-}
-
-function GetContributionByYear(year) {
-	var url = '/Managers?task=ContributionFaculty&year=' + year;
-	//redirect to url
-	window.location.href = url;
-}
 
 $(function () {
 	"use strict";

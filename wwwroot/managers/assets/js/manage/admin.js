@@ -379,3 +379,21 @@ function getRandomColor() {
 	return color;
 }
 //End Random Colors without duplicates
+
+function SelectedYearUser(year) {
+	var url = '/Managers?task=ContributionUser&year=' + year;
+	window.location.href = url;
+
+}
+function SelectedYear(year) {
+	var url = '/Managers?task=ContributionYear&year=' + year;
+	window.location.href = url;
+}
+
+
+
+function GetContributionByYear(year) {
+	var url = '/Managers?task=ContributionFaculty&year=' + year;
+	//redirect to url
+	window.location.href = url;
+}

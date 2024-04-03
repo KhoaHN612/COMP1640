@@ -226,156 +226,157 @@ function GetTotalContributionsData() {
 
 
 function GetApprovedContributionData() {
-    console.log("GetApprovedContributionData");
 	var approvedDataElement = document.getElementById("ContributionsApprovedData");
-	var approvedData = JSON.parse(approvedDataElement.dataset.approved);
+	if(approvedDataElement){
+		var approvedData = JSON.parse(approvedDataElement.dataset.approved);
 
-    var dataApprovedPie = [[], []];
-    for (var i = 0; i < approvedData.length; i++) {
-        var facultyName = approvedData[i].facultyName;
-        if (!dataApprovedPie[0].includes(facultyName)) {
-            dataApprovedPie[0].push(facultyName);
-        }
-    }
-
-    for (var i = 0; i < dataApprovedPie[0].length; i++) {
-        var total = 0;
-        for (var j = 0; j < approvedData.length; j++) {
-            if (dataApprovedPie[0][i] == approvedData[j].facultyName) {
-                total += approvedData[j].totalByMonth;
-            }
-        }
-        dataApprovedPie[1].push(total);
-    }
-
-    var selectedApprovedYear = document.getElementById("yearApproved").value;
-    var dataApprovedColumn = [[], []];
-    dataApprovedColumn[0] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    tempApprovedMonth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-    var currentApprovedYear = new Date().getFullYear();
-    if (selectedApprovedYear == currentApprovedYear) {
-        var currentMonth = new Date().getMonth();
-        dataApprovedColumn[0] = dataApprovedColumn[0].slice(0, currentMonth + 1);
-        tempApprovedMonth = tempApprovedMonth.slice(0, currentMonth + 1);
-    }
-
-    for (var i = 0; i < tempApprovedMonth.length; i++) {
-        var total = 0;
-        for (var j = 0; j < approvedData.length; j++) {
-            if (tempApprovedMonth[i] == approvedData[j].month) {
-                total += approvedData[j].totalByMonth;
-            }
-        }
-        dataApprovedColumn[1].push(total);
-    }
-
-    var arrLabelPie = [];
-    for (var i = 0; i < dataApprovedPie[0].length; i++) {
-        arrLabelPie.push(dataApprovedPie[0][i] + ' - ' + dataApprovedPie[1][i] + ' articles');
-    }
-
-    var optionsPie = {
-        series: dataApprovedPie[1],
-        chart: {
-            type: 'pie',
-        },
-        labels: arrLabelPie,
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                chart: {
-                    width: '100%'
-                },
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }]
-    };
-
-    var optionsColumn = {
-        series: [{
-            name: 'Inflation',
-            data: dataApprovedColumn[1]
-        }],
-        chart: {
-            height: 350,
-            type: 'bar',
-            toolbar: {
-                show: false
-            }
-        },
-        plotOptions: {
-            bar: {
-                borderRadius: 10,
-                dataLabels: {
-                    position: 'top', // top, center, bottom
-                },
-            }
-        },
-        dataLabels: {
-            enabled: true,
-            formatter: function (val) {
-                return val + "";
-            },
-            offsetY: -20,
-            style: {
-                fontSize: '12px',
-                colors: ["#304758"]
-            }
-        },
-
-        xaxis: {
-            categories: dataApprovedColumn[0],
-            position: 'top',
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false
-            },
-            crosshairs: {
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        colorFrom: '#D8E3F0',
-                        colorTo: '#BED1E6',
-                        stops: [0, 100],
-                        opacityFrom: 0.4,
-                        opacityTo: 0.5,
-                    }
-                }
-            },
-            tooltip: {
-                enabled: true,
-            }
-        },
-        yaxis: {
-            axisBorder: {
-                show: false
-            },
-            axisTicks: {
-                show: false,
-            },
-            labels: {
-                show: false,
-                formatter: function (val) {
-                    return val + "";
-                }
-            }
-
-        }
-    };
-
-    var sum = dataApprovedPie[1].reduce((a, b) => a + b, 0);
-    $('#totalApproved').text(sum + ' articles');
-
-    var chartPie = new ApexCharts(document.querySelector("#chartPieApproved"), optionsPie);
-    chartPie.render();
-
-    var chartColumn = new ApexCharts(document.querySelector("#chartColumnApproved"), optionsColumn);
-    chartColumn.render();
+		var dataApprovedPie = [[], []];
+		for (var i = 0; i < approvedData.length; i++) {
+			var facultyName = approvedData[i].facultyName;
+			if (!dataApprovedPie[0].includes(facultyName)) {
+				dataApprovedPie[0].push(facultyName);
+			}
+		}
+	
+		for (var i = 0; i < dataApprovedPie[0].length; i++) {
+			var total = 0;
+			for (var j = 0; j < approvedData.length; j++) {
+				if (dataApprovedPie[0][i] == approvedData[j].facultyName) {
+					total += approvedData[j].totalByMonth;
+				}
+			}
+			dataApprovedPie[1].push(total);
+		}
+	
+		var selectedApprovedYear = document.getElementById("yearApproved").value;
+		var dataApprovedColumn = [[], []];
+		dataApprovedColumn[0] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+		tempApprovedMonth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+	
+		var currentApprovedYear = new Date().getFullYear();
+		if (selectedApprovedYear == currentApprovedYear) {
+			var currentMonth = new Date().getMonth();
+			dataApprovedColumn[0] = dataApprovedColumn[0].slice(0, currentMonth + 1);
+			tempApprovedMonth = tempApprovedMonth.slice(0, currentMonth + 1);
+		}
+	
+		for (var i = 0; i < tempApprovedMonth.length; i++) {
+			var total = 0;
+			for (var j = 0; j < approvedData.length; j++) {
+				if (tempApprovedMonth[i] == approvedData[j].month) {
+					total += approvedData[j].totalByMonth;
+				}
+			}
+			dataApprovedColumn[1].push(total);
+		}
+	
+		var arrLabelPie = [];
+		for (var i = 0; i < dataApprovedPie[0].length; i++) {
+			arrLabelPie.push(dataApprovedPie[0][i] + ' - ' + dataApprovedPie[1][i] + ' articles');
+		}
+	
+		var optionsPie = {
+			series: dataApprovedPie[1],
+			chart: {
+				type: 'pie',
+			},
+			labels: arrLabelPie,
+			responsive: [{
+				breakpoint: 480,
+				options: {
+					chart: {
+						width: '100%'
+					},
+					legend: {
+						position: 'bottom'
+					}
+				}
+			}]
+		};
+	
+		var optionsColumn = {
+			series: [{
+				name: 'Inflation',
+				data: dataApprovedColumn[1]
+			}],
+			chart: {
+				height: 350,
+				type: 'bar',
+				toolbar: {
+					show: false
+				}
+			},
+			plotOptions: {
+				bar: {
+					borderRadius: 10,
+					dataLabels: {
+						position: 'top', // top, center, bottom
+					},
+				}
+			},
+			dataLabels: {
+				enabled: true,
+				formatter: function (val) {
+					return val + "";
+				},
+				offsetY: -20,
+				style: {
+					fontSize: '12px',
+					colors: ["#304758"]
+				}
+			},
+	
+			xaxis: {
+				categories: dataApprovedColumn[0],
+				position: 'top',
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false
+				},
+				crosshairs: {
+					fill: {
+						type: 'gradient',
+						gradient: {
+							colorFrom: '#D8E3F0',
+							colorTo: '#BED1E6',
+							stops: [0, 100],
+							opacityFrom: 0.4,
+							opacityTo: 0.5,
+						}
+					}
+				},
+				tooltip: {
+					enabled: true,
+				}
+			},
+			yaxis: {
+				axisBorder: {
+					show: false
+				},
+				axisTicks: {
+					show: false,
+				},
+				labels: {
+					show: false,
+					formatter: function (val) {
+						return val + "";
+					}
+				}
+	
+			}
+		};
+	
+		var sum = dataApprovedPie[1].reduce((a, b) => a + b, 0);
+		$('#totalApproved').text(sum + ' articles');
+	
+		var chartPie = new ApexCharts(document.querySelector("#chartPieApproved"), optionsPie);
+		chartPie.render();
+	
+		var chartColumn = new ApexCharts(document.querySelector("#chartColumnApproved"), optionsColumn);
+		chartColumn.render();
+	}
 }
 
 function GetRejectedContributionData() {
@@ -685,4 +686,29 @@ function GetPendingContributionData() {
 		var chartColumn = new ApexCharts(document.querySelector("#chartColumnPending"), optionsColumn);
 		chartColumn.render();
 	}
+}
+
+function SelectedYearContributions(year) {
+	var url = '/Managers/IndexManagers?task=TotalContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
+}
+
+
+function SelectedYearApproved(year) {
+	var url = '/Managers/IndexManagers?task=ApprovedContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
+}
+
+function SelectedYearRejected(year) {
+	var url = '/Managers/IndexManagers?task=RejectedContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
+}
+
+function SelectedYearPending(year) {
+	var url = '/Managers/IndexManagers?task=PendingContribution&year=' + year;
+	//redirect to url
+	window.location.href = url;
 }
