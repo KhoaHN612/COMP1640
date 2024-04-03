@@ -69,11 +69,22 @@
                                     <a asp-controller="Post" asp-action="PostList">Post List</a>
                                 </li>
                                 @if(User.Identity.IsAuthenticated && !User.IsInRole("Student")){
-    <li>
-        <a asp-controller="Managers" asp-action="Index">Admin</a>
-    </li>
-
-
+                                    <li>
+                                        @if(User.IsInRole("Admin")){
+                                            <a asp-controller="Managers" asp-action="Index">Admin</a>
+                                        }
+                                        @if(User.IsInRole("Manager")){
+                                            <a asp-controller="Managers" asp-action="IndexManagers">Admin</a>
+                                        }
+                                        @if(User.IsInRole("Coordinator")){
+                                            <a asp-controller="Managers" asp-action="IndexCoordinators">Admin</a>
+                                        }
+                                    </li>
+                                }
+                                @if(User.Identity.IsAuthenticated && User.IsInRole("Guest")){
+                                    <li>
+                                        <a asp-controller="Students" asp-action="IndexGuest">Statistic</a>
+                                    </li>
                                 }
                                 
                                 @if (SignInManager.IsSignedIn(User))

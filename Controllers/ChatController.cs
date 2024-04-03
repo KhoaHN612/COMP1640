@@ -29,7 +29,7 @@ namespace COMP1640.Controllers
         {
             return RedirectToAction(nameof(Find));
         }
-        [Authorize]
+        [Authorize(Roles = "Manager,Admin,Coordinator")]
         public async Task<IActionResult> Find()
         {   
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -48,7 +48,7 @@ namespace COMP1640.Controllers
             var users = _userManager.Users.Include(u => u.Faculty).ToList();
             return View(users);
         }
-        [Authorize]
+        [Authorize(Roles = "Manager,Admin,Coordinator")]
         public async Task<IActionResult> Chatwith(string Id)
         {
             var OrUserId = Id;

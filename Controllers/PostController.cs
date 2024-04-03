@@ -33,7 +33,7 @@ namespace COMP1640.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             return user?.FullName; // This will return null if user is null.
         }
-        [Authorize]
+        [Authorize(Roles = "Coordinator,Manager")]
         // GET: Post
         public async Task<IActionResult> Index()
         {
@@ -46,7 +46,7 @@ namespace COMP1640.Controllers
             return View(await comp1640Context.ToListAsync());
 
         }
-        [Authorize]
+        [Authorize(Roles = "Coordinator,Manager")]
         // GET: Post/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -69,7 +69,7 @@ namespace COMP1640.Controllers
 
             return View(post);
         }
-        [Authorize]
+
         public async Task<IActionResult> PostList()
         {   
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -92,7 +92,7 @@ namespace COMP1640.Controllers
             var comp1640Context = _context.Posts.Include(p => p.User);
             return View(await comp1640Context.ToListAsync());
         }
-        [Authorize]
+
         public async Task<IActionResult> PostDetail(int? id)
         {
             if (id == null)
@@ -118,7 +118,7 @@ namespace COMP1640.Controllers
             return View(post);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Coordinator,Manager")]
         // GET: Post/Create
         public IActionResult Create()
         {
@@ -152,7 +152,7 @@ namespace COMP1640.Controllers
         }
 
         // GET: Post/Edit/5
-        [Authorize]
+        [Authorize(Roles = "Coordinator,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -223,7 +223,7 @@ namespace COMP1640.Controllers
 
 
         // GET: Post/Delete/5
-        [Authorize]
+        [Authorize(Roles = "Coordinator,Manager")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
