@@ -89,9 +89,14 @@ function GetContributionsWithoutComment() {
 		}
 	  }
 	  };
+	  
+	var totalContributionsData = JSON.parse(document.getElementById("TotalContributions").dataset.totalcontributions);
+	if (totalContributionsData[0].quantity > 0) {
+		document.getElementById("withoutCOmmentCount").innerHTML = totalContributionsData[0].quantity + " articles";
+	}	  
 
-	  var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
-	  chart.render();
+	var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);
+	chart.render();
 }
 
 function GetContribution() {
