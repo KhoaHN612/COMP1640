@@ -25,38 +25,32 @@
                     <div class="row mt-3">
                         <div class="col-md-3 mb-3">
                             <div class="text-center p-3 border radius-10">
-                                <h3 class="mb-2 text-primary" id="totalContributions">0 article</h3>
+                                <h3 class="mb-2 text-primary" id="totalContributions">@ViewBag.TotalContribution.Count article</h3>
                                 <p class="mb-0">Total contribution</p>
                             </div>
-                            <div id="totalContributionData"
-                                data-totalcontribution='@Html.Raw(Json.Serialize(ViewData["TotalContribution"]))'>
-                            </div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <div class="text-center p-3 border radius-10">
-                                <h3 class="mb-2 text-primary-2" id="totalAccepted">0 article</h3>
+                                <h3 class="mb-2 text-primary-2" id="totalAccepted">@ViewBag.TotalContributionsAccepted.Count article</h3>
                                 <p class="mb-0">Contribution Puslished</p>
                             </div>
-                            <div id="totalAcceptedData"
-                                data-totalaccepted='@Html.Raw(Json.Serialize(ViewData["TotalContributionsAccepted"]))'>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                <h3 class="mb-2 text-primary-2" id="totalAccepted">@ViewBag.TotalContributionsAccepted.Count article</h3>
+                                <p class="mb-0">Contribution Approved</p>
                             </div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <div class="text-center p-3 border radius-10">
-                                <h3 class="mb-2 text-primary-2" id="totalRejected">0 article</h3>
+                                <h3 class="mb-2 text-primary-2" id="totalRejected">@ViewBag.TotalContributionsRejected.Count article</h3>
                                 <p class="mb-0">Contribution Rejected</p>
                             </div>
-                            <div id="totalRejectedData"
-                                data-totalrejected='@Html.Raw(Json.Serialize(ViewData["TotalContributionsRejected"]))'>
-                            </div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <div class="text-center p-3 border radius-10">
-                                <h3 class="mb-2 text-primary-2" id="totalPending">0 article</h3>
+                                <h3 class="mb-2 text-primary-2" id="totalPending">@ViewBag.TotalContributionsPending.Count article</h3>
                                 <p class="mb-0">Contribution Pending</p>
-                            </div>
-                            <div id="totalPendingData"
-                                data-totalpending='@Html.Raw(Json.Serialize(ViewData["TotalContributionsPending"]))'>
                             </div>
                         </div>
                     </div>
@@ -108,3 +102,5 @@
 
 </main>
 <!--end page main-->
+
+<script src="~/managers/assets/js/manage/students.js"></script>

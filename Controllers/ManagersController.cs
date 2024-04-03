@@ -396,7 +396,8 @@ namespace COMP1640.Controllers
         {
             ViewData["Title"] = "Dashboard Coordinators";
             List<TotalContribution> TotalContribution = new List<TotalContribution>();
-            List<TotalContribution> TotalContributionsAccepted = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsApproved = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsPublished = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsRejected = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsPending = new List<TotalContribution>();
             List<ContributionWithoutComment> contributions = new List<ContributionWithoutComment>();
@@ -420,8 +421,11 @@ namespace COMP1640.Controllers
 
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
 
+                //Total Contributions Published
+                TotalContributionsPublished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
+
                 //Total Contributions Accepted
-                TotalContributionsAccepted = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsAccepted");
+                TotalContributionsApproved = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsApproved");
 
                 //Total Contributions Rejected
                 TotalContributionsRejected = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsRejected");
@@ -491,7 +495,9 @@ namespace COMP1640.Controllers
                 .Distinct()
                 .ToListAsync();
 
-            ViewData["TotalContributionsAccepted"] = TotalContributionsAccepted;
+
+            ViewData["TotalContributionsApproved"] = TotalContributionsApproved;
+            ViewData["TotalContributionsPublished"] = TotalContributionsPublished;
             ViewData["TotalContributionsRejected"] = TotalContributionsRejected;
             ViewData["TotalContributionsPending"] = TotalContributionsPending;
             ViewData["TotalContribution"] = TotalContribution;
@@ -546,7 +552,10 @@ namespace COMP1640.Controllers
 
             switch (action)
             {
-                case "TotalContributionsAccepted":
+                case "TotalContributionsPuslished":
+                    query = query.Where(c => c.Contribution.IsPublished == true);
+                    break;
+                case "TotalContributionsApproved":
                     query = query.Where(c => c.Contribution.Status == "Approved");
                     break;
                 case "TotalContributionsRejected":
@@ -554,6 +563,8 @@ namespace COMP1640.Controllers
                     break;
                 case "TotalContributionsPending":
                     query = query.Where(c => c.Contribution.Status == "Pending");
+                    break;
+                default:
                     break;
             }
 
@@ -808,7 +819,6 @@ namespace COMP1640.Controllers
         //     return Json(students);
         // }
 
-        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> StudentSubmissionManagers()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
