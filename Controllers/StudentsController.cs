@@ -133,7 +133,8 @@ namespace COMP1640.Controllers
             ViewData["Title"] = "Dashboard Guest";
 
             List<TotalContribution> TotalContribution = new List<TotalContribution>();
-            List<TotalContribution> TotalContributionsPushlish = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsPushlished = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsApproved = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsRejected = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsPending = new List<TotalContribution>();
             List<ContributionWithoutComment> contributions = new List<ContributionWithoutComment>();
@@ -172,9 +173,15 @@ namespace COMP1640.Controllers
 
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
 
-                //Total Contributions Puslished
-                TotalContributionsPushlish = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
+                //Total Contributions Approved
+                TotalContributionsApproved = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsApproved");
 
+                //Total Contributions Puslished
+                TotalContributionsPushlished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
+
+            
+            Console.WriteLine("TotalContribution: ");
+            Console.WriteLine(TotalContributionsPushlished);
                 //Total Contributions Rejected
                 TotalContributionsRejected = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsRejected");
 
@@ -201,7 +208,8 @@ namespace COMP1640.Controllers
                 contributions.Add(new ContributionWithoutComment { Date = date, Year = date.Year, Quantity = 0 });
             }
 
-            ViewData["TotalContributionsAccepted"] = TotalContributionsPushlish;
+            ViewData["TotalContributionsApproved"] = TotalContributionsApproved;
+            ViewData["TotalContributionsPushlished"] = TotalContributionsPushlished;
             ViewData["TotalContributionsRejected"] = TotalContributionsRejected;
             ViewData["TotalContributionsPending"] = TotalContributionsPending;
             ViewData["TotalContribution"] = TotalContribution;
@@ -255,6 +263,9 @@ namespace COMP1640.Controllers
             {
                 case "TotalContributionsPuslished":
                     query = query.Where(c => c.Contribution.IsPublished == true);
+                    break;
+                case "TotalContributionsApproved":
+                    query = query.Where(c => c.Contribution.Status == "Approved");
                     break;
                 case "TotalContributionsRejected":
                     query = query.Where(c => c.Contribution.Status == "Rejected");
