@@ -512,8 +512,8 @@ namespace COMP1640.Controllers
                     string uniqueFileName;
                     do
                     {
-                        uniqueFileName = GenerateContributionName(userFullName, contribution.Title, index) 
-                        + Path.GetExtension(file.FileName);;
+                        uniqueFileName = GenerateContributionName(userFullName, contribution.Title, index)
+                        + Path.GetExtension(file.FileName); ;
                         index++;
                     } while (System.IO.File.Exists(Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName)));
 
@@ -647,7 +647,13 @@ namespace COMP1640.Controllers
             }
             else
             {
-                if (userToUpdate.ProfileImagePath != null)
+                if (userToUpdate.ProfileImagePath != null && Path.Exists(userToUpdate.ProfileImagePath))
+                {
+                    string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "profileImageUpload");
+                    string imageFilePath = Path.Combine(uploadsFolderPath, userToUpdate.ProfileImagePath);
+                    System.IO.File.Delete(imageFilePath);
+                }
+                else if (Path.Exists(userToUpdate.ProfileImagePath))
                 {
                     string uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "profileImageUpload");
                     string imageFilePath = Path.Combine(uploadsFolderPath, userToUpdate.ProfileImagePath);
@@ -750,7 +756,7 @@ namespace COMP1640.Controllers
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
             bool isCommentDeadlineOver = contribution.CommentDeadline < DateTime.Now;
-            
+
             ViewBag.isCommentDeadlineOver = isCommentDeadlineOver;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
