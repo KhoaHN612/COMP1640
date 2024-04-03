@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                             <div>
-                                <p>Total Contributions</p>
+                                <p>Total Approved Contributions</p>
                                 <h4 class="" id="totalArticles">0 article</h4>
                             </div>
                             <div class="w-50">
@@ -60,7 +60,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row m-2 align-items-center justify-content-center my-3">
+                        <div class="row m-2 align-items-center justify-content-center">
                             <div class="by-device-container mb-3" id="browerCount">
                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                     <div id="chartBrowser"></div>
@@ -154,8 +154,8 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <h6>Quantity Of Contributors</h6>
-                                <h4 class="" id="totalContributors">0 article</h4>
+                                <h5>Quantity Of Contributors</h5>
+                                <h6 class="" id="totalContributors">0 article</h6>
                             </div>
                             <div class="dropdown ms-auto">
                                 <select class="form-select" id="yearUser" aria-label="Default select example" onchange="SelectedYearUser(this.value)">
@@ -189,10 +189,10 @@
                                     <tbody id="qtyContribution">                                    
                                             @foreach (var item in ViewBag.ContributionUser)
                                             {
-                                                <tr>
+                                                <tr class="countContributors">
                                                     <td>@item.FullName</td>
                                                     <td>@item.Faculty</td>
-                                                    <td class="totalContributionCell">@item.TotalContribution</td>
+                                                    <td >@item.TotalContribution</td>
                                                     <td>@item.TotalAccept</td>
                                                     <td>@item.TotalReject</td>
                                                     <td>@item.TotalPending</td>
@@ -215,3 +215,5 @@
     </div>
 </main>
 <!--end page main-->
+
+<script src="~/managers/assets/js/manage/admin.js"></script>
