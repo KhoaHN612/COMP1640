@@ -31,7 +31,7 @@ namespace COMP1640.Controllers
             _emailSender = EmailSender;
         }
 
-        
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Index(string task, string year)
         {
             ViewData["Title"] = "Dashboard";
@@ -64,7 +64,7 @@ namespace COMP1640.Controllers
 
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
-           
+
             if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
             if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
 
@@ -180,7 +180,7 @@ namespace COMP1640.Controllers
                     TotalPending = g.Where(c => c.Contributions.Status == "Pending").Count(),
                     Year = year
                 })
-                .OrderByDescending(c => c.TotalContribution) 
+                .OrderByDescending(c => c.TotalContribution)
                 .ToListAsync();
 
             return contributions;
@@ -216,7 +216,7 @@ namespace COMP1640.Controllers
 
             return roleStatistics;
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TableFaculty()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -228,7 +228,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
             List<Faculty> faculty = _context.Faculties.OrderBy(f => f.FacultyId).ToList();
@@ -295,7 +295,7 @@ namespace COMP1640.Controllers
 
         //     return RedirectToAction("TableFaculty");
         // }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TableSubmissionDate()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -307,13 +307,14 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
             List<AnnualMagazine> annualMagazine = _context.AnnualMagazines.OrderBy(f => f.AnnualMagazineId).ToList();
             ViewData["Title"] = "Submission Date Table page";
             return View("admins/table_submission_date", annualMagazine);
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult FormCreateSubmissionDate(int? id)
         {
             if (id != null)
@@ -390,7 +391,7 @@ namespace COMP1640.Controllers
             return Ok();
         }
 
-        // [Authorize(Roles="Coordinator")]
+        [Authorize(Roles="Coordinator")]
         public async Task<IActionResult> IndexCoordinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
@@ -598,7 +599,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
 
@@ -644,10 +645,10 @@ namespace COMP1640.Controllers
             var userProfileImagePath = user.ProfileImagePath;
 
             var commentDeadline = contribution.CommentDeadline;
-                // Lấy thông tin của user tạo contribution
             var contributionUser = await _userManager.FindByIdAsync(contribution.UserId);
             var contributionUserFullName = contributionUser.FullName;
-
+            bool isCommentDeadlineOver = contribution.CommentDeadline < DateTime.Now;
+            ViewBag.isCommentDeadlineOver = isCommentDeadlineOver;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
@@ -662,46 +663,9 @@ namespace COMP1640.Controllers
             ViewBag.Deadline = contribution.CommentDeadline;
             return View("coordinators/create_comment", contribution);
         }
-        //=============================== POSTS ====================================//
-        public IActionResult TablePost()
-        {
-            ViewData["Title"] = "List of Posts";
-            return View("coordinators/table_post");
-        }
 
-        public IActionResult FormCreatePost(int? id)
-        {
-            if (id != null)
-            {
-                ViewData["Title"] = "Edit Post";
-                ViewData["ButtonLabel"] = "Update";
-            }
-            else
-            {
-                ViewData["Title"] = "Create Post";
-                ViewData["ButtonLabel"] = "Submit";
-            }
-            Contribution contribution = id != null ? _context.Contributions.Find(id) : new Contribution();
-            return View("coordinators/form_create_post", contribution);
-        }
-
-        // [HttpPost]
-        // public IActionResult CreatePost()
-        // {
-
-        // }
-        // [HttpPost]
-        // public IActionResult UpdatePost()
-        // {
-
-        // }
-
-        // [HttpDelete]
-        // public IActionResult DeletePost()
-        // {
-
-        // }
         //================================ MANAGERS ================================//
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> IndexManagers(string task, string year)
         {
             ViewData["Title"] = "Dashboard Managers";
@@ -737,7 +701,7 @@ namespace COMP1640.Controllers
             {
                 year = DateTime.Now.Year.ToString();
             }
-            
+
             if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
             if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
             if (rejectedResults.Count == 0) { rejectedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
@@ -863,7 +827,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
             List<Contribution> contributions = _context.Contributions
@@ -956,6 +920,7 @@ namespace COMP1640.Controllers
             }
         }
         //================================ PROFILES ================================//
+        [Authorize(Roles = "Manager,Admin,Coordinator")]
         public async Task<IActionResult> ShowProfileAsync()
         {
             ViewData["Title"] = "Profiles";
@@ -966,7 +931,7 @@ namespace COMP1640.Controllers
             }
             ViewBag.roles = await _userManager.GetRolesAsync(curUser);
             var faculty = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == curUser.FacultyId);
-            ViewBag.facultyName = faculty.Name;
+            ViewBag.facultyName = faculty?.Name;
             return View("profile_managers", curUser);
         }
 

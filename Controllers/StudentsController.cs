@@ -48,7 +48,7 @@ namespace COMP1640.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             return user?.FullName; // This will return null if user is null.
         }
-
+        // [Authorize]
         // GET: StudentsController
         public async Task<IActionResult> Index()
         {
@@ -128,6 +128,7 @@ namespace COMP1640.Controllers
             }
         }
 
+        [Authorize(Roles = "Guest")]
         public async Task<IActionResult> IndexGuest(string task, string year)
         {
             ViewData["Title"] = "Dashboard Guest";
@@ -448,7 +449,7 @@ namespace COMP1640.Controllers
             return View("~/Views/managers/student/student_submission.cshtml");
         }
 
-
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> FromEditSubmission(int id)
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -522,7 +523,8 @@ namespace COMP1640.Controllers
                     string uniqueFileName;
                     do
                     {
-                        uniqueFileName = GenerateContributionName(userFullName, contribution.Title, index);
+                        uniqueFileName = GenerateContributionName(userFullName, contribution.Title, index) 
+                        + Path.GetExtension(file.FileName);;
                         index++;
                     } while (System.IO.File.Exists(Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName)));
 
@@ -548,7 +550,9 @@ namespace COMP1640.Controllers
                 contribution.Comment = null;
                 contribution.Status = "Pending";
                 contribution.UserId = userId ?? "Unknown";
-                contribution.CommentDeadline = contribution.SubmissionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                var contributionDate = contribution.SubmissionDate.Date; ;
+                contribution.CommentDeadline = contributionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
                 _context.Add(contribution);
                 var result = await _context.SaveChangesAsync();
                 await SendNotificationEmails(AnnualMagazineId, contribution);
@@ -646,7 +650,7 @@ namespace COMP1640.Controllers
             pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
-            var userToUpdate = await _context.FindAsync<COMP1640User>(user.Id);
+            var userToUpdate = await _userManager.FindByIdAsync(user.Id);
             var profileImageFile = ProfileImageFile;
             if (user.ProfileImageFile == null)
             {
@@ -721,7 +725,7 @@ namespace COMP1640.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> SubmissionDetail(int id)
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -756,8 +760,9 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-
-            ViewBag.Deadline = contribution.CommentDeadline;
+            bool isCommentDeadlineOver = contribution.CommentDeadline < DateTime.Now;
+            
+            ViewBag.isCommentDeadlineOver = isCommentDeadlineOver;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
@@ -772,7 +777,6 @@ namespace COMP1640.Controllers
             return View(contribution);
 
         }
-
 
         public async Task<IActionResult> PostLists()
         {
@@ -796,7 +800,6 @@ namespace COMP1640.Controllers
             }
             return View();
         }
-
 
         public async Task<IActionResult> PostDetail()
         {
