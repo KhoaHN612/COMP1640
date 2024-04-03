@@ -31,7 +31,7 @@ namespace COMP1640.Controllers
             _emailSender = EmailSender;
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string task, string year)
         {
             ViewData["Title"] = "Dashboard";
@@ -584,7 +584,7 @@ namespace COMP1640.Controllers
             return contributions;
         }
 
-        [Authorize(Roles = "Coordinator, Manager")]
+        [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
 
@@ -701,7 +701,7 @@ namespace COMP1640.Controllers
             {
                 year = DateTime.Now.Year.ToString();
             }
-
+            
             if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
             if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
             if (rejectedResults.Count == 0) { rejectedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
