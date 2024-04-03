@@ -24,7 +24,7 @@
                             </select>
                         </div>
                     </div>
-                    @if(ViewBag.TotalContribution.Count > 0){
+                    @if(ViewBag.TotalContribution[0].Total > 0){
                         <div id="chartContributions"></div>
                         <div id="ContributionsTotalData" data-total= "@ViewBag.TotalContribution.Count"></div>
                         <div id="ContributionsApprovedData" data-approved= "@ViewBag.TotalContributionsApproved.Count"></div>
@@ -44,9 +44,15 @@
     <div class="row">
         <div class="card radius-10 w-100">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <h5 class="mb-0">Contribution without Comment in @ViewBag.Contributions[0].Date.Year</h5>
-                    </div>                    
+                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                        <div>
+                            <h5 class="mb-0">Contribution without Comment in @ViewBag.Contributions[0].Date.Year</h5>
+                            <h6 id="withoutCOmmentCount">0 article</h4>
+                        </div>
+                    </div>   
+                    <div id="TotalContributions"
+                        data-totalContributions='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'>
+                    </div>             
                     @if(ViewBag.Contributions[0].Quantity > 0){
                         <div id="ContributionsWithoutCommentData"
                             data-withoutcomment='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutComments"]))'>
@@ -58,7 +64,7 @@
                     }else{
                         <div class="empty d-flex flex-column align-items-center position-relative">
                             <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
-                            <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
+                            <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No approved contribution in @ViewBag.ContributionUser[0].Faculty!</p>
                         </div>
                     }
                 </div>
@@ -89,7 +95,7 @@
                                 </select>
                             </div>
                         </div>
-                        @if(ViewBag.ContributionUser[0].FullName != null){
+                        @if(ViewBag.ContributionUser[0].TotalContribution > 0){
                             <div class="table-responsive mt-2">
                                 <table class="table align-middle mb-0">
                                     <thead class="table-light">
@@ -125,7 +131,7 @@
                         }else{
                             <div class="empty d-flex flex-column align-items-center position-relative">
                                 <img src=".././gif/empty.gif" class="img-fluid w-50" alt="browser" />
-                                <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
+                                <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution in @ViewBag.ContributionUser[0].Faculty!</p>
                             </div>
                         }
                     </div>

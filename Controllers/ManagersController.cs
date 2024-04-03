@@ -416,10 +416,10 @@ namespace COMP1640.Controllers
             }
             else
             {
-
                 int currentFacultyId = currentUser.FacultyId ?? 0; ;
 
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
+                if(TotalContribution.Count == 0){TotalContribution.Add( new TotalContribution{Year = DateTime.Now.Year });};
 
                 //Total Contributions Published
                 TotalContributionsPublished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
@@ -437,7 +437,7 @@ namespace COMP1640.Controllers
                 //GET ALL CONTRIBUTIONS
                 contributions = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
-                    .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year && c.User.FacultyId == currentFacultyId)
+                    .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year && c.User.FacultyId == currentFacultyId && c.Contribution.Status == "Approved")
                     .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
                     .Select(g => new ContributionWithoutComment
                     {
@@ -484,8 +484,6 @@ namespace COMP1640.Controllers
 
                 if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
                 contributionUser = await GetContributors(currentFacultyId, selectedYearUser);
-                Console.WriteLine("contributionUser Faculty: " + contributionUser[0].Faculty);
-
             }
 
 
@@ -543,8 +541,7 @@ namespace COMP1640.Controllers
 
         public async Task<List<TotalContribution>> GetTotalContributions(int facultyID, int year, string action)
         {
-
-
+            List<TotalContribution> contributions = new List<TotalContribution>();
             var query = from c in _context.Contributions
                         join u in _context.Users on c.UserId equals u.Id
                         where c.SubmissionDate.Year == year
@@ -568,18 +565,33 @@ namespace COMP1640.Controllers
                     break;
             }
 
-            List<TotalContribution> contributions = await query
-            .Where(uc => uc.User.FacultyId == facultyID)
-            .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
-            .Select(g => new TotalContribution
-            {
-                Year = g.Key.Year,
-                Month = g.Key.Month,
-                Total = g.Count()
-            })
-            .OrderBy(c => c.Year)
-            .ThenBy(c => c.Month)
-            .ToListAsync();
+            if (action == "TotalContributionsPuslished" || action == "TotalContributionsApproved" || action == "TotalContributionsRejected" || action == "TotalContributionsPending"){
+                contributions = await query
+                    .Where(uc => uc.User.FacultyId == facultyID)
+                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
+                    .Select(g => new TotalContribution
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        Total = g.Count()
+                    })
+                    .OrderBy(c => c.Year)
+                    .ThenBy(c => c.Month)
+                    .ToListAsync();
+            }else{
+                contributions = await query
+                    .Where(uc => uc.User.FacultyId == facultyID)
+                    .GroupBy(c => new { c.Contribution.SubmissionDate })
+                    .Select(g => new TotalContribution
+                    {
+                        Year = g.Key.SubmissionDate.Year,
+                        Month = g.Key.SubmissionDate.Month,
+                        Total = g.Count()
+                    })
+                    .OrderBy(c => c.Year)
+                    .ThenBy(c => c.Month)
+                    .ToListAsync();
+            }            
 
             return contributions;
         }
