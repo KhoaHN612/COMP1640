@@ -48,7 +48,7 @@ namespace COMP1640.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             return user?.FullName; // This will return null if user is null.
         }
-        [Authorize]
+        // [Authorize]
         // GET: StudentsController
         public async Task<IActionResult> Index()
         {
