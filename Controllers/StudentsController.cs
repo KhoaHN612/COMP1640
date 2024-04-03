@@ -512,7 +512,8 @@ namespace COMP1640.Controllers
                     string uniqueFileName;
                     do
                     {
-                        uniqueFileName = GenerateContributionName(userFullName, contribution.Title, index);
+                        uniqueFileName = GenerateContributionName(userFullName, contribution.Title, index) 
+                        + Path.GetExtension(file.FileName);;
                         index++;
                     } while (System.IO.File.Exists(Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName)));
 
