@@ -140,8 +140,7 @@
                                 <h6 class="me-3">Sort By</h6>
                                 <div id="sort-by"></div>
                             </div>
-                        </div>                          
-                        
+                        </div>  
                         <div id="chartPageVisit"></div>
                     </div>
                 </div>
@@ -161,7 +160,7 @@
                                 <select class="form-select" id="yearUser" aria-label="Default select example" onchange="SelectedYearUser(this.value)">
                                     @foreach (var item in ViewBag.Years)
                                     {
-                                        if (item == ViewBag.Year)
+                                        if (item == ViewBag.ContributionUser[0].Year)
                                         {
                                             <option value="@item" selected>@item</option>
                                         }

@@ -16,10 +16,18 @@ function GetGifEmpty(size) {
 }
 
 function GetPageVisitData(action) {
+	document.getElementById("chartPageVisit").innerHTML = `                        
+	<div class="empty d-flex flex-column align-items-center position-relative">
+		<img src="./gif/loading.gif" class="img-fluid" style="width : 30%" alt="loading" />
+	</div>
+	`
 	if (action == "desc") {
 		document.getElementById("sort-by").innerHTML = '<i class="bi bi-sort-up" onclick="GetPageVisitData(\'asc\')"></i>';
+		document.getElementById("chartPageVisit").innerHTML = "";
+
 	} else {	
 		document.getElementById("sort-by").innerHTML = '<i class="bi bi-sort-down" onclick="GetPageVisitData(\'desc\')"></i>';
+		document.getElementById("chartPageVisit").innerHTML = "";
 	}
 
 	//Method POST sent desc to server
