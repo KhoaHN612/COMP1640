@@ -714,12 +714,6 @@ namespace COMP1640.Controllers
                 .ToListAsync();
 
             //GET CONTRIBUTIONS BY YEAR
-            int selectedYearAll = DateTime.Now.Year;
-            int selectedYearApproved = DateTime.Now.Year;
-            int selectedYearRejected = DateTime.Now.Year;
-            int selectedYearPending = DateTime.Now.Year;
-            List<ContributionDate> approvedResults = new List<ContributionDate>();
-            List<ContributionDate> rejectedResults = new List<ContributionDate>();
             List<ContributionDate> pendingResults = new List<ContributionDate>();
 
             if (task == "TotalContribution" && !string.IsNullOrEmpty(year)) { selectedYearAll = Convert.ToInt32(year); }
