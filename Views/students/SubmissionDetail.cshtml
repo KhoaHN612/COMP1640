@@ -2,7 +2,29 @@
 @using Microsoft.AspNetCore.Identity
 @using COMP1640.Areas.Identity.Data
 @inject UserManager<COMP1640User> UserManager
+@inject Comp1640Context _context
 <style>
+        .image-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .image-row {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .image-container {
+        margin: 5px;
+    }
+
+    .image-container img {
+        max-width: 100%; /* Đảm bảo hình ảnh không vượt quá kích thước của container */
+        max-height: 200px; /* Giới hạn chiều cao của hình ảnh */
+    }
     .navigation-wrapper .primary-navigation-wrapper header .navbar-brand:after {
         height: 10px !important;
     }
@@ -86,6 +108,24 @@
                                     </div>
                                 </header>
                                 <hr>
+    <div class="image-gallery">
+        @{
+            var images = _context.FileDetails.Where(c => c.ContributionId == Model.ContributionId);
+            int imageCount = 0;
+            foreach(var item in images)
+            {
+                if (imageCount % 4 == 0 && imageCount != 0)
+                {
+                    @:</div><div class="image-row">
+                }
+                <div class="image-container">
+                    <img src="~/contributionUpload/@item.FilePath" alt="">
+                </div>
+                imageCount++;
+            }
+        }
+    </div>
+                                
                                 @{
                                     var errorMessage = TempData["ErrorMessage"] as string;
                                 }
