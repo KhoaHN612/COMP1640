@@ -9,10 +9,8 @@ function GetContributionsWithoutComment() {
 	if (contributionsData.length == 0) {
 		contributionsData[0] = { quantity: 0 };
 	}	
-
 	
 	var contributionsOver14DaysData = JSON.parse(document.getElementById("ContributionsOver14DaysData").dataset.over14days);
-
 	if (contributionsOver14DaysData.length == 0) {
 		contributionsOver14DaysData[0] = { quantity: 0 };
 	}

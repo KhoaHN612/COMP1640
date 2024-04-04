@@ -232,16 +232,6 @@ function FillData(month, totalArticles, totalWithoutComments, totalComment) {
 	return arrDataChartGuest;
 }
 
-function SelectedContributionsYearByStudent(year) {
-	var url = '/Students/IndexGuest?task=Contributions&year=' + year;
-	window.location.href = url;
-}
-
-function SelectedCommentYearByStudent(year) {
-	var url = '/Students/IndexGuest?task=CommentContributions&year=' + year;
-	window.location.href = url;
-}
-
 
 
 

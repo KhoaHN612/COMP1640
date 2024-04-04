@@ -1,124 +1,150 @@
 ﻿<!--start content-->
-<main class="page-content">
-    <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-4">
-        <div class="card radius-10 w-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Contribution in @ViewBag.TotalContribution[0].Year</h5>
-                    <!-- Select year, display current year first access-->
-                    <div class="w-5">
-                        <select class="form-select" id="yearStudent" aria-label="Default select example"
-                            onchange="SelectedContributionsYearByStudent(this.value)">
-                            @foreach (var item in ViewBag.Years)
-                            {
-                                if (item == ViewBag.TotalContribution[0].Year)
+<main class="page-content student">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <div class="breadcrumb-title pe-3">Statistic for Guest</div>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Students" asp-action="Index"><i class="bx bx-home-alt"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Validations</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <div class="container pt-4">
+        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-4">
+            <div class="card radius-10 w-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Contribution in @ViewBag.TotalContribution[0].Year</h5>
+                        <!-- Select year, display current year first access-->
+                        <div class="w-5">
+                            <select class="form-select" id="yearStudent" aria-label="Default select example"
+                                onchange="SelectedContributionsYearByStudent(this.value)">
+                                @foreach (var item in ViewBag.Years)
                                 {
-                                    <option value="@item" selected>@item</option>
+                                    if (item == ViewBag.TotalContribution[0].Year)
+                                    {
+                                        <option value="@item" selected>@item</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
                                 }
-                                else
-                                {
-                                    <option value="@item">@item</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3 justify-content-center p-2">
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                @if (ViewBag.TotalContribution[0].Total > 0)
+                                { 
+                                    <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContribution[0].Total articles</h3>
+                                } else {
+                                    <h3 class="mb-2 text-primary-2"> 0 article</h3>
                                 }
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-3 mb-3">
-                        <div class="text-center p-3 border radius-10">
-                            @if (ViewBag.TotalContribution[0].Total > 0)
-                            { 
-                                <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContribution[0].Total articles</h3>
-                            } else {
-                                <h3 class="mb-2 text-primary-2"> 0 article</h3>
-                            }
-                            <p class="mb-0">Total contribution</p>
+                                <p class="mb-0">Total contribution</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="text-center p-3 border radius-10">
-                            @if (ViewBag.TotalContributionsPublished[0].Total > 0)
-                            { 
-                                <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContributionsPublished[0].Total articles</h3>
-                            } else {
-                                <h3 class="mb-2 text-primary-2"> 0 article</h3>
-                             }
-                            <p class="mb-0">Contribution Puslished</p>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                @if (ViewBag.TotalContributionsPublished[0].Total > 0)
+                                { 
+                                    <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContributionsPublished[0].Total articles</h3>
+                                } else {
+                                    <h3 class="mb-2 text-primary-2"> 0 article</h3>
+                                }
+                                <p class="mb-0">Contribution Puslished</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="text-center p-3 border radius-10">
-                            @if (ViewBag.TotalContributionsRejected[0].Total > 0)
-                            { 
-                                <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContributionsRejected[0].Total articles</h3>
-                            } else {
-                                <h3 class="mb-2 text-primary-2"> 0 article</h3>
-                            }
-                            <p class="mb-0">Contribution Rejected</p>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                @if (ViewBag.TotalContributionsApproved[0].Total > 0)
+                                { 
+                                    <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContributionsApproved[0].Total articles</h3>
+                                } else {
+                                    <h3 class="mb-2 text-primary-2"> 0 article</h3>
+                                }
+                                <p class="mb-0">Contribution Approved</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="text-center p-3 border radius-10">
-                            @if (ViewBag.TotalContributionsPending[0].Total > 0)
-                            { 
-                                <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContributionsPending[0].Total articles</h3>
-                            } else {
-                                <h3 class="mb-2 text-primary-2"> 0 article</h3>
-                            }
-                            <p class="mb-0">Contribution Pending</p>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                @if (ViewBag.TotalContributionsRejected[0].Total > 0)
+                                { 
+                                    <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContributionsRejected[0].Total articles</h3>
+                                } else {
+                                    <h3 class="mb-2 text-primary-2"> 0 article</h3>
+                                }
+                                <p class="mb-0">Contribution Rejected</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center p-3 border radius-10">
+                                @if (ViewBag.TotalContributionsPending[0].Total > 0)
+                                { 
+                                    <h3 class="mb-2 text-primary-2"> @ViewBag.TotalContributionsPending[0].Total articles</h3>
+                                } else {
+                                    <h3 class="mb-2 text-primary-2"> 0 article</h3>
+                                }
+                                <p class="mb-0">Contribution Pending</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div><!--end row-->
+        </div><!--end row-->
 
-    <div class="row">
-        <div class="card radius-10 w-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Contribution Approved without Comment in @ViewBag.Contributions[0].Year</h5>
-                    <div class="w-5">
-                        <select class="form-select" id="yearStudent" aria-label="Default select example"
-                            onchange="SelectedCommentYearByStudent(this.value)">
-                            @foreach (var item in ViewBag.Years)
-                            {
-                                if (item == ViewBag.Contributions[0].Year)
+        <div class="row">
+            <div class="card radius-10 w-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Contribution Approved in @ViewBag.Contributions[0].Year</h5>
+                        <div class="w-5">
+                            <select class="form-select" id="yearStudent" aria-label="Default select example"
+                                onchange="SelectedCommentYearByStudent(this.value)">
+                                @foreach (var item in ViewBag.Years)
                                 {
-                                    <option value="@item" selected>@item</option>
+                                    if (item == ViewBag.Contributions[0].Year)
+                                    {
+                                        <option value="@item" selected>@item</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
                                 }
-                                else
-                                {
-                                    <option value="@item">@item</option>
-                                }
-                            }
-                        </select>
+                            </select>
+                        </div>
                     </div>
+                    @if (ViewBag.Contributions[0].Quantity > 0)
+                    {
+                        <div id="contributionGuest"
+                            data-contributionguest='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'>
+                        </div>
+                        <div id="contributionWithoutCommentsGuest"
+                            data-contributionwithoutcommentsguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutComments"]))'>
+                        </div>
+                        <div id="contributionCommentGuest"
+                            data-contributioncommentguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutCommentsAfter14Days"]))'>
+                        </div>
+                        <div id="chartStudent"></div>
+                    }
+                    else
+                    {
+                        <div class="empty d-flex flex-column align-items-center position-relative">
+                            <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
+                            <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
+                        </div>
+                    }
                 </div>
-                @if (ViewBag.Contributions[0].Quantity > 0)
-                {
-                    <div id="contributionGuest"
-                        data-contributionguest='@Html.Raw(Json.Serialize(ViewData["Contributions"]))'>
-                    </div>
-                    <div id="contributionWithoutCommentsGuest"
-                        data-contributionwithoutcommentsguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutComments"]))'>
-                    </div>
-                    <div id="contributionCommentGuest"
-                        data-contributioncommentguest='@Html.Raw(Json.Serialize(ViewData["ContributionWithoutCommentsAfter14Days"]))'>
-                    </div>
-                    <div id="chartStudent"></div>
-                }
-                else
-                {
-                    <div class="empty d-flex flex-column align-items-center position-relative">
-                        <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
-                        <p class="position-absolute start-50 translate-middle mt-2" style="top: 85%;">No contribution!</p>
-                    </div>
-                }
             </div>
-        </div>
-    </div><!--end row-->
-
+        </div><!--end row-->
+    </div>
 </main>
 <!--end page main-->
 
