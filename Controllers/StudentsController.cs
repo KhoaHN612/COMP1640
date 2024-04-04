@@ -55,6 +55,7 @@ namespace COMP1640.Controllers
 
             List<TotalContribution> TotalContribution = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsPublished = new List<TotalContribution>();
+            List<TotalContribution> TotalContributionsApproved = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsRejected = new List<TotalContribution>();
             List<TotalContribution> TotalContributionsPending = new List<TotalContribution>();
             List<ContributionWithoutComment> contributions = new List<ContributionWithoutComment>();
@@ -96,6 +97,9 @@ namespace COMP1640.Controllers
                 //Total Contributions Puslished
                 TotalContributionsPublished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
 
+                //Total Contributions Approved
+                TotalContributionsApproved = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsApproved");
+
                 //Total Contributions Rejected
                 TotalContributionsRejected = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsRejected");
 
@@ -104,7 +108,7 @@ namespace COMP1640.Controllers
 
                 //GET ALL CONTRIBUTIONS
                 contributions = await GetComments(currentFacultyId, date.Year, "Contribution");
-
+                Console.WriteLine(contributions[0].Faculty);
                 //GET ALL CONTRIBUTIONS WITHOUT COMMENTS  
                 contributionWithoutComments = await GetComments(currentFacultyId, date.Year, "ContributionWithoutComments");
 
@@ -113,6 +117,7 @@ namespace COMP1640.Controllers
             }
 
             ViewData["TotalContributionsPublished"] = TotalContributionsPublished;
+            ViewData["TotalContributionsApproved"] = TotalContributionsApproved;
             ViewData["TotalContributionsRejected"] = TotalContributionsRejected;
             ViewData["TotalContributionsPending"] = TotalContributionsPending;
             ViewData["TotalContribution"] = TotalContribution;
@@ -129,7 +134,7 @@ namespace COMP1640.Controllers
             var query = from c in _context.Contributions
                         join u in _context.Users on c.UserId equals u.Id
                         select new { Contribution = c, User = u };
-
+            
             if (actions == "ContributionWithoutComments")
             {
                 query = query.Where(c => c.Contribution.Comment == null);
@@ -139,23 +144,25 @@ namespace COMP1640.Controllers
                 query = query.Where(c => c.Contribution.Comment != null);
             }
 
-            List<ContributionWithoutComment> contributions = await query
+            var contributions = await query
                 .Where(c => c.Contribution.SubmissionDate.Year == year
                             && c.Contribution.Status == "Approved"
                             && c.User.FacultyId == facultyID)
-                .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
+                .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date, CurrentFaculty = c.User.Faculty.Name }) // Sửa: Thêm ".Name" để truy cập vào tên khoa
                 .Select(g => new ContributionWithoutComment
                 {
                     Date = g.Key.Date,
                     Year = g.Key.Date.Year,
-                    Quantity = g.Count()
+                    Quantity = g.Count(),
+                    Faculty = g.Key.CurrentFaculty // Sửa: Loại bỏ ".Name", vì đã truy cập vào tên khoa ở phần GroupBy
                 })
                 .OrderBy(c => c.Date)
                 .ToListAsync();
 
-            if (contributions.Count <= 0)
+
+            if (contributions.Count == 0) // Sửa: Thay vì "<= 0", bạn có thể sử dụng "== 0" để kiểm tra xem danh sách contributions có rỗng không
             {
-                contributions.Add(new ContributionWithoutComment{Year = year});
+                contributions.Add(new ContributionWithoutComment{ Year = year });
             }
             
             return contributions;
@@ -172,6 +179,9 @@ namespace COMP1640.Controllers
             {
                 case "TotalContributionsPuslished":
                     query = query.Where(c => c.Contribution.IsPublished == true);
+                    break;
+                case "TotalContributionsApproved":
+                    query = query.Where(c => c.Contribution.Status == "Approved");
                     break;
                 case "TotalContributionsRejected":
                     query = query.Where(c => c.Contribution.Status == "Rejected");
