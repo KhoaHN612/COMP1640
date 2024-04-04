@@ -613,6 +613,46 @@ namespace COMP1640.Controllers
             return contributions;
         }
 
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> SubmitListManager()
+        {
+
+            ViewData["Title"] = "List Submission";
+
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++;
+
+            await _context.SaveChangesAsync();
+
+
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null || currentUser.FacultyId == null)
+            {
+                return NotFound();
+            }
+            var currentFacultyId = currentUser.FacultyId;
+
+            var userIdsInSameFaculty = await _context.Users
+                .Where(u => u.FacultyId == currentFacultyId)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            var contributions = await _context.Contributions
+                .Where(c => userIdsInSameFaculty.Contains(c.UserId))
+                .ToListAsync();
+
+            return View("head_managers/SubmitList", contributions);
+        }
+
         [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> StudentSubmissionCoordinators(int? id)
         {
