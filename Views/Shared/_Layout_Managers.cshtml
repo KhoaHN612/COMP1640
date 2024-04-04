@@ -313,9 +313,14 @@
             var WelcomeMessage = '@TempData["WelcomeMessage"]';
             if (showWelcomeMessage === 'True') {
                 Swal.fire({
+                    position: "bottom-end",
                     title: 'Welcome!',
                     text: WelcomeMessage,
                     type: 'success',
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    backdrop: false,
+                    timer: 1500
                 });
             }
         };

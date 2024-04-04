@@ -484,9 +484,8 @@ namespace COMP1640.Controllers
             else
             {
                 TempData["ErrorMessage"] = "The contribution edit date has passed";
-                return RedirectToAction(nameof(MyAccount));
+                return RedirectToAction("SubmissionDetail", new { id = id });
             }
-
         }
 
 

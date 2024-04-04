@@ -86,6 +86,23 @@
                                     </div>
                                 </header>
                                 <hr>
+                                @{
+                                    var errorMessage = TempData["ErrorMessage"] as string;
+                                }
+
+                                @if (!string.IsNullOrEmpty(errorMessage))
+                                {
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: '@errorMessage',
+                                                icon: 'error',
+                                                confirmButtonText: 'OK'
+                                            });
+                                        });
+                                    </script>
+                                }
                                 <section id="join-to-course" class="center">
                                     <a asp-controller="Students" asp-action="FromEditSubmission" asp-route-id="@Model.ContributionId"
                                         class="btn">Change Submission</a>
@@ -94,8 +111,7 @@
                                 <figure id="course-summary">
                                     <span class="course-summary" id="course-length"><i class="fa fa-book"></i>Magazine
                                         Name</span>
-                                    <span class="course-summary" id="course-time-amount"><i class="fa fa-rocket"
-aria-hidden="true"></i></i>Status: <strong>@Model.Status</strong></span>
+                                    <span class="course-summary" id="course-time-amount"><i class="fa fa-rocket" aria-hidden="true"></i></i>Status: <strong>@Model.Status</strong></span>
                                 </figure><!-- /#course-summary -->
                             </section><!-- /#course-header -->
 
