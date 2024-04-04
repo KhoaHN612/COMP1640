@@ -27,6 +27,23 @@
             <div class="card">
                 <div class="card-body">
                     <div class="p-4 border rounded">
+                        @{
+                            var errorMessage = TempData["ErrorMessage"] as string;
+                        }
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: '@errorMessage',
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    });
+                                });
+                            </script>
+                        }
                         <form asp-controller="Students" asp-action='Create' enctype='multipart/form-data'
                             class="row g-3" onsubmit="return validateForm();">
                             <div class="col-md-6">
@@ -144,6 +161,7 @@
         </div>
     </div>
 </main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function validateCheckbox() {
         var checkbox = document.getElementById('invalidCheck2');
@@ -183,13 +201,5 @@
             submitButton.innerHTML = "Submitting...";
             return true;
         });
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        var errorMessage = "@ViewBag.ErrorMessage";
-        if (errorMessage !== "") {
-            swal("Error!", errorMessage, "error");
-        }
     });
 </script>
