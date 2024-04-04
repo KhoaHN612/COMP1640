@@ -869,6 +869,7 @@ namespace COMP1640.Controllers
             List<Contribution> contributions = _context.Contributions
                                             .Include(c => c.AnnualMagazine)
                                             .Where(c => c.Status == "Approved")
+                                            .Where(c => c.IsPublished == false)
                                             .ToList();
             ViewData["Title"] = "List Student Submission";
             return View("head_managers/student_submission", contributions);
@@ -1049,19 +1050,18 @@ namespace COMP1640.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Publish(int id, bool isPublished)
+        public async Task<IActionResult> Publish(int id)
         {
             var contribution = await _context.Contributions.FindAsync(id);
             if (contribution == null)
             {
                 return NotFound();
             }
-
             try
             {
                 contribution.IsPublished = true;
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var result = await _context.SaveChangesAsync();
+                return RedirectToAction("StudentSubmissionManagers");
             }
             catch (DbUpdateException)
             {
