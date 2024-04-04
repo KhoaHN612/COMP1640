@@ -108,7 +108,7 @@ namespace COMP1640.Controllers
 
                 //GET ALL CONTRIBUTIONS
                 contributions = await GetComments(currentFacultyId, date.Year, "Contribution");
-                Console.WriteLine(contributions[0].Faculty);
+
                 //GET ALL CONTRIBUTIONS WITHOUT COMMENTS  
                 contributionWithoutComments = await GetComments(currentFacultyId, date.Year, "ContributionWithoutComments");
 
@@ -148,21 +148,25 @@ namespace COMP1640.Controllers
                 .Where(c => c.Contribution.SubmissionDate.Year == year
                             && c.Contribution.Status == "Approved"
                             && c.User.FacultyId == facultyID)
-                .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date, CurrentFaculty = c.User.Faculty.Name }) // Sửa: Thêm ".Name" để truy cập vào tên khoa
+                .GroupBy(c => new { Year = c.Contribution.SubmissionDate.Year, CurrentFaculty = c.User.Faculty.Name }) // Sửa: Thêm ".Name" để truy cập vào tên khoa
                 .Select(g => new ContributionWithoutComment
                 {
-                    Date = g.Key.Date,
-                    Year = g.Key.Date.Year,
+                    Year = g.Key.Year,
                     Quantity = g.Count(),
-                    Faculty = g.Key.CurrentFaculty // Sửa: Loại bỏ ".Name", vì đã truy cập vào tên khoa ở phần GroupBy
+                    Faculty = g.Key.CurrentFaculty
                 })
-                .OrderBy(c => c.Date)
                 .ToListAsync();
 
 
             if (contributions.Count == 0) // Sửa: Thay vì "<= 0", bạn có thể sử dụng "== 0" để kiểm tra xem danh sách contributions có rỗng không
             {
                 contributions.Add(new ContributionWithoutComment{ Year = year });
+            }
+
+            //print
+            foreach (var item in contributions)
+            {
+                Console.WriteLine(actions + item.Quantity);
             }
             
             return contributions;
@@ -198,18 +202,16 @@ namespace COMP1640.Controllers
             .Select(g => new TotalContribution
             {
                 Year = g.Key.Year,
-                Month = g.Key.Month,
                 Total = g.Count()
             })
             .OrderBy(c => c.Year)
-            .ThenBy(c => c.Month)
             .ToListAsync();
 
             if (contributions.Count <= 0)
             {
                 contributions.Add(new TotalContribution{Year = year});
             }
-
+            
             return contributions;
         }
 

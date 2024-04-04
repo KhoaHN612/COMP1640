@@ -463,8 +463,6 @@ namespace COMP1640.Controllers
                     })
                     .ToListAsync();
 
-                if (contributions.Count == 0) { contributions.Add(new ContributionWithoutComment { Date = currentDate });}
-
                 contributionWithoutComments = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
                     .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year
@@ -478,6 +476,12 @@ namespace COMP1640.Controllers
                         Quantity = g.Count()
                     })
                     .ToListAsync();
+
+            //contributionWithoutComments print
+            foreach (var item in contributionWithoutComments)
+            {
+                Console.WriteLine("Date: " + item.Date + " Quantity: " + item.Quantity);
+            }
 
 
                 contributionWithoutCommentsAfter14Days = await _context.Contributions
@@ -585,15 +589,13 @@ namespace COMP1640.Controllers
             if (action == "TotalContributionsPuslished" || action == "TotalContributionsApproved" || action == "TotalContributionsRejected" || action == "TotalContributionsPending"){
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
-                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
+                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year})
                     .Select(g => new TotalContribution
                     {
-                        Year = g.Key.Year,
-                        Month = g.Key.Month,
+                        Year = g.Key.Year,  
                         Total = g.Count()
                     })
                     .OrderBy(c => c.Year)
-                    .ThenBy(c => c.Month)
                     .ToListAsync();
             }else{
                 contributions = await query
@@ -602,13 +604,16 @@ namespace COMP1640.Controllers
                     .Select(g => new TotalContribution
                     {
                         Year = g.Key.SubmissionDate.Year,
-                        Month = g.Key.SubmissionDate.Month,
                         Total = g.Count()
                     })
                     .OrderBy(c => c.Year)
-                    .ThenBy(c => c.Month)
                     .ToListAsync();
-            }            
+            }       
+
+            if (contributions.Count == 0)
+            {
+                contributions.Add(new TotalContribution { Year = year, Total = 0 });
+            }
 
             return contributions;
         }
