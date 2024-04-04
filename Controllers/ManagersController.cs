@@ -48,7 +48,7 @@ namespace COMP1640.Controllers
                 .Select(c => c.SubmissionDate.Year)
                 .Distinct()
                 .ToListAsync();
-            
+
             // GET ALL YEARS IN BROWERS
             List<int> YearBrower = await _context.WebAccessLogs
                 .Select(a => a.AccessDate.Year)
@@ -107,7 +107,7 @@ namespace COMP1640.Controllers
 
             if (contributions.Count <= 0)
             {
-                contributions.Add(new ContributionFaculty{SubmissionDate = date});
+                contributions.Add(new ContributionFaculty { SubmissionDate = date });
             }
 
             return contributions;
@@ -146,7 +146,7 @@ namespace COMP1640.Controllers
 
             if (contributions.Count <= 0)
             {
-                contributions.Add(new ContributionDate{Year = year});
+                contributions.Add(new ContributionDate { Year = year });
             }
 
             return contributions;
@@ -194,10 +194,10 @@ namespace COMP1640.Controllers
                 })
                 .OrderByDescending(c => c.TotalContribution)
                 .ToListAsync();
-            
+
             if (contributions.Count <= 0)
             {
-                contributions.Add(new ContributionUser{Year = year});
+                contributions.Add(new ContributionUser { Year = year });
             }
 
             return contributions;
@@ -408,7 +408,7 @@ namespace COMP1640.Controllers
             return Ok();
         }
 
-        [Authorize(Roles="Coordinator")]
+        [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> IndexCoordinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
@@ -436,7 +436,7 @@ namespace COMP1640.Controllers
                 int currentFacultyId = currentUser.FacultyId ?? 0; ;
 
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
-                if(TotalContribution.Count == 0){TotalContribution.Add( new TotalContribution{Year = DateTime.Now.Year });};
+                if (TotalContribution.Count == 0) { TotalContribution.Add(new TotalContribution { Year = DateTime.Now.Year }); };
 
                 //Total Contributions Published
                 TotalContributionsPublished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
@@ -497,7 +497,7 @@ namespace COMP1640.Controllers
                         Date = g.Key.Date,
                         Quantity = g.Count()
                     })
-                    .ToListAsync(); 
+                    .ToListAsync();
 
 
                 //GET CONTRIBUTIONS BY USER
@@ -550,12 +550,12 @@ namespace COMP1640.Controllers
                 })
                 .ToListAsync();
 
-                if (contributions.Count == 0)
-                {
-                    var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == currentFacultyId);
-                    var faculty = facultyName != null ? facultyName.Name : null;
-                    contributions.Add(new ContributionUser { Faculty = faculty, Year = year});
-                }
+            if (contributions.Count == 0)
+            {
+                var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == currentFacultyId);
+                var faculty = facultyName != null ? facultyName.Name : null;
+                contributions.Add(new ContributionUser { Faculty = faculty, Year = year });
+            }
 
             return contributions;
         }
@@ -586,7 +586,8 @@ namespace COMP1640.Controllers
                     break;
             }
 
-            if (action == "TotalContributionsPuslished" || action == "TotalContributionsApproved" || action == "TotalContributionsRejected" || action == "TotalContributionsPending"){
+            if (action == "TotalContributionsPuslished" || action == "TotalContributionsApproved" || action == "TotalContributionsRejected" || action == "TotalContributionsPending")
+            {
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
                     .GroupBy(c => new { c.Contribution.SubmissionDate.Year})
@@ -597,7 +598,9 @@ namespace COMP1640.Controllers
                     })
                     .OrderBy(c => c.Year)
                     .ToListAsync();
-            }else{
+            }
+            else
+            {
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
                     .GroupBy(c => new { c.Contribution.SubmissionDate })
@@ -616,6 +619,46 @@ namespace COMP1640.Controllers
             }
 
             return contributions;
+        }
+
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> SubmitListManager()
+        {
+
+            ViewData["Title"] = "List Submission";
+
+            var pageName = ControllerContext.ActionDescriptor.ActionName;
+            var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
+
+            if (pageVisit == null)
+            {
+                pageVisit = new PageVisit { PageName = pageName };
+                _context.PageVisits.Add(pageVisit);
+            }
+
+            pageVisit.VisitCount++;
+
+            await _context.SaveChangesAsync();
+
+
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null || currentUser.FacultyId == null)
+            {
+                return NotFound();
+            }
+            var currentFacultyId = currentUser.FacultyId;
+
+            var userIdsInSameFaculty = await _context.Users
+                .Where(u => u.FacultyId == currentFacultyId)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            var contributions = await _context.Contributions
+                .Where(c => userIdsInSameFaculty.Contains(c.UserId))
+                .ToListAsync();
+
+            return View("head_managers/SubmitList", contributions);
         }
 
         [Authorize(Roles = "Coordinator")]
@@ -812,8 +855,8 @@ namespace COMP1640.Controllers
             }
 
             if (contributions.Count <= 0)
-            { 
-                contributions.Add(new ContributionDate{Year = year});
+            {
+                contributions.Add(new ContributionDate { Year = year });
             }
 
             return contributions;
@@ -856,7 +899,7 @@ namespace COMP1640.Controllers
 
         //     return Json(students);
         // }
-
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> StudentSubmissionManagers()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -1054,19 +1097,18 @@ namespace COMP1640.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Publish(int id, bool isPublished)
+        public async Task<IActionResult> Publish(int id)
         {
             var contribution = await _context.Contributions.FindAsync(id);
             if (contribution == null)
             {
                 return NotFound();
             }
-
             try
             {
                 contribution.IsPublished = true;
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var result = await _context.SaveChangesAsync();
+                return RedirectToAction("StudentSubmissionManagers");
             }
             catch (DbUpdateException)
             {

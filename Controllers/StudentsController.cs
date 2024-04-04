@@ -509,7 +509,8 @@ namespace COMP1640.Controllers
             if (annualMagazine.SubmissionClosureDate.HasValue &&
             DateOnly.FromDateTime(contribution.SubmissionDate.Date) > annualMagazine.SubmissionClosureDate)
             {
-                return RedirectToAction(nameof(FromCreateSubmissionWithError));
+                TempData["ErrorMessage"] = "The submission deadline has passed. You can no longer submit.";
+                return RedirectToAction("student_submission");
             }
             else
             {

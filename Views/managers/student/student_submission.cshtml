@@ -27,6 +27,23 @@
             <div class="card">
                 <div class="card-body">
                     <div class="p-4 border rounded">
+                        @{
+                            var errorMessage = TempData["ErrorMessage"] as string;
+                        }
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: '@errorMessage',
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    });
+                                });
+                            </script>
+                        }
                         <form asp-controller="Students" asp-action='Create' enctype='multipart/form-data'
                             class="row g-3" onsubmit="return validateForm();">
                             <div class="col-md-6">
@@ -144,6 +161,7 @@
         </div>
     </div>
 </main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function validateCheckbox() {
         var checkbox = document.getElementById('invalidCheck2');
@@ -158,38 +176,49 @@
     var currentDate = new Date().toISOString().slice(0, 10);
     document.getElementById('submissionDate').value = currentDate;
 
-    function validateForm() {
-        var files = document.getElementById('inputGroupFile01').files;
-        var isValid = true;
+        function validateForm() {
+            var files = document.getElementById('inputGroupFile01').files;
+            var isValidDoc = false;
+            var isValidImage = false;
 
-        for (var i = 0; i < files.length; i++) {
-            var extension = files[i].name.split('.').pop().toLowerCase();
-            var acceptedExtensions = ['.docx', '.doc', '.jpg', '.jpeg', '.webp', '.png'];
-            if (!acceptedExtensions.includes('.' + extension)) {
-                isValid = false;
-                $('#errorMessage').text('Invalid file extension: ' + files[i].name);
-                $('#errorModal').modal('show');
-                break;
+            for (var i = 0; i < files.length; i++) {
+                var extension = files[i].name.split('.').pop().toLowerCase();
+                var acceptedExtensions = ['.docx', '.doc', '.jpg', '.jpeg', '.webp', '.png'];
+
+                if (acceptedExtensions.includes('.' + extension)) {
+                    if (['.docx', '.doc'].includes('.' + extension)) {
+                        isValidDoc = true;
+                    }
+                    if (['.jpg', '.jpeg', '.webp', '.png'].includes('.' + extension)) {
+                        isValidImage = true; 
+                    }
+                } else {
+                    $('#errorMessage').text('Invalid file extension: ' + files[i].name);
+                    $('#errorModal').modal('show');
+                    return false;
+                }
             }
-        }
-        return isValid;
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        var form = document.querySelector("form");
-        form.addEventListener("submit", function () {
-            var submitButton = document.getElementById("submitBtn");
-            submitButton.disabled = true;
-            submitButton.innerHTML = "Submitting...";
+            if (!isValidDoc || !isValidImage) {
+                $('#errorMessage').text('Please upload at least one .doc/docx file and one image file.');
+                $('#errorModal').modal('show');
+                return false;
+            }
             return true;
-        });
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        var errorMessage = "@ViewBag.ErrorMessage";
-        if (errorMessage !== "") {
-            swal("Error!", errorMessage, "error");
         }
-    });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.querySelector("form");
+            var submitButton = document.getElementById("submitBtn");
+
+            form.addEventListener("submit", function (event) {
+                submitButton.disabled = true;
+                if (!validateForm()) {
+                    event.preventDefault();
+                }
+            });
+            $('#errorModal').on('hidden.bs.modal', function () {
+                submitButton.disabled = false;
+            });
+        });
+
 </script>

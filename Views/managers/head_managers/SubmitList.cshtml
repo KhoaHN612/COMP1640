@@ -1,0 +1,111 @@
+﻿@model IEnumerable<COMP1640.Models.Contribution>
+@inject Microsoft.AspNetCore.Identity.UserManager<COMP1640.Areas.Identity.Data.COMP1640User> _userManager
+
+@{
+    Layout = "~/Views/Shared/_Layout_Manager_Table.cshtml";
+}
+<!--start content-->
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <div class="breadcrumb-title pe-3">Tables</div>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Managers" asp-action="IndexCoordinators"><i class="bx bx-home-alt"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">List submission</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <hr />
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="example2" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Full Name</th>
+                            <th>Title</th>
+                            <th>Submission Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int index = 1;
+                        }
+                        @foreach (var contributions in Model)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                @{
+                                    string userId = contributions.UserId;
+                                    var user = await _userManager.FindByIdAsync(userId);
+                                    string fullName = user != null ? user.FullName : "Unknown";
+                                }
+                                <td>@fullName</td>
+                                <td class="text-ellipsis">@contributions.Title</td>
+
+                                <td>@contributions.SubmissionDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (contributions.Status == "Pending")
+                                    {
+                                        <span class="badge bg-light-warning text-warning w-100">Pending</span>
+                                    }
+                                    else if (contributions.Status == "Rejected")
+                                    {
+                                        <span class="badge bg-light-danger text-danger w-100">Rejected</span>
+                                    }
+                                    else if (contributions.Status == "Approved")
+                                    {
+                                        <span class="badge bg-light-success text-success w-100">Approved</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                                        <a href="@Url.Action("DownloadContributionFiles", "Managers", new { id = contributions.ContributionId })"
+                                            class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                            title="Download">
+                                            <i class="lni lni-download"></i>
+                                        </a>
+
+                                        <a asp-controller="Managers" asp-action="CoordinatorComment" class="text-warning"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Comment"
+                                            asp-route-id="@contributions.ContributionId">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            index++;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Full Name</th>
+                            <th>Title</th>
+                            <th>Submission Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<style>
+    .text-ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 150px;
+    }
+</style>
+<!--end page main-->
