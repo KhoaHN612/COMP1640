@@ -477,13 +477,6 @@ namespace COMP1640.Controllers
                     })
                     .ToListAsync();
 
-            //contributionWithoutComments print
-            foreach (var item in contributionWithoutComments)
-            {
-                Console.WriteLine("Date: " + item.Date + " Quantity: " + item.Quantity);
-            }
-
-
                 contributionWithoutCommentsAfter14Days = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
                     .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year
@@ -502,9 +495,9 @@ namespace COMP1640.Controllers
 
                 //GET CONTRIBUTIONS BY USER
                 int selectedYearUser = DateTime.Now.Year;
+                Console.WriteLine("TEST: " + selectedYearUser);
 
                 if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
-                Console.WriteLine(year);
                 contributionUser = await GetContributors(currentFacultyId, selectedYearUser);
             }
 
@@ -554,6 +547,7 @@ namespace COMP1640.Controllers
             {
                 var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == currentFacultyId);
                 var faculty = facultyName != null ? facultyName.Name : null;
+
                 contributions.Add(new ContributionUser { Faculty = faculty, Year = year });
             }
 
