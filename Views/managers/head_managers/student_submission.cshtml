@@ -75,7 +75,13 @@
                                         <form asp-controller="Managers" asp-action="publish" method="post">
                                             <input type="hidden" name="id" value="@contribution.ContributionId" />
                                             <input type="hidden" name="isPublished" value="True" />
-                                            <button type="submit" class="btn btn-primary">Publish</button>
+                                            @{
+                                                if (contribution.IsPublished == false)
+                                                {
+                                                    <button type="submit" class="btn btn-primary">Publish</button>
+                                                }
+                                            }
+
                                         </form>
                                     </div>
                                 </td>

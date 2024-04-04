@@ -48,7 +48,7 @@ namespace COMP1640.Controllers
                 .Select(c => c.SubmissionDate.Year)
                 .Distinct()
                 .ToListAsync();
-            
+
             // GET ALL YEARS IN BROWERS
             List<int> YearBrower = await _context.WebAccessLogs
                 .Select(a => a.AccessDate.Year)
@@ -107,7 +107,7 @@ namespace COMP1640.Controllers
 
             if (contributions.Count <= 0)
             {
-                contributions.Add(new ContributionFaculty{SubmissionDate = date});
+                contributions.Add(new ContributionFaculty { SubmissionDate = date });
             }
 
             return contributions;
@@ -146,7 +146,7 @@ namespace COMP1640.Controllers
 
             if (contributions.Count <= 0)
             {
-                contributions.Add(new ContributionDate{Year = year});
+                contributions.Add(new ContributionDate { Year = year });
             }
 
             return contributions;
@@ -194,10 +194,10 @@ namespace COMP1640.Controllers
                 })
                 .OrderByDescending(c => c.TotalContribution)
                 .ToListAsync();
-            
+
             if (contributions.Count <= 0)
             {
-                contributions.Add(new ContributionUser{Year = year});
+                contributions.Add(new ContributionUser { Year = year });
             }
 
             return contributions;
@@ -408,7 +408,7 @@ namespace COMP1640.Controllers
             return Ok();
         }
 
-        [Authorize(Roles="Coordinator")]
+        [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> IndexCoordinators(string task, string year)
         {
             ViewData["Title"] = "Dashboard Coordinators";
@@ -436,7 +436,7 @@ namespace COMP1640.Controllers
                 int currentFacultyId = currentUser.FacultyId ?? 0; ;
 
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
-                if(TotalContribution.Count == 0){TotalContribution.Add( new TotalContribution{Year = DateTime.Now.Year });};
+                if (TotalContribution.Count == 0) { TotalContribution.Add(new TotalContribution { Year = DateTime.Now.Year }); };
 
                 //Total Contributions Published
                 TotalContributionsPublished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
@@ -463,7 +463,7 @@ namespace COMP1640.Controllers
                     })
                     .ToListAsync();
 
-                if (contributions.Count == 0) { contributions.Add(new ContributionWithoutComment { Date = currentDate });}
+                if (contributions.Count == 0) { contributions.Add(new ContributionWithoutComment { Date = currentDate }); }
 
                 contributionWithoutComments = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
@@ -493,7 +493,7 @@ namespace COMP1640.Controllers
                         Date = g.Key.Date,
                         Quantity = g.Count()
                     })
-                    .ToListAsync(); 
+                    .ToListAsync();
 
 
                 //GET CONTRIBUTIONS BY USER
@@ -546,12 +546,12 @@ namespace COMP1640.Controllers
                 })
                 .ToListAsync();
 
-                if (contributions.Count == 0)
-                {
-                    var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == currentFacultyId);
-                    var faculty = facultyName != null ? facultyName.Name : null;
-                    contributions.Add(new ContributionUser { Faculty = faculty, Year = year});
-                }
+            if (contributions.Count == 0)
+            {
+                var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == currentFacultyId);
+                var faculty = facultyName != null ? facultyName.Name : null;
+                contributions.Add(new ContributionUser { Faculty = faculty, Year = year });
+            }
 
             return contributions;
         }
@@ -582,7 +582,8 @@ namespace COMP1640.Controllers
                     break;
             }
 
-            if (action == "TotalContributionsPuslished" || action == "TotalContributionsApproved" || action == "TotalContributionsRejected" || action == "TotalContributionsPending"){
+            if (action == "TotalContributionsPuslished" || action == "TotalContributionsApproved" || action == "TotalContributionsRejected" || action == "TotalContributionsPending")
+            {
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
                     .GroupBy(c => new { c.Contribution.SubmissionDate.Year, c.Contribution.SubmissionDate.Month })
@@ -595,7 +596,9 @@ namespace COMP1640.Controllers
                     .OrderBy(c => c.Year)
                     .ThenBy(c => c.Month)
                     .ToListAsync();
-            }else{
+            }
+            else
+            {
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
                     .GroupBy(c => new { c.Contribution.SubmissionDate })
@@ -608,7 +611,7 @@ namespace COMP1640.Controllers
                     .OrderBy(c => c.Year)
                     .ThenBy(c => c.Month)
                     .ToListAsync();
-            }            
+            }
 
             return contributions;
         }
@@ -847,8 +850,8 @@ namespace COMP1640.Controllers
             }
 
             if (contributions.Count <= 0)
-            { 
-                contributions.Add(new ContributionDate{Year = year});
+            {
+                contributions.Add(new ContributionDate { Year = year });
             }
 
             return contributions;
@@ -891,7 +894,7 @@ namespace COMP1640.Controllers
 
         //     return Json(students);
         // }
-
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> StudentSubmissionManagers()
         {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
@@ -909,7 +912,6 @@ namespace COMP1640.Controllers
             List<Contribution> contributions = _context.Contributions
                                             .Include(c => c.AnnualMagazine)
                                             .Where(c => c.Status == "Approved")
-                                            .Where(c => c.IsPublished == false)
                                             .ToList();
             ViewData["Title"] = "List Student Submission";
             return View("head_managers/student_submission", contributions);
