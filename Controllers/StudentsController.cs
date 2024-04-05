@@ -152,6 +152,7 @@ namespace COMP1640.Controllers
                             || (actions == "ContributionComments" && cm.CommentId != null))
                             && c.Status == "Approved"
                             && u.FacultyId == facultyID
+                            && c.CommentDeadline.Year == year
                      group c by new { Year = c.SubmissionDate.Year, Faculty = f.Name } into g // Group by Year and Faculty name
                      select new ContributionWithoutComment
                      {

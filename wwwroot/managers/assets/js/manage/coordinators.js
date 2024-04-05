@@ -102,9 +102,9 @@ function GetContributionsWithoutComment() {
 		}
 	  }
 	  };
-	  
 	var totalContributionsData = JSON.parse(document.getElementById("TotalContributions").dataset.totalcontributions);
 	if (totalContributionsData[0].quantity > 0) {
+		console.log("test: " + totalContributionsData.length);
 		//sum contributions in totalContributionsData
 		var sum = 0;
 		for (var i = 0; i < totalContributionsData.length; i++) {
