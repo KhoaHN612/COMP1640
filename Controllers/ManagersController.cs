@@ -597,10 +597,11 @@ namespace COMP1640.Controllers
             {
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
-                    .GroupBy(c => new { c.Contribution.SubmissionDate })
+                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year})
                     .Select(g => new TotalContribution
                     {
-                        Year = g.Key.SubmissionDate.Year,
+                        
+                        Year = g.Key.Year,
                         Total = g.Count()
                     })
                     .OrderBy(c => c.Year)
