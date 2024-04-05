@@ -437,7 +437,11 @@ namespace COMP1640.Controllers
 
                 TotalContribution = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributions");
                 if (TotalContribution.Count == 0) { TotalContribution.Add(new TotalContribution { Year = DateTime.Now.Year }); };
-
+                // print TotalContribution
+                for (int i = 0; i < TotalContribution.Count; i++)
+                {
+                    Console.WriteLine("Test" + TotalContribution[i].Total + " " + TotalContribution[i].Year);
+                }
                 //Total Contributions Published
                 TotalContributionsPublished = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPuslished");
 
@@ -449,7 +453,7 @@ namespace COMP1640.Controllers
 
                 //Total Contributions Pending
                 TotalContributionsPending = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPending");
-
+                
 
                 //GET ALL CONTRIBUTIONS
                 contributions = await _context.Contributions
@@ -462,20 +466,20 @@ namespace COMP1640.Controllers
                         Quantity = g.Count()
                     })
                     .ToListAsync();
-
-                contributionWithoutComments = await _context.Contributions
-                    .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
-                    .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year
-                                && c.Contribution.Comment == null
-                                && c.Contribution.Status == "Approved"
-                                && c.User.FacultyId == currentFacultyId)
-                    .GroupBy(c => new { Date = c.Contribution.SubmissionDate.Date })
-                    .Select(g => new ContributionWithoutComment
+                
+                contributionWithoutComments = (from c in _context.Contributions
+                    join u in _context.Users on c.UserId equals u.Id
+                    join cm in _context.Comments on c.ContributionId equals cm.ContributionId into cmGroup
+                    from cm in cmGroup.DefaultIfEmpty()
+                    where cm.CommentId == null
+                            && c.Status == "Approved"
+                            && u.FacultyId == 2
+                    group c by c.SubmissionDate.Year into g
+                    select new ContributionWithoutComment
                     {
-                        Date = g.Key.Date,
+                        Year = g.Key,
                         Quantity = g.Count()
-                    })
-                    .ToListAsync();
+                    }).ToList();
 
                 contributionWithoutCommentsAfter14Days = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
@@ -584,10 +588,10 @@ namespace COMP1640.Controllers
             {
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
-                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year})
+                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year })
                     .Select(g => new TotalContribution
                     {
-                        Year = g.Key.Year,  
+                        Year = g.Key.Year,
                         Total = g.Count()
                     })
                     .OrderBy(c => c.Year)
@@ -597,16 +601,15 @@ namespace COMP1640.Controllers
             {
                 contributions = await query
                     .Where(uc => uc.User.FacultyId == facultyID)
-                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year})
+                    .GroupBy(c => new { c.Contribution.SubmissionDate.Year })
                     .Select(g => new TotalContribution
                     {
-                        
                         Year = g.Key.Year,
                         Total = g.Count()
                     })
                     .OrderBy(c => c.Year)
                     .ToListAsync();
-            }       
+            }
 
             if (contributions.Count == 0)
             {
