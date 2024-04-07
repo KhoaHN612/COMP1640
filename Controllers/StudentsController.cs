@@ -489,7 +489,7 @@ namespace COMP1640.Controllers
         }
 
 
-        [HttpPost]
+                [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(int AnnualMagazineId, [Bind("Title")] Contribution contribution, FileDetail fileDetails)
         {
@@ -512,11 +512,20 @@ namespace COMP1640.Controllers
             }
             else
             {
+                maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
+                contribution.AnnualMagazineId = AnnualMagazineId;
+                contribution.Comment = null;
+                contribution.Status = "Pending";
+                contribution.UserId = userId ?? "Unknown";
+                var contributionDate = contribution.SubmissionDate.Date; ;
+                contribution.CommentDeadline = contributionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
+                _context.Add(contribution);
                 int index = 0;
                 foreach (var file in fileDetails.ContributionFile)
                 {
+                    var newFileDetails = new FileDetail();
                     var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                    fileDetails.FileId = maxId + 1;
+                    newFileDetails.FileId = maxId + 1;
                     maxId++;
 
 
@@ -534,26 +543,16 @@ namespace COMP1640.Controllers
                     {
                         await file.CopyToAsync(fileStream);
                     }
-                    fileDetails.FilePath = uniqueFileName;
+                    newFileDetails.FilePath = uniqueFileName;
 
                     var documentExtensions = new List<string> { ".doc", ".docx" };
                     var imageExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
-                    fileDetails.Type = documentExtensions.Any(e => e == fileExtension) ? "Document" :
+                    newFileDetails.Type = documentExtensions.Any(e => e == fileExtension) ? "Document" :
                        imageExtensions.Any(e => e == fileExtension) ? "Image" : "Unknown";
 
-                    fileDetails.ContributionId = contribution.ContributionId;
-                    _context.Add(fileDetails);
-                    await _context.SaveChangesAsync();
+                    newFileDetails.ContributionId = contribution.ContributionId;
+                    _context.Add(newFileDetails);
                 }
-                maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-                contribution.AnnualMagazineId = AnnualMagazineId;
-                contribution.Comment = null;
-                contribution.Status = "Pending";
-                contribution.UserId = userId ?? "Unknown";
-
-                var contributionDate = contribution.SubmissionDate.Date; ;
-                contribution.CommentDeadline = contributionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
-                _context.Add(contribution);
                 var result = await _context.SaveChangesAsync();
                 await SendNotificationEmails(AnnualMagazineId, contribution);
                 return RedirectToAction(nameof(MyAccount));
