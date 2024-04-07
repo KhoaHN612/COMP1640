@@ -15,9 +15,24 @@ function GetContributionsWithoutComment() {
 		contributionsOver14DaysData[0] = { quantity: 0 };
 	}
 
+	var data = [];
+	var withoutcomment = 0;
+	var after14days = 0;
+
+	for (var i = 0; i < contributionsData.length; i++) {
+		withoutcomment += contributionsData[i].quantity;
+	}
+
+	for (var i = 0; i < contributionsOver14DaysData.length; i++) {
+		after14days += contributionsOver14DaysData[i].quantity;
+	}
+
+	data.push(withoutcomment);
+	data.push(after14days);
+
 	var options = {
 		series: [{
-		data: [contributionsData[0].quantity, contributionsOver14DaysData[0].quantity],
+		data: data,
 		name: 'Quantity',
 	  }],
 		chart: {
@@ -87,10 +102,15 @@ function GetContributionsWithoutComment() {
 		}
 	  }
 	  };
-	  
 	var totalContributionsData = JSON.parse(document.getElementById("TotalContributions").dataset.totalcontributions);
 	if (totalContributionsData[0].quantity > 0) {
-		document.getElementById("withoutCOmmentCount").innerHTML = totalContributionsData[0].quantity + " articles";
+		console.log("test: " + totalContributionsData.length);
+		//sum contributions in totalContributionsData
+		var sum = 0;
+		for (var i = 0; i < totalContributionsData.length; i++) {
+			sum += totalContributionsData[i].quantity;
+		}
+		document.getElementById("withoutCOmmentCount").innerHTML = sum + " articles";
 	}	  
 
 	var chart = new ApexCharts(document.querySelector("#chartCoordinators1"), options);

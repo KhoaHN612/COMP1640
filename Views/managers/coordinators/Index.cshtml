@@ -26,11 +26,11 @@
                     </div>
                     @if(ViewBag.TotalContribution[0].Total > 0){
                         <div id="chartContributions"></div>
-                        <div id="ContributionsTotalData" data-total= "@ViewBag.TotalContribution.Count"></div>
-                        <div id="ContributionsApprovedData" data-approved= "@ViewBag.TotalContributionsApproved.Count"></div>
-                        <div id="ContributionsPublishedData" data-published= "@ViewBag.TotalContributionsPublished.Count"></div>
-                        <div id="ContributionsRejectedData" data-rejected= "@ViewBag.TotalContributionsRejected.Count"></div>
-                        <div id="ContributionsPendingData" data-pending= "@ViewBag.TotalContributionsPending.Count"></div>
+                        <div id="ContributionsTotalData" data-total= "@ViewBag.TotalContribution[0].Total"></div>
+                        <div id="ContributionsApprovedData" data-approved= "@ViewBag.TotalContributionsApproved[0].Total"></div>
+                        <div id="ContributionsPublishedData" data-published= "@ViewBag.TotalContributionsPublished[0].Total"></div>
+                        <div id="ContributionsRejectedData" data-rejected= "@ViewBag.TotalContributionsRejected[0].Total"></div>
+                        <div id="ContributionsPendingData" data-pending= "@ViewBag.TotalContributionsPending[0].Total"></div>
                     }else{
                         <div class="empty d-flex flex-column align-items-center position-relative">
                             <img src="/.././gif/empty.gif" class="img-fluid w-50" alt="browser" />
@@ -46,7 +46,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                         <div>
-                            <h5 class="mb-0">Contribution without Comment in @ViewBag.Contributions[0].Date.Year</h5>
+                            <h5 class="mb-0">Contribution without Comment in @ViewBag.Contributions[0].Year</h5>
                             <h6 id="withoutCOmmentCount">0 article</h4>
                         </div>
                     </div>   
@@ -116,7 +116,7 @@
                                         @foreach (var item in ViewBag.ContributionUser)
                                         {
                                             <tr>
-                                                <td>@i</td>
+                                                <td>@item.Year</td>
                                                 <td>@item.FullName</td>
                                                 <td class="totalContributionCell">@item.TotalContribution</td>
                                                 <td>@item.TotalAccept</td>
