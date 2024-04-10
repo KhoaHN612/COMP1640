@@ -493,7 +493,10 @@ namespace COMP1640.Controllers
                         Year = g.Key,
                         Quantity = g.Count()
                     }).ToList();
-;
+                if(contributions.Count == 0)
+                {
+                    contributions.Add(new ContributionWithoutComment { Year = currentDate.Year });
+                }
                 
                 //GET CONTRIBUTIONS BY USER
                 int selectedYearUser = DateTime.Now.Year;
