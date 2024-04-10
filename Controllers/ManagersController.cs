@@ -454,9 +454,10 @@ namespace COMP1640.Controllers
                     join cm in _context.Comments on c.ContributionId equals cm.ContributionId into cmGroup
                     from cm in cmGroup.DefaultIfEmpty()
                     where cm.CommentId == null
-                            && DateTime.Now < c.CommentDeadline
+                            && DateTime.Now <= c.CommentDeadline
                             && c.Status == "Approved"
-                            && u.FacultyId == 2
+                            && u.FacultyId == currentFacultyId
+                            && c.SubmissionDate.Year == DateTime.Now.Year
                     group c by c.SubmissionDate.Year into g
                     select new ContributionWithoutComment
                     {
@@ -471,7 +472,8 @@ namespace COMP1640.Controllers
                     where cm.CommentId == null
                             && DateTime.Now > c.CommentDeadline
                             && c.Status == "Approved"
-                            && u.FacultyId == 2
+                            && u.FacultyId == currentFacultyId
+                            && c.SubmissionDate.Year == DateTime.Now.Year
                     group c by c.SubmissionDate.Year into g
                     select new ContributionWithoutComment
                     {
@@ -486,14 +488,18 @@ namespace COMP1640.Controllers
                     from cm in cmGroup.DefaultIfEmpty()
                     where cm.CommentId == null
                             && c.Status == "Approved"
-                            && u.FacultyId == 2
+                            && u.FacultyId == currentFacultyId
+                            && c.SubmissionDate.Year == DateTime.Now.Year
                     group c by c.SubmissionDate.Year into g
                     select new ContributionWithoutComment
                     {
                         Year = g.Key,
                         Quantity = g.Count()
                     }).ToList();
-;
+;               if(contributions.Count == 0)
+                {
+                    contributions.Add(new ContributionWithoutComment { Year = currentDate.Year });
+                }
                 
                 //GET CONTRIBUTIONS BY USER
                 int selectedYearUser = DateTime.Now.Year;
