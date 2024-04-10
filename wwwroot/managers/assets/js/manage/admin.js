@@ -1,9 +1,10 @@
 //onload
 document.addEventListener('DOMContentLoaded', function () {
-    GetPageVisitData("desc");
-    GetContributionByFaculty();
-    GetBrowserByYear(new Date().getFullYear());
-    GetTotalContribution();
+	GetPageVisitData("desc");
+	GetContributionByFaculty();
+	GetBrowserByYear(new Date().getFullYear());
+	GetTotalContribution();
+	GetTotalContributors();
 });
 
 function GetGifEmpty(size) {
@@ -25,7 +26,7 @@ function GetPageVisitData(action) {
 		document.getElementById("sort-by").innerHTML = '<i class="bi bi-sort-up" onclick="GetPageVisitData(\'asc\')"></i>';
 		document.getElementById("chartPageVisit").innerHTML = "";
 
-	} else {	
+	} else {
 		document.getElementById("sort-by").innerHTML = '<i class="bi bi-sort-down" onclick="GetPageVisitData(\'desc\')"></i>';
 		document.getElementById("chartPageVisit").innerHTML = "";
 	}
@@ -40,7 +41,7 @@ function GetPageVisitData(action) {
 	})
 		.then(response => response.json())
 		.then(data => {
-			
+
 			if (data.length > 0) {
 				//Get data from server
 				var arrData = [];
@@ -130,15 +131,16 @@ function GetContributionByFaculty() {
 			//Lấy phần tử đầu tiên hiển thị phần trăm và tên faculty
 			document.getElementById('falcuty').innerText = arrDataChart6[0][0];
 			document.getElementById('percent').innerText = lstPercent[0] + '%';
-			
+
+
 			var chart = new Chart(document.getElementById('chart6'), {
 				type: 'doughnut',
 				data: {
 					labels: arrDataChart6[0],
 					datasets: [{
-						label: "Device Users",
 						backgroundColor: backgroundColors,
-						data: arrDataChart6[1]
+						data: arrDataChart6[1],
+						unit: 'articles'
 					}]
 				},
 				options: {
@@ -151,8 +153,7 @@ function GetContributionByFaculty() {
 					},
 					onHover: function (event, chartElement) {
 						if (chartElement.length > 0) {
-							var index = chartElement[0]._index; // Lấy chỉ mục của phần tử được nhấp
-							//check index in lstLabels after that display percent at this index
+							var index = chartElement[0]._index;
 							document.getElementById('falcuty').innerText = arrDataChart6[0][index];
 							document.getElementById('percent').innerText = lstPercent[index] + '%';
 						}
@@ -163,8 +164,8 @@ function GetContributionByFaculty() {
 			});
 
 			// Display chart 
-			chart.render();	
-		}else{
+			chart.render();
+		} else {
 			document.getElementById('PieChartPercent').innerHTML = GetGifEmpty(75);
 		}
 	}
@@ -232,7 +233,7 @@ function GetBrowserByYear(year) {
 }
 
 function GetTotalContribution() {
-    var contributionItems = document.querySelectorAll('.contribution-item');
+	var contributionItems = document.querySelectorAll('.contribution-item');
 	if (contributionItems[0].getAttribute('data-month') != 0) {
 		var arrLabel = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -360,11 +361,109 @@ function GetTotalContribution() {
 
 		var chart = new ApexCharts(document.querySelector("#chart5"), options);
 		chart.render();
-	}else{
+	} else {
 		document.getElementById('chart5').innerHTML = GetGifEmpty(50);
 	}
 
 	document.getElementById("totalContributors").textContent = document.querySelectorAll('.countContributors').length + " contributors";
+}
+
+
+function GetTotalContributors() {
+	//Retrieve the data from the HTML data attribute
+	var contributorsDataElement = document.getElementById("contributors");
+	if (contributorsDataElement) {
+		var contributorsData = JSON.parse(contributorsDataElement.dataset.contributors);
+		if (contributorsData[0].totalContribution > 0) {
+			var faculties = [];
+			var totalContributors = [];
+			var sum = 0;
+			// Get data
+			for (var i = 0; i < contributorsData.length; i++) {
+				//check trùng faculty
+				if (faculties.indexOf(contributorsData[i].faculty) == -1) {
+					faculties.push(contributorsData[i].faculty);
+					totalContributors.push(contributorsData[i].totalContribution + ' contributors');
+					sum += contributorsData[i].totalContribution;
+				}
+			}
+			console.log(totalContributors);
+			//set color for each faculty
+			var backgroundColors = [];
+			for (var i = 0; i < faculties.length; i++) {
+				backgroundColors.push(getRandomColor());
+			}
+			
+			var options = {
+				series: [{
+				data: totalContributors
+			  }],
+				chart: {
+				type: 'bar',
+				height: 380
+			  },
+			  plotOptions: {
+				bar: {
+				  barHeight: '100%',
+				  distributed: true,
+				  horizontal: true,
+				  dataLabels: {
+					position: 'bottom'
+				  },
+				}
+			  },
+			  colors: backgroundColors,
+			  dataLabels: {
+				enabled: true,
+				textAnchor: 'start',
+				style: {
+				  colors: ['#fff']
+				},
+				formatter: function (val, opt) {
+				  return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+				},
+				offsetX: 0,
+				dropShadow: {
+				  enabled: true
+				}
+			  },
+			  stroke: {
+				width: 1,
+				colors: ['#fff']
+			  },
+			  xaxis: {
+				categories: faculties,
+			  },
+			  yaxis: {
+				labels: {
+				  show: false
+				}
+			  },
+			  title: {
+				  text: 'The number of contributors per faculty in the year ' + contributorsData[0].year,
+				  align: 'center',
+			  },
+			  tooltip: {
+				theme: 'dark',
+				x: {
+				  show: false
+				},
+				y: {
+				  title: {
+					formatter: function () {
+					  return ''
+					}
+				  }
+				}
+			  }
+			  };
+	  
+			  var chart = new ApexCharts(document.querySelector("#chartContributors"), options);
+			  chart.render();
+
+			document.getElementById("totalContributors").innerHTML = sum + " contributors";
+		}
+	}
 }
 
 //Random Colors without duplicates
@@ -405,3 +504,4 @@ function GetContributionByYear(year) {
 	//redirect to url
 	window.location.href = url;
 }
+

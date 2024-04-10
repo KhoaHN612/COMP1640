@@ -59,21 +59,28 @@ namespace COMP1640.Controllers
             int selectedYear = DateTime.Now.Year;
 
             if (task == "ContributionYear" && !string.IsNullOrEmpty(year)) { selectedYear = Convert.ToInt32(year); }
-            List<ContributionDate> ContributionByYear = await GetContributionByYear(selectedYear);
+            List<ContributionDate> contributionByYear = await GetContributionByYear(selectedYear);
 
             //GET CONTRIBUTIONS BY USER
             int selectedYearUser = DateTime.Now.Year;
 
             if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
-            List<ContributionUser> ContributionUser = await GetContributionByUser(selectedYearUser);
+            List<ContributionUser> contributiors = await GetContributionByUser(selectedYearUser);
 
+            Console.WriteLine("============ContributionUser============");
+            //print contributiors
+            foreach (var contributior in contributiors)
+            {
+                Console.WriteLine("Id: " + contributior.Id + " FullName: " + contributior.FullName + " Faculty: " + contributior.Faculty + " TotalContribution: " + contributior.TotalContribution + " TotalAccept: " + contributior.TotalAccept + " TotalReject: " + contributior.TotalReject + " TotalPending: " + contributior.TotalPending + " Year: " + contributior.Year);
+            }
+            
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
             ViewData["Years"] = years;
             ViewData["YearBrower"] = YearBrower;
             ViewData["ContributionFaculty"] = contributionFaculty;
-            ViewData["ContributionByYear"] = ContributionByYear;
-            ViewData["ContributionUser"] = ContributionUser;
+            ViewData["ContributionByYear"] = contributionByYear;
+            ViewData["Contributiors"] = contributiors;
             ViewData["RoleStatistics"] = roleStatistics;
 
             return View("admins/index");
@@ -177,23 +184,22 @@ namespace COMP1640.Controllers
             */
 
             List<ContributionUser> contributions = await _context.Users
-                .Join(_context.Faculties, u => u.FacultyId, f => f.FacultyId, (u, f) => new { User = u, Faculty = f })
-                .Join(_context.Contributions, uf => uf.User.Id, c => c.UserId, (uf, c) => new { UserFaculty = uf, Contributions = c })
-                .Where(uc => uc.Contributions.SubmissionDate.Year == year)
-                .GroupBy(uc => new { uc.UserFaculty.User.Id, uc.UserFaculty.User.FullName, uc.UserFaculty.Faculty.Name })
+                .Join(_context.Faculties,
+                    u => u.FacultyId,
+                    f => f.FacultyId,
+                    (u, f) => new { User = u, Faculty = f })
+                .Join(_context.Contributions,
+                    uf => uf.User.Id,
+                    c => c.UserId,
+                    (uf, c) => new { UserFaculty = uf, Contribution = c })
+                .Where(uc => uc.Contribution.SubmissionDate.Year == year)
+                .GroupBy(uc => new { uc.UserFaculty.Faculty.FacultyId, uc.UserFaculty.Faculty.Name })
                 .Select(g => new ContributionUser
                 {
-                    Id = g.Key.Id,
-                    FullName = g.Key.FullName,
                     Faculty = g.Key.Name,
-                    TotalContribution = g.Count(),
-                    TotalAccept = g.Where(c => c.Contributions.Status == "Approved").Count(),
-                    TotalReject = g.Where(c => c.Contributions.Status == "Rejected").Count(),
-                    TotalPending = g.Where(c => c.Contributions.Status == "Pending").Count(),
+                    TotalContribution = g.Select(x => x.UserFaculty.User.Id).Distinct().Count(),
                     Year = year
-                })
-                .OrderByDescending(c => c.TotalContribution)
-                .ToListAsync();
+                }).ToListAsync();
 
             if (contributions.Count <= 0)
             {
@@ -454,9 +460,10 @@ namespace COMP1640.Controllers
                     join cm in _context.Comments on c.ContributionId equals cm.ContributionId into cmGroup
                     from cm in cmGroup.DefaultIfEmpty()
                     where cm.CommentId == null
-                            && DateTime.Now < c.CommentDeadline
+                            && DateTime.Now <= c.CommentDeadline
                             && c.Status == "Approved"
-                            && u.FacultyId == 2
+                            && u.FacultyId == currentFacultyId
+                            && c.SubmissionDate.Year == DateTime.Now.Year
                     group c by c.SubmissionDate.Year into g
                     select new ContributionWithoutComment
                     {
@@ -471,7 +478,8 @@ namespace COMP1640.Controllers
                     where cm.CommentId == null
                             && DateTime.Now > c.CommentDeadline
                             && c.Status == "Approved"
-                            && u.FacultyId == 2
+                            && u.FacultyId == currentFacultyId
+                            && c.SubmissionDate.Year == DateTime.Now.Year
                     group c by c.SubmissionDate.Year into g
                     select new ContributionWithoutComment
                     {
@@ -486,7 +494,8 @@ namespace COMP1640.Controllers
                     from cm in cmGroup.DefaultIfEmpty()
                     where cm.CommentId == null
                             && c.Status == "Approved"
-                            && u.FacultyId == 2
+                            && u.FacultyId == currentFacultyId
+                            && c.SubmissionDate.Year == DateTime.Now.Year
                     group c by c.SubmissionDate.Year into g
                     select new ContributionWithoutComment
                     {
