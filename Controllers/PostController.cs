@@ -71,7 +71,7 @@ namespace COMP1640.Controllers
         }
 
         public async Task<IActionResult> PostList()
-        {   
+        {
             var pageName = ControllerContext.ActionDescriptor.ActionName;
             var pageVisit = await _context.PageVisits.FirstOrDefaultAsync(p => p.PageName == pageName);
 
@@ -81,7 +81,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
             var userFullName = await GetUserFullName();
@@ -138,6 +138,13 @@ namespace COMP1640.Controllers
             {
                 post.ImageFile = imageFile;
                 string uniqueFileName = GetUniqueFileName(post.ImageFile.FileName);
+                string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "postUpload");
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
                 string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "postUpload", uniqueFileName);
                 using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
                 {
