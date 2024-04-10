@@ -13,7 +13,9 @@ public partial class FileDetail
     public int FileId { get; set; }
 
     [Column("contributionId")]
-    public int? ContributionId { get; set; }
+    public int ContributionId { get; set; }
+
+    public Contribution? Contribution {get; set;}
 
     [Column("type")]
     [StringLength(10)]
