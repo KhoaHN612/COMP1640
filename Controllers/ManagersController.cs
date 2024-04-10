@@ -275,18 +275,17 @@ namespace COMP1640.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateFaculty(Faculty faculty)
+        public IActionResult CreateFaculty(string name, string deanName, string description, Faculty faculty)
         {
-            if (ModelState.IsValid)
-            {
                 int? maxFacultyId = _context.Faculties.Max(f => (int?)f.FacultyId);
                 int newFacultyId = (maxFacultyId ?? 0) + 1;
                 faculty.FacultyId = newFacultyId;
+                faculty.Name = name;
+                faculty.Description = description;
+                faculty.DeanName = deanName;
                 _context.Faculties.Add(faculty);
                 _context.SaveChanges();
                 return RedirectToAction("TableFaculty");
-            }
-            return View("admins/form_create_faculty", faculty);
         }
         [HttpPost]
         public IActionResult UpdateFaculty(Faculty faculty)
@@ -305,19 +304,6 @@ namespace COMP1640.Controllers
             }
             return View("admins/form_create_faculty", faculty);
         }
-
-        // [HttpDelete]
-        // public IActionResult DeleteFaculty(int id)
-        // {
-        //     var facultyToDelete = _context.Faculties.Find(id);
-        //     if (facultyToDelete != null)
-        //     {
-        //         _context.Faculties.Remove(facultyToDelete);
-        //         _context.SaveChanges();
-        //     }
-
-        //     return RedirectToAction("TableFaculty");
-        // }
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TableSubmissionDate()
         {
