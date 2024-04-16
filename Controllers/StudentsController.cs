@@ -537,7 +537,9 @@ namespace COMP1640.Controllers
                 contribution.Comment = null;
                 contribution.Status = "Pending";
                 contribution.UserId = userId ?? "Unknown";
-                contribution.CommentDeadline = contribution.SubmissionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                var contributionDate = contribution.SubmissionDate.Date; ;
+                contribution.CommentDeadline = contributionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
                 _context.Add(contribution);
                 var result = await _context.SaveChangesAsync();
                 await SendNotificationEmails(AnnualMagazineId, contribution);
@@ -635,7 +637,7 @@ namespace COMP1640.Controllers
             pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
-            var userToUpdate = await _context.FindAsync<COMP1640User>(user.Id);
+            var userToUpdate = await _userManager.FindByIdAsync(user.Id);
             var profileImageFile = ProfileImageFile;
             if (user.ProfileImageFile == null)
             {
@@ -745,8 +747,9 @@ namespace COMP1640.Controllers
             var userFaculty = facultyName != null ? facultyName.Name : null;
             var userEmail = user.Email;
             var userProfileImagePath = user.ProfileImagePath;
-
-            ViewBag.Deadline = contribution.CommentDeadline;
+            bool isCommentDeadlineOver = contribution.CommentDeadline < DateTime.Now;
+            
+            ViewBag.isCommentDeadlineOver = isCommentDeadlineOver;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
