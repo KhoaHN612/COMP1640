@@ -441,6 +441,8 @@ namespace COMP1640.Controllers
                     })
                     .ToListAsync();
 
+                if (contributions.Count == 0) { contributions.Add(new ContributionWithoutComment { Date = currentDate });}
+
                 contributionWithoutComments = await _context.Contributions
                     .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { Contribution = c, User = u })
                     .Where(c => c.Contribution.SubmissionDate.Year == DateTime.Now.Year
@@ -469,7 +471,7 @@ namespace COMP1640.Controllers
                         Date = g.Key.Date,
                         Quantity = g.Count()
                     })
-                    .ToListAsync();
+                    .ToListAsync(); 
 
 
                 //GET CONTRIBUTIONS BY USER
@@ -477,6 +479,7 @@ namespace COMP1640.Controllers
 
                 if (task == "ContributionUser" && !string.IsNullOrEmpty(year)) { selectedYearUser = Convert.ToInt32(year); }
                 contributionUser = await GetContributors(currentFacultyId, selectedYearUser);
+                Console.WriteLine("contributionUser Faculty: " + contributionUser[0].Faculty);
 
             }
 
@@ -519,6 +522,14 @@ namespace COMP1640.Controllers
                     Year = year
                 })
                 .ToListAsync();
+
+                if (contributions.Count == 0)
+                {
+                    //Get Faculty Name
+                    var facultyName = await _context.Faculties.FirstOrDefaultAsync(f => f.FacultyId == currentFacultyId);
+                    var faculty = facultyName != null ? facultyName.Name : null;
+                    contributions.Add(new ContributionUser { Faculty = faculty});
+                }
 
             return contributions;
         }
@@ -695,7 +706,6 @@ namespace COMP1640.Controllers
             int selectedYearApproved = DateTime.Now.Year;
             int selectedYearRejected = DateTime.Now.Year;
             int selectedYearPending = DateTime.Now.Year;
-
             List<ContributionDate> approvedResults = new List<ContributionDate>();
             List<ContributionDate> rejectedResults = new List<ContributionDate>();
             List<ContributionDate> pendingResults = new List<ContributionDate>();
