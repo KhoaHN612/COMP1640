@@ -137,8 +137,9 @@ aria-hidden="true"></i></i>Status: <strong>@Model.Status</strong></span>
                                         @if(User.IsInRole("Student")){
                                         <div class="border p-3 rounded">
                                             <hr />
-                                            <form class="row g-3" asp-action="UpdateComment" method="post">
-<input type="hidden" asp-for="ContributionId" />
+                                            @if (!ViewBag.isCommentDeadlineOver){
+                                                <form class="row g-3" asp-action="UpdateComment" method="post">
+                                                <input type="hidden" asp-for="ContributionId" />
                                                 <div class="form-group"> 
                                                     <label class="form-label">Comment</label>
                                                     <div>
@@ -151,7 +152,6 @@ aria-hidden="true"></i></i>Status: <strong>@Model.Status</strong></span>
                                                         <button type="submit" class="btn btn-primary">Send</button>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-12 mt-3">
                                                     <div class="alert alert-warning" role="alert">
                                                         The deadline to comment on this contribution is <strong>
@@ -162,6 +162,13 @@ aria-hidden="true"></i></i>Status: <strong>@Model.Status</strong></span>
                                                 </div>
                                                 <input type="hidden" id="userId" name="id" value="@UserManager.GetUserId(User)">
                                             </form>
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-warning" role="alert">
+        The deadline to comment on this contribution has passed.
+    </div>
+                                            }
                                         </div>
                                         }
                                     </div>

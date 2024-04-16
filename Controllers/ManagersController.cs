@@ -31,7 +31,7 @@ namespace COMP1640.Controllers
             _emailSender = EmailSender;
         }
 
-        
+
         public async Task<IActionResult> Index(string task, string year)
         {
             ViewData["Title"] = "Dashboard";
@@ -64,7 +64,7 @@ namespace COMP1640.Controllers
 
             //GET ROLE STATISTICS
             List<RoleStatistics> roleStatistics = await GetRoleStatistics();
-           
+
             if (ContributionByYear.Count == 0) { ContributionByYear.Add(new ContributionDate { Year = selectedYear }); }
             if (contributionFaculty.Count == 0) { contributionFaculty.Add(new ContributionFaculty { SubmissionDate = currentDate }); }
 
@@ -180,7 +180,7 @@ namespace COMP1640.Controllers
                     TotalPending = g.Where(c => c.Contributions.Status == "Pending").Count(),
                     Year = year
                 })
-                .OrderByDescending(c => c.TotalContribution) 
+                .OrderByDescending(c => c.TotalContribution)
                 .ToListAsync();
 
             return contributions;
@@ -228,7 +228,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
             List<Faculty> faculty = _context.Faculties.OrderBy(f => f.FacultyId).ToList();
@@ -307,7 +307,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
             List<AnnualMagazine> annualMagazine = _context.AnnualMagazines.OrderBy(f => f.AnnualMagazineId).ToList();
@@ -576,7 +576,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
 
@@ -622,10 +622,10 @@ namespace COMP1640.Controllers
             var userProfileImagePath = user.ProfileImagePath;
 
             var commentDeadline = contribution.CommentDeadline;
-                // Lấy thông tin của user tạo contribution
             var contributionUser = await _userManager.FindByIdAsync(contribution.UserId);
             var contributionUserFullName = contributionUser.FullName;
-
+            bool isCommentDeadlineOver = contribution.CommentDeadline < DateTime.Now;
+            ViewBag.isCommentDeadlineOver = isCommentDeadlineOver;
             ViewBag.userEmail = userEmail;
             ViewBag.contributions = contributions;
             ViewBag.userFaculty = userFaculty;
@@ -716,7 +716,7 @@ namespace COMP1640.Controllers
             {
                 year = DateTime.Now.Year.ToString();
             }
-            
+
             if (allResults.Count == 0) { allResults.Add(new ContributionDate { Year = int.Parse(year) }); }
             if (approvedResults.Count == 0) { approvedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
             if (rejectedResults.Count == 0) { rejectedResults.Add(new ContributionDate { Year = Convert.ToInt32(year) }); }
@@ -843,7 +843,7 @@ namespace COMP1640.Controllers
                 _context.PageVisits.Add(pageVisit);
             }
 
-            pageVisit.VisitCount++; 
+            pageVisit.VisitCount++;
 
             await _context.SaveChangesAsync();
             List<Contribution> contributions = _context.Contributions
