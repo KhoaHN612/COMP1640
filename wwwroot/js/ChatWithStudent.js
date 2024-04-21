@@ -50,7 +50,7 @@ connection.on("ReceiveMessageFrom", function (CchatId, CsenderId, Cmessage) {
         let className = isCurrentUserMessage ? "right-chat" : "left-chat";
 
         let html = `
-        <div class="col-md-12 chat-main chat-sidebar right-chat">
+        <div class="col-md-12 chat-main chat-sidebar ${className}">
             <div id="chat-messages">
                 <ul class="discussion-list">
                     <li class="author-block ${className}">
