@@ -48,7 +48,7 @@ namespace COMP1640.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             return user?.FullName; // This will return null if user is null.
         }
-         [Authorize(Roles = "Guest")]
+        [Authorize(Roles = "Guest")]
         public async Task<IActionResult> IndexGuest(string task, string year)
         {
             ViewData["Title"] = "Dashboard Guest";
@@ -107,7 +107,19 @@ namespace COMP1640.Controllers
                 TotalContributionsPending = await GetTotalContributions(currentFacultyId, currentDate.Year, "TotalContributionsPending");
 
                 //GET ALL CONTRIBUTIONS
-                contributions = await GetComments(currentFacultyId, date.Year, "Contribution");
+                contributions = await _context.Contributions
+                    .Where(c => c.SubmissionDate.Year == date.Year)
+                    .Join(_context.Users, c => c.UserId, u => u.Id, (c, u) => new { c, u })
+                    .Where(cu => cu.u.FacultyId == currentFacultyId && cu.c.Status == "Approved")
+                    .GroupBy(c => new { c.c.SubmissionDate.Year })
+                    .Select(g => new ContributionWithoutComment
+                    {
+                        Year = g.Key.Year,
+                        Quantity = g.Count()
+                    })
+                    .OrderBy(c => c.Year)
+                    .ToListAsync();
+
 
                 //GET ALL CONTRIBUTIONS WITHOUT COMMENTS  
                 contributionWithoutComments = await GetComments(currentFacultyId, date.Year, "ContributionWithoutComments");
@@ -131,36 +143,29 @@ namespace COMP1640.Controllers
 
         public async Task<List<ContributionWithoutComment>> GetComments(int facultyID, int year, string actions)
         {
-            var query = from c in _context.Contributions
-                        join u in _context.Users on c.UserId equals u.Id
-                        select new { Contribution = c, User = u };
-            
-            if (actions == "ContributionWithoutComments")
-            {
-                query = query.Where(c => c.Contribution.Comment == null);
-            }
-            else if (actions == "ContributionComments")
-            {
-                query = query.Where(c => c.Contribution.Comment != null);
-            }
+            var contributions = (from c in _context.Contributions
+                                 join u in _context.Users on c.UserId equals u.Id
+                                 join f in _context.Faculties on u.FacultyId equals f.FacultyId // Join with Faculties table
+                                 join cm in _context.Comments on c.ContributionId equals cm.ContributionId into cmGroup
+                                 from cm in cmGroup.DefaultIfEmpty()
+                                 where ((actions == "ContributionWithoutComments" && cm.CommentId == null)
+                                        || (actions == "ContributionComments" && cm.CommentId != null))
+                                        && c.Status == "Approved"
+                                        && u.FacultyId == facultyID
+                                        && c.CommentDeadline.Year == year
+                                 group c by new { Year = c.SubmissionDate.Year, Faculty = f.Name } into g // Group by Year and Faculty name
+                                 select new ContributionWithoutComment
+                                 {
+                                     Year = g.Key.Year,
+                                     Faculty = g.Key.Faculty, // Get the Faculty name from the group key
+                                     Quantity = g.Count()
+                                 }).ToList();
 
-            var contributions = await query
-                .Where(c => c.Contribution.SubmissionDate.Year == year
-                            && c.Contribution.Status == "Approved"
-                            && c.User.FacultyId == facultyID)
-                .GroupBy(c => new { Year = c.Contribution.SubmissionDate.Year, CurrentFaculty = c.User.Faculty.Name }) // Sửa: Thêm ".Name" để truy cập vào tên khoa
-                .Select(g => new ContributionWithoutComment
-                {
-                    Year = g.Key.Year,
-                    Quantity = g.Count(),
-                    Faculty = g.Key.CurrentFaculty
-                })
-                .ToListAsync();
 
 
             if (contributions.Count == 0) // Sửa: Thay vì "<= 0", bạn có thể sử dụng "== 0" để kiểm tra xem danh sách contributions có rỗng không
             {
-                contributions.Add(new ContributionWithoutComment{ Year = year });
+                contributions.Add(new ContributionWithoutComment { Year = year });
             }
 
             //print
@@ -168,7 +173,7 @@ namespace COMP1640.Controllers
             {
                 Console.WriteLine(actions + item.Quantity);
             }
-            
+
             return contributions;
         }
 
@@ -209,9 +214,9 @@ namespace COMP1640.Controllers
 
             if (contributions.Count <= 0)
             {
-                contributions.Add(new TotalContribution{Year = year});
+                contributions.Add(new TotalContribution { Year = year });
             }
-            
+
             return contributions;
         }
 
@@ -502,8 +507,6 @@ namespace COMP1640.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             var userFullName = currentUser.FullName;
             contribution.ContributionId = currentContributionId + 1;
-            int maxId = 0;
-            maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
             var annualMagazine = await _context.AnnualMagazines.FindAsync(AnnualMagazineId);
             contribution.SubmissionDate = DateTime.Now;
             if (annualMagazine.SubmissionClosureDate.HasValue &&
@@ -514,19 +517,25 @@ namespace COMP1640.Controllers
             }
             else
             {
+                int maxId = await _context.FileDetails.MaxAsync(f => (int?)f.FileId) ?? 0;
+                contribution.AnnualMagazineId = AnnualMagazineId;
+                contribution.Comment = null;
+                contribution.Status = "Pending";
+                contribution.UserId = userId ?? "Unknown";
+                var contributionDate = contribution.SubmissionDate.Date; ;
+                contribution.CommentDeadline = contributionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
+                _context.Add(contribution);
                 int index = 0;
                 foreach (var file in fileDetails.ContributionFile)
                 {
+                    var newFileDetails = new FileDetail();
                     var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                    fileDetails.FileId = maxId + 1;
-                    maxId++;
-
-
+                    newFileDetails.FileId = ++maxId;
                     string uniqueFileName;
                     do
                     {
                         uniqueFileName = GenerateContributionName(userFullName, contribution.Title, index)
-                        + Path.GetExtension(file.FileName); ;
+                        + Path.GetExtension(file.FileName);
                         index++;
                     } while (System.IO.File.Exists(Path.Combine(_webHostEnvironment.WebRootPath, "contributionUpload", uniqueFileName)));
 
@@ -536,26 +545,15 @@ namespace COMP1640.Controllers
                     {
                         await file.CopyToAsync(fileStream);
                     }
-                    fileDetails.FilePath = uniqueFileName;
-
+                    newFileDetails.FilePath = uniqueFileName;
                     var documentExtensions = new List<string> { ".doc", ".docx" };
                     var imageExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
-                    fileDetails.Type = documentExtensions.Any(e => e == fileExtension) ? "Document" :
+                    newFileDetails.Type = documentExtensions.Any(e => e == fileExtension) ? "Document" :
                        imageExtensions.Any(e => e == fileExtension) ? "Image" : "Unknown";
 
-                    fileDetails.ContributionId = contribution.ContributionId;
-                    _context.Add(fileDetails);
-                    await _context.SaveChangesAsync();
+                    newFileDetails.ContributionId = contribution.ContributionId;
+                    _context.Add(newFileDetails);
                 }
-                maxId = await _context.Contributions.MaxAsync(c => (int?)c.ContributionId) ?? 0;
-                contribution.AnnualMagazineId = AnnualMagazineId;
-                contribution.Comment = null;
-                contribution.Status = "Pending";
-                contribution.UserId = userId ?? "Unknown";
-
-                var contributionDate = contribution.SubmissionDate.Date; ;
-                contribution.CommentDeadline = contributionDate.AddDays(13).AddHours(23).AddMinutes(59).AddSeconds(59);
-                _context.Add(contribution);
                 var result = await _context.SaveChangesAsync();
                 await SendNotificationEmails(AnnualMagazineId, contribution);
                 return RedirectToAction(nameof(MyAccount));

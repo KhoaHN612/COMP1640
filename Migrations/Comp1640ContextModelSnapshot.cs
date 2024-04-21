@@ -489,7 +489,7 @@ namespace COMP1640.Migrations
                         .HasColumnType("int")
                         .HasColumnName("fileId");
 
-                    b.Property<int?>("ContributionId")
+                    b.Property<int>("ContributionId")
                         .HasColumnType("int")
                         .HasColumnName("contributionId");
 
@@ -506,6 +506,8 @@ namespace COMP1640.Migrations
 
                     b.HasKey("FileId")
                         .HasName("PK__FileDeta__C2C6FFDCE73A7F89");
+
+                    b.HasIndex("ContributionId");
 
                     b.ToTable("FileDetails");
                 });
@@ -913,6 +915,17 @@ namespace COMP1640.Migrations
                         .HasConstraintName("FK__Contribut__annua__656C112C");
 
                     b.Navigation("AnnualMagazine");
+                });
+
+            modelBuilder.Entity("COMP1640.Models.FileDetail", b =>
+                {
+                    b.HasOne("COMP1640.Models.Contribution", "Contribution")
+                        .WithMany()
+                        .HasForeignKey("ContributionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contribution");
                 });
 
             modelBuilder.Entity("COMP1640.Models.Message", b =>
